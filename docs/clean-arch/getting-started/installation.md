@@ -9,11 +9,38 @@ Before you begin, ensure you have the following installed:
 
 ## Adding the Plugin
 
+### Step 1: Configure Plugin Repository
+
+Add `mavenLocal()` to your `settings.gradle.kts`:
+
+```kotlin
+pluginManagement {
+    repositories {
+        mavenLocal()
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+```
+
+### Step 2: Add the Plugin
+
 Add the Clean Architecture Generator plugin to your `build.gradle.kts`:
 
 ```kotlin
 plugins {
-    id("com.pragma.archetype-generator") version "1.0.0"
+    id("com.pragma.archetype-generator") version "0.1.15-SNAPSHOT"
+    id("java")
+}
+```
+
+### Step 3: Configure Java Version
+
+```kotlin
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
 }
 ```
 
@@ -32,10 +59,9 @@ Clean Architecture tasks
 ------------------------
 initCleanArch - Initialize a clean architecture project
 generateEntity - Generate a domain entity
-generateUseCase - Generate a use case
-generateOutputAdapter - Generate an output adapter
-generateInputAdapter - Generate an input adapter
-listComponents - List all generated components
+generateUseCase - Generate a use case (port and implementation)
+generateOutputAdapter - Generate an output adapter (Redis, MongoDB, etc.)
+generateInputAdapter - Generate an input adapter (REST controller, GraphQL resolver, etc.)
 ```
 
 ## Next Steps

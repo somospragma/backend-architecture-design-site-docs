@@ -11,12 +11,13 @@ The Onion Architecture places the domain model at the center and builds layers a
 ```
 src/main/java/com/company/service/
 ├── core/
-│   ├── domain/         # Domain entities (innermost layer)
-│   └── application/    # Application services
+│   ├── domain/             # Domain entities (innermost layer)
+│   └── application/        # Application services
 │       ├── service/
 │       └── port/
-└── infrastructure/     # Infrastructure (outermost layer)
-    ├── adapter/
+└── infrastructure/         # Infrastructure (outermost layer)
+    ├── entry-points/       # Entry points (REST, GraphQL, etc.)
+    ├── driven-adapters/    # Driven adapters (DB, Redis, etc.)
     └── config/
 ```
 

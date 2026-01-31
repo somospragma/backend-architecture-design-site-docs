@@ -11,16 +11,15 @@ The hexagonal architecture divides a system into several loosely-coupled interch
 ```
 src/main/java/com/company/service/
 ├── domain/
-│   ├── model/          # Domain entities
+│   ├── model/              # Domain entities
 │   ├── port/
-│   │   ├── in/         # Input ports (use cases)
-│   │   └── out/        # Output ports (repositories, services)
-│   └── usecase/        # Use case implementations
+│   │   ├── in/             # Input ports (use cases)
+│   │   └── out/            # Output ports (repositories, services)
+│   └── usecase/            # Use case implementations
 └── infrastructure/
-    ├── adapter/
-    │   ├── in/         # Input adapters (REST, GraphQL, etc.)
-    │   └── out/        # Output adapters (DB, Redis, Kafka, etc.)
-    └── config/         # Configuration classes
+    ├── entry-points/       # Entry points (REST, GraphQL, gRPC, etc.)
+    ├── driven-adapters/    # Driven adapters (DB, Redis, Kafka, etc.)
+    └── config/             # Configuration classes
 ```
 
 ## Variants

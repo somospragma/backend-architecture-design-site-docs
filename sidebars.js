@@ -35,6 +35,32 @@ const sidebars = {
           items: [
             {
               type: 'category',
+              label: 'Component Generators',
+              items: [
+                'clean-arch/guides/generators/entities',
+                'clean-arch/guides/generators/use-cases',
+                'clean-arch/guides/generators/output-adapters',
+                'clean-arch/guides/generators/input-adapters',
+              ],
+            },
+            {
+              type: 'category',
+              label: 'Driven Adapters (Output)',
+              items: [
+                'clean-arch/guides/adapters/driven-adapters/redis',
+                'clean-arch/guides/adapters/driven-adapters/mongodb',
+                'clean-arch/guides/adapters/driven-adapters/postgresql',
+              ],
+            },
+            {
+              type: 'category',
+              label: 'Entry Points (Input)',
+              items: [
+                'clean-arch/guides/adapters/entry-points/rest',
+              ],
+            },
+            {
+              type: 'category',
               label: 'Architectures',
               items: [
                 'clean-arch/guides/architectures/hexagonal',
@@ -57,6 +83,16 @@ const sidebars = {
           items: [
             'clean-arch/reference/commands',
             'clean-arch/reference/configuration',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Contributing',
+          items: [
+            'clean-arch/contributing/overview',
+            'clean-arch/contributing/adding-commands',
+            'clean-arch/contributing/adding-adapters',
+            'clean-arch/contributing/modifying-templates',
           ],
         },
       ],
