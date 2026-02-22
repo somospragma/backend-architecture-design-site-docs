@@ -27,6 +27,62 @@ const sidebars = {
             'clean-arch/getting-started/installation',
             'clean-arch/getting-started/quick-start',
             'clean-arch/getting-started/first-project',
+            'clean-arch/getting-started/adding-adapters',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Commands',
+          items: [
+            'clean-arch/commands/init-clean-arch',
+            'clean-arch/commands/generate-output-adapter',
+            'clean-arch/commands/generate-input-adapter',
+            'clean-arch/commands/generate-use-case',
+            'clean-arch/commands/validate-templates',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Adapters',
+          items: [
+            'clean-arch/adapters/index',
+            'clean-arch/adapters/mongodb',
+            'clean-arch/adapters/redis',
+            'clean-arch/adapters/dynamodb',
+            'clean-arch/adapters/rest-controller',
+            'clean-arch/adapters/http-client',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Architectures',
+          items: [
+            'clean-arch/architectures/overview',
+            'clean-arch/architectures/hexagonal-single',
+            'clean-arch/architectures/hexagonal-multi',
+            'clean-arch/architectures/hexagonal-multi-granular',
+            'clean-arch/architectures/onion-single',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'For Contributors',
+          items: [
+            'clean-arch/for-contributors/developer-mode',
+            'clean-arch/for-contributors/adding-adapters',
+            'clean-arch/for-contributors/adding-architectures',
+            'clean-arch/for-contributors/testing-templates',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Reference',
+          items: [
+            'clean-arch/reference/cleanarch-yml',
+            'clean-arch/reference/metadata-yml',
+            'clean-arch/reference/structure-yml',
+            'clean-arch/reference/commands',
+            'clean-arch/reference/configuration',
           ],
         },
         {
@@ -45,68 +101,20 @@ const sidebars = {
             },
             {
               type: 'category',
-              label: 'Driven Adapters (Output)',
-              items: [
-                'clean-arch/guides/adapters/driven-adapters/redis',
-                'clean-arch/guides/adapters/driven-adapters/mongodb',
-                'clean-arch/guides/adapters/driven-adapters/postgresql',
-              ],
-            },
-            {
-              type: 'category',
-              label: 'Entry Points (Input)',
-              items: [
-                'clean-arch/guides/adapters/entry-points/rest',
-              ],
-            },
-            {
-              type: 'category',
-              label: 'Architectures',
-              items: [
-                'clean-arch/guides/architectures/hexagonal',
-                'clean-arch/guides/architectures/onion',
-              ],
-            },
-            {
-              type: 'category',
               label: 'Frameworks',
               items: [
                 'clean-arch/guides/frameworks/spring-reactive',
                 'clean-arch/guides/frameworks/spring-imperative',
               ],
             },
-          ],
-        },
-        {
-          type: 'category',
-          label: 'Reference',
-          items: [
-            'clean-arch/reference/commands',
-            'clean-arch/reference/configuration',
-          ],
-        },
-        {
-          type: 'category',
-          label: 'Contributing',
-          items: [
-            'clean-arch/contributing/overview',
-            'clean-arch/contributing/adding-commands',
-            'clean-arch/contributing/adding-adapters',
-            'clean-arch/contributing/modifying-templates',
-          ],
-        },
-        {
-          type: 'category',
-          label: 'For Contributors',
-          collapsed: false,
-          items: [
-            'contributors/overview',
-            'contributors/contributing-templates',
-            'contributors/development-setup',
-            'contributors/template-system',
-            'contributors/adding-architecture',
-            'contributors/adding-command',
-            'contributors/adding-adapter',
+            {
+              type: 'category',
+              label: 'Architecture Patterns',
+              items: [
+                'clean-arch/guides/architectures/hexagonal',
+                'clean-arch/guides/architectures/onion',
+              ],
+            },
           ],
         },
       ],

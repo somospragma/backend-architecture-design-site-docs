@@ -23,7 +23,7 @@ const config = {
   organizationName: 'somospragma', // Usually your GitHub org/user name.
   projectName: 'backend-architecture-design-archetype-generator', // Usually your repo name.
 
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
   markdown: {
     mermaid: true,

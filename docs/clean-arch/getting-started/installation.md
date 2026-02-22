@@ -1,17 +1,17 @@
-# Installation
+# Instalación
 
-## Prerequisites
+## Requisitos Previos
 
-Before you begin, ensure you have the following installed:
+Antes de comenzar, asegúrate de tener instalado lo siguiente:
 
-- **Java 21** or higher
-- **Gradle 8.x** or higher
+- **Java 21** o superior
+- **Gradle 8.x** o superior
 
-## Adding the Plugin
+## Agregar el Plugin
 
-### Step 1: Configure Plugin Repository
+### Paso 1: Configurar el Repositorio del Plugin
 
-Add `mavenLocal()` to your `settings.gradle.kts`:
+Agrega `mavenLocal()` a tu archivo `settings.gradle.kts`:
 
 ```kotlin
 pluginManagement {
@@ -23,9 +23,9 @@ pluginManagement {
 }
 ```
 
-### Step 2: Add the Plugin
+### Paso 2: Agregar el Plugin
 
-Add the Clean Architecture Generator plugin to your `build.gradle.kts`:
+Agrega el plugin Clean Architecture Generator a tu archivo `build.gradle.kts`:
 
 ```kotlin
 plugins {
@@ -34,7 +34,7 @@ plugins {
 }
 ```
 
-### Step 3: Configure Java Version
+### Paso 3: Configurar la Versión de Java
 
 ```kotlin
 java {
@@ -44,27 +44,28 @@ java {
 }
 ```
 
-## Verify Installation
+## Verificar la Instalación
 
-Run the following command to verify the plugin is installed:
+Ejecuta el siguiente comando para verificar que el plugin está instalado correctamente:
 
 ```bash
 ./gradlew tasks --group="clean architecture"
 ```
 
-You should see the available tasks:
+Deberías ver las tareas disponibles:
 
 ```
 Clean Architecture tasks
 ------------------------
-initCleanArch - Initialize a clean architecture project
-generateEntity - Generate a domain entity
-generateUseCase - Generate a use case (port and implementation)
-generateOutputAdapter - Generate an output adapter (Redis, MongoDB, etc.)
-generateInputAdapter - Generate an input adapter (REST controller, GraphQL resolver, etc.)
+initCleanArch - Inicializar un proyecto con arquitectura limpia
+generateEntity - Generar una entidad de dominio
+generateUseCase - Generar un caso de uso (puerto e implementación)
+generateOutputAdapter - Generar un adaptador de salida (Redis, MongoDB, etc.)
+generateInputAdapter - Generar un adaptador de entrada (controlador REST, resolver GraphQL, etc.)
 ```
 
-## Next Steps
+## Próximos Pasos
 
-- [Quick Start Guide](quick-start)
-- [Create Your First Project](first-project)
+- [Guía de Inicio Rápido](quick-start)
+- [Crear tu Primer Proyecto](first-project)
+- [Agregar Adaptadores](adding-adapters)
