@@ -85,6 +85,7 @@ const sidebars = {
             'clean-arch/reference/configuration',
           ],
         },
+        'clean-arch/troubleshooting',
         {
           type: 'category',
           label: 'Guides',
