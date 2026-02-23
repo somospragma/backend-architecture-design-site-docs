@@ -733,5 +733,5 @@ packages:
 
 - [Referencia de .cleanarch.yml](cleanarch-yml) - Configuración del proyecto
 - [Referencia de metadata.yml](metadata-yml) - Configuración de adaptadores
-- [Agregar Arquitecturas](../for-contributors/adding-architectures) - Guía para crear nuevas arquitecturas
+- [Agregar Arquitecturas](../contributors/adding-architecture) - Guía para crear nuevas arquitecturas
 - [Arquitecturas Disponibles](../architectures/overview) - Comparación de arquitecturas

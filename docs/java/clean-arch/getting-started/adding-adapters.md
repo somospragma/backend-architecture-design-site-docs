@@ -536,4 +536,4 @@ docker ps | grep redis
 - [Entender los comandos del plugin](../commands/)
 - [Aprender sobre las arquitecturas soportadas](../architectures/)
 - [Configuración avanzada](../reference/cleanarch-yml)
-- [Contribuir con nuevos adaptadores](../for-contributors/adding-adapters)
+- [Contribuir con nuevos adaptadores](../contributors/adding-adapter)

@@ -173,7 +173,7 @@ const config = {
             items: [
               {
                 type: 'docSidebar',
-                sidebarId: 'cleanArchSidebar',
+                sidebarId: 'javaSidebar',
                 label: 'Clean Architecture Generator',
               },
               // Add more Java libraries here as they become available

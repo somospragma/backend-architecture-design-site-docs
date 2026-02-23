@@ -717,5 +717,5 @@ Missing required field 'name' in metadata.yml.
 
 - [Referencia de .cleanarch.yml](cleanarch-yml) - Configuración del proyecto
 - [Referencia de structure.yml](structure-yml) - Configuración de arquitecturas
-- [Agregar Adaptadores](../for-contributors/adding-adapters) - Guía para crear nuevos adaptadores
-- [Modo Developer](../for-contributors/developer-mode) - Desarrollo de plantillas
+- [Agregar Adaptadores](../contributors/adding-adapter) - Guía para crear nuevos adaptadores
+- [Modo Developer](../contributors/developer-mode) - Desarrollo de plantillas

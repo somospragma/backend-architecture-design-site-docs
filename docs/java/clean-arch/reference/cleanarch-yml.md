@@ -460,5 +460,5 @@ Check YAML syntax.
 
 - [Referencia de metadata.yml](metadata-yml) - Configuración de adaptadores
 - [Referencia de structure.yml](structure-yml) - Configuración de arquitecturas
-- [Modo Developer](../for-contributors/developer-mode) - Desarrollo de plantillas
+- [Modo Developer](../contributors/developer-mode) - Desarrollo de plantillas
 - [Comandos](commands) - Referencia de comandos del plugin

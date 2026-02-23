@@ -531,4 +531,4 @@ Después de generar un adaptador de salida:
 - [generateInputAdapter](generate-input-adapter.md)
 - [Guía de Adaptadores](../guides/adapters/)
 - [Referencia de Configuración](../reference/configuration.md)
-- [Modo de Desarrollo](../for-contributors/developer-mode.md)
+- [Modo de Desarrollo](../contributors/developer-mode.md)

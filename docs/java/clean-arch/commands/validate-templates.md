@@ -463,8 +463,8 @@ Después de validar plantillas:
 
 ## Ver También
 
-- [Modo de Desarrollo](../for-contributors/developer-mode.md)
-- [Agregar Adaptadores](../for-contributors/adding-adapters.md)
-- [Agregar Arquitecturas](../for-contributors/adding-architectures.md)
+- [Modo de Desarrollo](../contributors/developer-mode.md)
+- [Agregar Adaptadores](../contributors/adding-adapter.md)
+- [Agregar Arquitecturas](../contributors/adding-architecture.md)
 - [Referencia de metadata.yml](../reference/metadata-yml.md)
 - [Referencia de structure.yml](../reference/structure-yml.md)
