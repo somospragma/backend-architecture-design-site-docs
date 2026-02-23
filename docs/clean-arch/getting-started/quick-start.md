@@ -1,22 +1,22 @@
-# Quick Start
+# Inicio Rápido
 
-Get started with Clean Architecture Generator in 10 minutes! Build a complete User service with REST API.
+¡Comienza con Clean Architecture Generator en 10 minutos! Construye un servicio completo de Usuario con API REST.
 
-## Prerequisites
+## Requisitos Previos
 
-- Java 21 or higher
-- Gradle 8.x or higher
+- Java 21 o superior
+- Gradle 8.x o superior
 
-## Step 1: Create a New Project
+## Paso 1: Crear un Nuevo Proyecto
 
 ```bash
 mkdir user-service
 cd user-service
 ```
 
-## Step 2: Configure Plugin
+## Paso 2: Configurar el Plugin
 
-Create `settings.gradle.kts`:
+Crea `settings.gradle.kts`:
 
 ```kotlin
 pluginManagement {
@@ -30,7 +30,7 @@ pluginManagement {
 rootProject.name = "user-service"
 ```
 
-Create `build.gradle.kts`:
+Crea `build.gradle.kts`:
 
 ```kotlin
 plugins {
@@ -52,7 +52,7 @@ repositories {
 }
 ```
 
-## Step 3: Initialize Clean Architecture
+## Paso 3: Inicializar Arquitectura Limpia
 
 ```bash
 ./gradlew initCleanArch \
@@ -62,13 +62,13 @@ repositories {
   --package=com.pragma.user
 ```
 
-This creates:
-- ✅ Project structure with clean architecture layers
-- ✅ `build.gradle.kts` with Spring Boot dependencies
-- ✅ `.cleanarch.yml` configuration file
-- ✅ Base package structure
+Esto crea:
+- ✅ Estructura del proyecto con capas de arquitectura limpia
+- ✅ `build.gradle.kts` con dependencias de Spring Boot
+- ✅ Archivo de configuración `.cleanarch.yml`
+- ✅ Estructura base de paquetes
 
-## Step 4: Generate Domain Entity
+## Paso 4: Generar Entidad de Dominio
 
 ```bash
 ./gradlew generateEntity \
@@ -77,9 +77,9 @@ This creates:
   --packageName=com.pragma.user.domain.model
 ```
 
-Generated: `User.java` with id, name, email, and age fields.
+Generado: `User.java` con campos id, name, email y age.
 
-## Step 5: Generate Use Case
+## Paso 5: Generar Caso de Uso
 
 ```bash
 ./gradlew generateUseCase \
@@ -88,11 +88,11 @@ Generated: `User.java` with id, name, email, and age fields.
   --packageName=com.pragma.user.domain.port.in
 ```
 
-Generated:
-- ✅ `CreateUserUseCase.java` (port interface)
-- ✅ `CreateUserUseCaseImpl.java` (implementation)
+Generado:
+- ✅ `CreateUserUseCase.java` (interfaz del puerto)
+- ✅ `CreateUserUseCaseImpl.java` (implementación)
 
-## Step 6: Generate Output Adapter (Redis)
+## Paso 6: Generar Adaptador de Salida (Redis)
 
 ```bash
 ./gradlew generateOutputAdapter \
@@ -102,12 +102,12 @@ Generated:
   --packageName=com.pragma.user.infrastructure.driven-adapters.redis
 ```
 
-Generated:
-- ✅ `UserRepositoryAdapter.java` (Redis adapter)
-- ✅ `UserMapper.java` (MapStruct mapper)
-- ✅ `UserData.java` (Redis entity)
+Generado:
+- ✅ `UserRepositoryAdapter.java` (adaptador Redis)
+- ✅ `UserMapper.java` (mapper MapStruct)
+- ✅ `UserData.java` (entidad Redis)
 
-## Step 7: Generate Input Adapter (REST Controller)
+## Paso 7: Generar Adaptador de Entrada (REST Controller)
 
 ```bash
 ./gradlew generateInputAdapter \
@@ -117,11 +117,11 @@ Generated:
   --packageName=com.pragma.user.infrastructure.entry-points.rest
 ```
 
-Generated: `UserController.java` with POST and GET endpoints.
+Generado: `UserController.java` con endpoints POST y GET.
 
-## Step 8: Configure Application
+## Paso 8: Configurar la Aplicación
 
-Add to `src/main/resources/application.yml`:
+Agrega a `src/main/resources/application.yml`:
 
 ```yaml
 spring:
@@ -136,20 +136,20 @@ server:
   port: 8080
 ```
 
-## Step 9: Build and Run
+## Paso 9: Construir y Ejecutar
 
 ```bash
-# Build the project
+# Construir el proyecto
 ./gradlew build
 
-# Run the application
+# Ejecutar la aplicación
 ./gradlew bootRun
 ```
 
-## Step 10: Test Your API
+## Paso 10: Probar tu API
 
 ```bash
-# Create a user
+# Crear un usuario
 curl -X POST http://localhost:8080/api/users \
   -H "Content-Type: application/json" \
   -d '{
@@ -158,22 +158,22 @@ curl -X POST http://localhost:8080/api/users \
     "age": 30
   }'
 
-# Get user by ID
+# Obtener usuario por ID
 curl http://localhost:8080/api/users/{id}
 ```
 
-## What You've Built
+## Lo que has Construido
 
-In just 10 minutes, you've created:
+En solo 10 minutos, has creado:
 
-- ✅ Clean architecture project structure
-- ✅ Domain entity (User)
-- ✅ Use case with port and implementation
-- ✅ Redis repository adapter with CRUD operations
-- ✅ REST API controller with reactive endpoints
-- ✅ Complete separation of concerns
+- ✅ Estructura de proyecto con arquitectura limpia
+- ✅ Entidad de dominio (User)
+- ✅ Caso de uso con puerto e implementación
+- ✅ Adaptador de repositorio Redis con operaciones CRUD
+- ✅ Controlador REST API con endpoints reactivos
+- ✅ Separación completa de responsabilidades
 
-## Project Structure
+## Estructura del Proyecto
 
 ```
 user-service/
@@ -203,74 +203,74 @@ user-service/
 └── .cleanarch.yml
 ```
 
-## Next Steps
+## Próximos Pasos
 
-### Add More Features
+### Agregar Más Funcionalidades
 
 ```bash
-# Add more entities
+# Agregar más entidades
 ./gradlew generateEntity --name=Profile --fields=bio:String,avatar:String ...
 
-# Add more use cases
+# Agregar más casos de uso
 ./gradlew generateUseCase --name=UpdateUser ...
 
-# Add more adapters
+# Agregar más adaptadores
 ./gradlew generateOutputAdapter --type=mongodb ...
 ```
 
-### Learn More
+### Aprender Más
 
-- [Detailed Tutorial](first-project) - Step-by-step guide with explanations
-- [Commands Reference](../reference/commands) - All available commands
-- [Component Generators](../guides/generators/entities) - Deep dive into generators
-- [Architecture Guide](../guides/architectures/hexagonal) - Understanding hexagonal architecture
-- [Spring Reactive Guide](../guides/frameworks/spring-reactive) - Reactive programming patterns
+- [Tutorial Detallado](first-project) - Guía paso a paso con explicaciones
+- [Referencia de Comandos](../reference/commands) - Todos los comandos disponibles
+- [Generadores de Componentes](../guides/generators/entities) - Profundización en generadores
+- [Guía de Arquitectura](../guides/architectures/hexagonal) - Entendiendo arquitectura hexagonal
+- [Guía Spring Reactive](../guides/frameworks/spring-reactive) - Patrones de programación reactiva
 
-## Common Issues
+## Problemas Comunes
 
-### Redis Connection Error
+### Error de Conexión Redis
 
-If you get a Redis connection error, make sure Redis is running:
+Si obtienes un error de conexión Redis, asegúrate de que Redis esté ejecutándose:
 
 ```bash
-# Using Docker
+# Usando Docker
 docker run -d -p 6379:6379 redis:latest
 
-# Or install locally
+# O instalar localmente
 brew install redis  # macOS
 redis-server
 ```
 
-### Build Errors
+### Errores de Compilación
 
-If you encounter build errors:
+Si encuentras errores de compilación:
 
 ```bash
-# Clean and rebuild
+# Limpiar y reconstruir
 ./gradlew clean build
 
-# Check Java version
-java -version  # Should be 21 or higher
+# Verificar versión de Java
+java -version  # Debe ser 21 o superior
 ```
 
-### Plugin Not Found
+### Plugin No Encontrado
 
-Make sure `mavenLocal()` is in your `settings.gradle.kts`:
+Asegúrate de que `mavenLocal()` esté en tu `settings.gradle.kts`:
 
 ```kotlin
 pluginManagement {
     repositories {
-        mavenLocal()  // Important!
+        mavenLocal()  // ¡Importante!
         gradlePluginPortal()
         mavenCentral()
     }
 }
 ```
 
-## Tips
+## Consejos
 
-1. **Start Simple**: Begin with `hexagonal-single` architecture
-2. **Use Reactive**: Choose `reactive` paradigm for better scalability
-3. **Test Each Step**: Generate and test components incrementally
-4. **Follow Conventions**: Use PascalCase for names, proper package structure
-5. **Read the Docs**: Check the detailed guides for best practices
+1. **Comienza Simple**: Inicia con arquitectura `hexagonal-single`
+2. **Usa Reactivo**: Elige paradigma `reactive` para mejor escalabilidad
+3. **Prueba Cada Paso**: Genera y prueba componentes incrementalmente
+4. **Sigue Convenciones**: Usa PascalCase para nombres, estructura de paquetes apropiada
+5. **Lee la Documentación**: Consulta las guías detalladas para mejores prácticas

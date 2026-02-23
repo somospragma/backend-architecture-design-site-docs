@@ -13,6 +13,11 @@ The template system uses **FreeMarker** to generate code from templates. Templat
 
 ```
 templates/
+├── adapters/                   # Symlinks for quick access (compatibility)
+│   ├── mongodb -> ../frameworks/spring/reactive/adapters/driven-adapters/mongodb
+│   ├── redis -> ../frameworks/spring/reactive/adapters/driven-adapters/redis
+│   └── rest -> ../frameworks/spring/reactive/adapters/entry-points/rest
+│
 ├── architectures/              # Architecture definitions
 │   └── {architecture-type}/
 │       ├── structure.yml       # Package structure definition
@@ -25,7 +30,7 @@ templates/
 │           ├── .gitignore.ftl
 │           └── README.md.ftl
 │
-└── frameworks/                 # Framework implementations
+└── frameworks/                 # Framework implementations (REAL TEMPLATES)
     └── {framework}/
         └── {paradigm}/
             ├── metadata.yml
@@ -59,6 +64,18 @@ templates/
                         ├── Test.java.ftl
                         └── metadata.yml
 ```
+
+### Important: Symlinks in `templates/adapters/`
+
+The `templates/adapters/` directory contains **symbolic links (symlinks)** that point to the real template files in `templates/frameworks/`. These symlinks serve as shortcuts for:
+
+- **Backward compatibility**: Legacy code that references `templates/adapters/`
+- **Quick access**: Shorter paths during development and testing
+- **Default behavior**: When framework/paradigm is not explicitly specified
+
+**Real templates are stored in:** `templates/frameworks/{framework}/{paradigm}/adapters/`
+
+**Symlinks point from:** `templates/adapters/{type}` → `templates/frameworks/spring/reactive/adapters/.../`
 
 ## Current Structure (Real)
 
@@ -374,6 +391,113 @@ Lists available adapters:
 5. **Test Templates**: Always test generated code compiles and runs
 6. **Document Variables**: List all variables used in template comments
 7. **Use Metadata**: Provide metadata.yml for adapters with dependencies and configuration
+8. **Store Templates in frameworks/**: Always create real templates in `frameworks/{framework}/{paradigm}/`, not in `adapters/`
+9. **Use Symlinks for Shortcuts**: Create symlinks in `adapters/` only for backward compatibility or quick access
+
+## Working with Symlinks
+
+### Understanding Symlinks
+
+Symbolic links (symlinks) are shortcuts that point to files or directories in another location. In this project, `templates/adapters/` contains symlinks to the real templates in `templates/frameworks/`.
+
+### Verifying Symlinks
+
+```bash
+# Check if a path is a symlink
+ls -la templates/adapters/
+# Output: lrwxr-xr-x ... mongodb -> ../frameworks/spring/reactive/adapters/driven-adapters/mongodb
+#         ↑ The 'l' at the start indicates it's a link
+
+# See where a symlink points
+readlink templates/adapters/mongodb
+# Output: ../frameworks/spring/reactive/adapters/driven-adapters/mongodb
+
+# Follow the symlink to see the real files
+ls -la templates/adapters/mongodb/
+# This shows the actual files in the target directory
+```
+
+### Creating Symlinks
+
+When adding a new adapter, create the real templates first, then optionally create a symlink:
+
+```bash
+# 1. Create the real template directory
+mkdir -p templates/frameworks/spring/reactive/adapters/driven-adapters/postgresql
+
+# 2. Add your template files
+cd templates/frameworks/spring/reactive/adapters/driven-adapters/postgresql
+touch Adapter.java.ftl Entity.java.ftl Config.java.ftl metadata.yml
+
+# 3. (Optional) Create a symlink for quick access
+cd ../../../../adapters/
+ln -s ../frameworks/spring/reactive/adapters/driven-adapters/postgresql postgresql
+
+# 4. Verify the symlink
+ls -la postgresql
+# Should show: postgresql -> ../frameworks/spring/reactive/adapters/driven-adapters/postgresql
+```
+
+### Symlink Best Practices
+
+**DO:**
+- ✅ Create real templates in `frameworks/{framework}/{paradigm}/`
+- ✅ Use relative paths in symlinks (e.g., `../frameworks/...`)
+- ✅ Create symlinks for commonly used adapters
+- ✅ Document symlinks in README or this guide
+
+**DON'T:**
+- ❌ Create templates directly in `adapters/` directory
+- ❌ Use absolute paths in symlinks (breaks portability)
+- ❌ Create circular symlinks (A → B → A)
+- ❌ Commit broken symlinks to version control
+
+### Removing Symlinks
+
+```bash
+# Remove a symlink (does NOT delete the target files)
+rm templates/adapters/mongodb
+
+# The real files remain safe in:
+# templates/frameworks/spring/reactive/adapters/driven-adapters/mongodb/
+```
+
+### Cross-Platform Considerations
+
+**Windows:**
+- Symlinks require administrator privileges or Developer Mode enabled
+- Use `mklink /D` command instead of `ln -s`
+- Git on Windows can handle symlinks if `core.symlinks=true`
+
+**macOS/Linux:**
+- Symlinks work natively without special permissions
+- Use `ln -s` command
+
+**Git:**
+- Git stores symlinks as special files
+- When cloning, Git recreates symlinks automatically
+- Ensure `core.symlinks=true` in Git config (default on Unix systems)
+
+### Example: Adding a New Framework
+
+When adding support for Spring Imperative:
+
+```bash
+# 1. Create the framework structure
+mkdir -p templates/frameworks/spring/imperative/adapters/driven-adapters/mongodb
+
+# 2. Create templates (without Mono/Flux)
+cd templates/frameworks/spring/imperative/adapters/driven-adapters/mongodb
+# Add Adapter.java.ftl, Entity.java.ftl, etc.
+
+# 3. DO NOT create symlinks in adapters/ yet
+# The existing symlinks point to reactive, keep them as-is
+
+# 4. Update generator code to resolve templates based on paradigm
+# Generator should look in:
+# - frameworks/spring/reactive/... for reactive
+# - frameworks/spring/imperative/... for imperative
+```
 
 ## Testing Templates
 

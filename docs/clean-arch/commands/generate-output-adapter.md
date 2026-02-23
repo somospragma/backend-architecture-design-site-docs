@@ -25,6 +25,79 @@ En arquitectura limpia, los adaptadores de salida se llaman **driven adapters** 
 | `--type` | Sí | Tipo de adaptador | `redis`, `mongodb`, `postgresql`, `rest_client`, `kafka` |
 | `--packageName` | Sí | Paquete completo | ej., `com.pragma.test.infrastructure.driven-adapters.redis` |
 
+## Adaptadores de Salida Disponibles
+
+### Matriz de Disponibilidad por Framework y Paradigma
+
+| Adaptador | Spring Reactive | Spring Imperative | Quarkus Reactive | Quarkus Imperative | Estado |
+|-----------|----------------|-------------------|------------------|-------------------|--------|
+| **Redis** | ✅ | 🚧 | 🚧 | 🚧 | Disponible |
+| **MongoDB** | ✅ | 🚧 | 🚧 | 🚧 | Disponible |
+| **PostgreSQL** | ✅ | 🚧 | 🚧 | 🚧 | Disponible |
+| **REST Client** | 🚧 | 🚧 | 🚧 | 🚧 | En desarrollo |
+| **Kafka** | 🚧 | 🚧 | 🚧 | 🚧 | En desarrollo |
+| **DynamoDB** | 🔜 | 🔜 | 🔜 | 🔜 | Planeado |
+| **MySQL** | 🔜 | 🔜 | 🔜 | 🔜 | Planeado |
+| **RabbitMQ** | 🔜 | 🔜 | 🔜 | 🔜 | Planeado |
+| **SQS** | 🔜 | 🔜 | 🔜 | 🔜 | Planeado |
+
+**Leyenda:**
+- ✅ Disponible y probado
+- 🚧 En desarrollo
+- 🔜 Planeado para futuras versiones
+
+### Compatibilidad por Arquitectura
+
+Todos los adaptadores de salida son compatibles con todas las arquitecturas:
+
+| Arquitectura | Redis | MongoDB | PostgreSQL | REST Client | Kafka |
+|--------------|-------|---------|------------|-------------|-------|
+| `hexagonal-single` | ✅ | ✅ | ✅ | 🚧 | 🚧 |
+| `hexagonal-multi` | ✅ | ✅ | ✅ | 🚧 | 🚧 |
+| `hexagonal-multi-granular` | ✅ | ✅ | ✅ | 🚧 | 🚧 |
+| `onion-single` | ✅ | ✅ | ✅ | 🚧 | 🚧 |
+
+### Detalles por Tecnología
+
+#### Spring WebFlux (Reactive)
+
+**Bases de Datos:**
+- **Redis**: Usa `spring-boot-starter-data-redis-reactive` con Lettuce
+- **MongoDB**: Usa `spring-boot-starter-data-mongodb-reactive`
+- **PostgreSQL**: Usa `spring-boot-starter-data-r2dbc` con `r2dbc-postgresql`
+
+**Clientes HTTP:**
+- **REST Client**: Usa `WebClient` de Spring WebFlux
+
+**Mensajería:**
+- **Kafka**: Usa `reactor-kafka` para operaciones reactivas
+
+#### Spring MVC (Imperative) - En desarrollo
+
+**Bases de Datos:**
+- **Redis**: Usará `spring-boot-starter-data-redis`
+- **MongoDB**: Usará `spring-boot-starter-data-mongodb`
+- **PostgreSQL**: Usará `spring-boot-starter-data-jpa` con Hibernate
+
+**Clientes HTTP:**
+- **REST Client**: Usará `RestTemplate` o `RestClient`
+
+**Mensajería:**
+- **Kafka**: Usará `spring-kafka`
+
+#### Quarkus Reactive - En desarrollo
+
+**Bases de Datos:**
+- **Redis**: Usará `quarkus-redis-client` con Mutiny
+- **MongoDB**: Usará `quarkus-mongodb-client` con Mutiny
+- **PostgreSQL**: Usará `quarkus-reactive-pg-client`
+
+**Clientes HTTP:**
+- **REST Client**: Usará `quarkus-rest-client-reactive`
+
+**Mensajería:**
+- **Kafka**: Usará `quarkus-smallrye-reactive-messaging-kafka`
+
 ## Tipos de Adaptadores
 
 ### redis

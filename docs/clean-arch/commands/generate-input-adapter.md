@@ -27,10 +27,39 @@ En arquitectura limpia, los adaptadores de entrada se llaman **entry points** po
 | `--packageName` | Sí | Paquete completo | - |
 | `--type` | No | Tipo de adaptador | `rest` |
 
+## Adaptadores de Entrada Disponibles
+
+### Matriz de Disponibilidad por Framework y Paradigma
+
+| Adaptador | Spring Reactive | Spring Imperative | Quarkus Reactive | Quarkus Imperative | Estado |
+|-----------|----------------|-------------------|------------------|-------------------|--------|
+| **REST** | ✅ | 🚧 | 🚧 | 🚧 | Disponible |
+| **GraphQL** | 🔜 | 🔜 | 🔜 | 🔜 | Planeado |
+| **gRPC** | 🔜 | 🔜 | 🔜 | 🔜 | Planeado |
+| **WebSocket** | 🔜 | 🔜 | 🔜 | 🔜 | Planeado |
+
+**Leyenda:**
+- ✅ Disponible y probado
+- 🚧 En desarrollo
+- 🔜 Planeado para futuras versiones
+
+### Compatibilidad por Arquitectura
+
+Todos los adaptadores de entrada son compatibles con todas las arquitecturas:
+
+| Arquitectura | REST | GraphQL | gRPC | WebSocket |
+|--------------|------|---------|------|-----------|
+| `hexagonal-single` | ✅ | 🔜 | 🔜 | 🔜 |
+| `hexagonal-multi` | ✅ | 🔜 | 🔜 | 🔜 |
+| `hexagonal-multi-granular` | ✅ | 🔜 | 🔜 | 🔜 |
+| `onion-single` | ✅ | 🔜 | 🔜 | 🔜 |
+
 ## Tipos de Adaptadores
 
 ### rest
-Entry point REST API con Spring WebFlux (reactivo).
+Entry point REST API con Spring WebFlux (reactivo) o Spring MVC (imperativo).
+
+**Framework: Spring Reactive (WebFlux)**
 
 **Dependencias incluidas:**
 - `spring-boot-starter-webflux`
@@ -42,6 +71,46 @@ Entry point REST API con Spring WebFlux (reactivo).
 - Anotaciones Spring Web (`@RestController`, `@GetMapping`, etc.)
 - Manejo de errores HTTP
 - Validación de entrada
+- Soporte para tipos reactivos en casos de uso
+
+**Nota sobre Dependencias Reactivas en Casos de Uso:**
+
+En proyectos reactivos, los casos de uso (use cases) **SÍ deben** retornar tipos reactivos (`Mono<T>` o `Flux<T>`) cuando el adaptador de entrada es reactivo. Esto permite:
+
+- Propagación del flujo reactivo desde el controlador hasta la capa de dominio
+- Operaciones no bloqueantes en toda la cadena de ejecución
+- Mejor rendimiento y escalabilidad
+
+**Ejemplo:**
+
+```java
+// Puerto de entrada (domain/port/in)
+public interface CreateUserUseCase {
+    Mono<User> execute(UserData userData);  // Retorna Mono para flujo reactivo
+}
+
+// Implementación (application/usecase)
+public class CreateUserUseCaseImpl implements CreateUserUseCase {
+    private final UserRepository repository;
+    
+    @Override
+    public Mono<User> execute(UserData userData) {
+        return repository.save(userData);  // Propaga el Mono
+    }
+}
+
+// Controlador (infrastructure/entry-points/rest)
+@RestController
+public class UserController {
+    private final CreateUserUseCase createUserUseCase;
+    
+    @PostMapping("/users")
+    public Mono<ResponseEntity<User>> createUser(@RequestBody UserData userData) {
+        return createUserUseCase.execute(userData)  // Consume el Mono
+            .map(user -> ResponseEntity.status(HttpStatus.CREATED).body(user));
+    }
+}
+```
 
 ### graphql
 Entry point GraphQL resolver (próximamente).
@@ -50,6 +119,7 @@ Entry point GraphQL resolver (próximamente).
 - Resolvers con Spring GraphQL
 - Subscriptions reactivas
 - DataLoader para N+1 queries
+- Soporte para Quarkus SmallRye GraphQL
 
 ### grpc
 Entry point gRPC service (próximamente).
@@ -58,6 +128,7 @@ Entry point gRPC service (próximamente).
 - Servicios gRPC con Protocol Buffers
 - Streaming bidireccional
 - Interceptores para autenticación
+- Soporte para gRPC reactivo
 
 ### websocket
 Entry point WebSocket handler (próximamente).
@@ -66,6 +137,7 @@ Entry point WebSocket handler (próximamente).
 - Handlers WebSocket reactivos
 - Broadcast de mensajes
 - Gestión de sesiones
+- Soporte para STOMP
 
 ## Formato de Endpoints
 
