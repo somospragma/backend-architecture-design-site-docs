@@ -62,6 +62,27 @@ A Gradle plugin for generating clean architecture projects with support for:
 └── sidebars.js                   # Sidebar configuration
 ```
 
+## 🚀 Deployment
+
+El sitio se despliega automáticamente a GitHub Pages cuando se hace push a `main`.
+
+**URL de producción:** https://somospragma.github.io/backend-architecture-design-site-docs/
+
+### Despliegue Automático
+
+Cada push a `main` ejecuta el workflow de GitHub Actions que:
+1. Instala dependencias
+2. Ejecuta `pnpm build`
+3. Despliega a GitHub Pages
+
+Ver [DEPLOYMENT.md](DEPLOYMENT.md) para más detalles.
+
+### Configuración Inicial
+
+1. Habilitar GitHub Pages en `Settings` → `Pages`
+2. Seleccionar "Source": `GitHub Actions`
+3. Verificar permisos en `Settings` → `Actions` → `General`
+
 ## 🛠️ Built With
 
 - [Docusaurus](https://docusaurus.io/) - Documentation framework

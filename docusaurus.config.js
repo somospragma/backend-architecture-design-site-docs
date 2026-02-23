@@ -13,15 +13,19 @@ const config = {
   favicon: 'img/pragma-icon.svg',
 
   // Set the production url of your site here
-  url: 'https://libs.pragma.com.co',
+  url: 'https://somospragma.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/',
+  baseUrl: '/backend-architecture-design-site-docs/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: 'somospragma', // Usually your GitHub org/user name.
-  projectName: 'backend-architecture-design-archetype-generator', // Usually your repo name.
+  projectName: 'backend-architecture-design-site-docs', // Usually your repo name.
+
+  // Deployment branch
+  deploymentBranch: 'gh-pages',
+  trailingSlash: false,
 
   onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
