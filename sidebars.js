@@ -52,6 +52,7 @@ const sidebars = {
           items: [
             'java/clean-arch/adapters/index',
             'java/clean-arch/adapters/mongodb',
+            'java/clean-arch/adapters/postgresql',
             'java/clean-arch/adapters/redis',
             'java/clean-arch/adapters/dynamodb',
             'java/clean-arch/adapters/rest-controller',
@@ -110,6 +111,7 @@ const sidebars = {
           ],
         },
         'java/clean-arch/troubleshooting',
+        'java/clean-arch/migration-guide',
         {
           type: 'category',
           label: 'Guides',

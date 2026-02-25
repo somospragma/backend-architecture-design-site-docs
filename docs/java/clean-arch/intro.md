@@ -59,12 +59,14 @@ El Generador de Arquitectura Limpia es un plugin de Gradle que automatiza la cre
 
 - 🏗️ **Múltiples Arquitecturas**: Hexagonal (Puertos y Adaptadores), Onion
 - 🚀 **Múltiples Frameworks**: Spring Boot (Reactivo e Imperativo)
-- ⚡ **Reactivo e Imperativo**: Soporte completo para ambos paradigmas
+- ⚡ **Reactivo e Imperativo**: Soporte completo para ambos paradigmas con 10 adaptadores cada uno
 - 📦 **Generadores de Componentes**: Genera entidades, casos de uso y adaptadores bajo demanda
 - 🎯 **Mejores Prácticas**: Sigue los principios de arquitectura limpia desde el inicio
 - 🔄 **Operaciones CRUD**: Operaciones CRUD auto-generadas para adaptadores
 - 🗺️ **Integración MapStruct**: Generación automática de mapeadores
 - 🧪 **Listo para Pruebas**: Código generado preparado para testing
+- 🌐 **10 Adaptadores Disponibles**: REST, GraphQL, gRPC, SQS, Redis, MongoDB, PostgreSQL, HTTP Client, DynamoDB
+- 📚 **Documentación Completa**: Guías detalladas y ejemplos de código
 
 ## Arquitecturas Soportadas
 
@@ -321,13 +323,16 @@ Redis Database
 
 **Versión**: 0.1.15-SNAPSHOT
 
-**Estado**: Fase 2 Completa + Actualización de Nomenclatura
-- ✅ Inicialización de proyectos
+**Estado**: Spring Imperative Support Complete ✅
+- ✅ Inicialización de proyectos (reactive e imperative)
 - ✅ Generación de entidades
-- ✅ Generación de casos de uso
-- ✅ Generación de adaptadores de salida (Redis, MongoDB, PostgreSQL)
-- ✅ Generación de adaptadores de entrada (controladores REST)
+- ✅ Generación de casos de uso (reactive e imperative)
+- ✅ Generación de adaptadores de salida (Redis, MongoDB, PostgreSQL, HTTP Client, DynamoDB, SQS Producer)
+- ✅ Generación de adaptadores de entrada (REST, GraphQL, gRPC, SQS Consumer)
+- ✅ Soporte completo para Spring Reactive (WebFlux)
+- ✅ Soporte completo para Spring Imperative (MVC)
 - ✅ Nomenclatura correcta: `driven-adapters` y `entry-points`
+- ✅ 10 adaptadores disponibles en ambos paradigmas
 
 ## Comenzando
 

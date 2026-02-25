@@ -8,21 +8,23 @@ Los adaptadores son componentes que conectan el núcleo de tu aplicación con si
 
 | Adaptador | Spring Reactive | Spring Imperative | Quarkus Reactive | Quarkus Imperative |
 |-----------|----------------|-------------------|------------------|-------------------|
-| **REST** | ✅ | 🚧 | 🚧 | 🚧 |
-| **GraphQL** | 🔜 | 🔜 | 🔜 | 🔜 |
-| **gRPC** | 🔜 | 🔜 | 🔜 | 🔜 |
+| **REST** | ✅ | ✅ | 🚧 | 🚧 |
+| **GraphQL** | ✅ | ✅ | 🔜 | 🔜 |
+| **gRPC** | ✅ | ✅ | 🔜 | 🔜 |
+| **SQS Consumer** | ✅ | ✅ | 🔜 | 🔜 |
 | **WebSocket** | 🔜 | 🔜 | 🔜 | 🔜 |
 
 ### Adaptadores de Salida (Driven Adapters)
 
 | Adaptador | Spring Reactive | Spring Imperative | Quarkus Reactive | Quarkus Imperative |
 |-----------|----------------|-------------------|------------------|-------------------|
-| **Redis** | ✅ | 🚧 | 🚧 | 🚧 |
-| **MongoDB** | ✅ | 🚧 | 🚧 | 🚧 |
-| **PostgreSQL** | ✅ | 🚧 | 🚧 | 🚧 |
-| **REST Client** | 🚧 | 🚧 | 🚧 | 🚧 |
+| **Redis** | ✅ | ✅ | 🚧 | 🚧 |
+| **MongoDB** | ✅ | ✅ | 🚧 | 🚧 |
+| **PostgreSQL** | ✅ | ✅ | 🚧 | 🚧 |
+| **HTTP Client** | ✅ | ✅ | 🚧 | 🚧 |
+| **DynamoDB** | ✅ | ✅ | 🔜 | 🔜 |
+| **SQS Producer** | ✅ | ✅ | 🔜 | 🔜 |
 | **Kafka** | 🚧 | 🚧 | 🚧 | 🚧 |
-| **DynamoDB** | 🔜 | 🔜 | 🔜 | 🔜 |
 | **MySQL** | 🔜 | 🔜 | 🔜 | 🔜 |
 | **RabbitMQ** | 🔜 | 🔜 | 🔜 | 🔜 |
 
@@ -38,16 +40,24 @@ Los adaptadores son componentes que conectan el núcleo de tu aplicación con si
 Los adaptadores de entrada reciben solicitudes del exterior y las dirigen hacia tu aplicación:
 
 - **[REST Controller](./rest-controller.md)** - Expone endpoints HTTP REST para tu aplicación
-  - Framework: Spring WebFlux (Reactive)
-  - Retorna: `Mono<T>`, `Flux<T>`
+  - **Reactive**: Spring WebFlux con `Mono<T>`, `Flux<T>`
+  - **Imperative**: Spring MVC con tipos síncronos
   - Características: Validación, manejo de errores, códigos HTTP
   
-- **GraphQL** (Próximamente) - Proporciona una API GraphQL con resolvers reactivos o imperativos
-  - Frameworks planeados: Spring GraphQL, Quarkus SmallRye GraphQL
+- **GraphQL** - Proporciona una API GraphQL con resolvers
+  - **Reactive**: Spring GraphQL con `Mono<T>`, `Flux<T>`
+  - **Imperative**: Spring GraphQL con tipos síncronos
   - Características: Subscriptions, DataLoader, schema-first
   
-- **gRPC** (Próximamente) - Servidor gRPC para comunicación de alto rendimiento
+- **gRPC** - Servidor gRPC para comunicación de alto rendimiento
+  - **Reactive**: ReactorStub para operaciones no bloqueantes
+  - **Imperative**: BlockingStub para operaciones síncronas
   - Características: Protocol Buffers, streaming bidireccional, interceptores
+  
+- **SQS Consumer** - Consumidor de mensajes de AWS SQS
+  - **Reactive**: SqsAsyncClient con `Mono<T>`, `Flux<T>`
+  - **Imperative**: SqsClient con tipos síncronos
+  - Características: @SqsListener, procesamiento de mensajes, manejo de errores
   
 - **WebSocket** (Próximamente) - Comunicación bidireccional en tiempo real
   - Características: STOMP, broadcast, gestión de sesiones
@@ -59,46 +69,50 @@ Los adaptadores de salida permiten que tu aplicación se comunique con servicios
 #### Bases de Datos
 
 - **[MongoDB](./mongodb.md)** - Adaptador para base de datos NoSQL MongoDB
-  - Framework: Spring Data MongoDB Reactive
+  - **Reactive**: Spring Data MongoDB Reactive con `Mono<T>`, `Flux<T>`
+  - **Imperative**: Spring Data MongoDB con tipos síncronos
   - Operaciones: CRUD completo, queries personalizadas
-  - Retorna: `Mono<T>`, `Flux<T>`
   
 - **[Redis](./redis.md)** - Adaptador para caché y estructuras de datos Redis
-  - Framework: Spring Data Redis Reactive con Lettuce
+  - **Reactive**: Spring Data Redis Reactive con Lettuce, retorna `Mono<T>`, `Flux<T>`
+  - **Imperative**: RedisTemplate con tipos síncronos
   - Operaciones: Get, Set, Delete, Exists, TTL
-  - Retorna: `Mono<T>`, `Flux<T>`
   
-- **PostgreSQL** - Adaptador reactivo para PostgreSQL
-  - Framework: Spring Data R2DBC
-  - Operaciones: CRUD completo con R2DBC
-  - Retorna: `Mono<T>`, `Flux<T>`
+- **[PostgreSQL](./postgresql.md)** - Adaptador para PostgreSQL
+  - **Reactive**: Spring Data R2DBC con `Mono<T>`, `Flux<T>`
+  - **Imperative**: Spring Data JPA con HikariCP, tipos síncronos
+  - Operaciones: CRUD completo, queries personalizadas
   
-- **DynamoDB** (Próximamente) - Adaptador para AWS DynamoDB
-  - Framework planeado: AWS SDK v2 con soporte reactivo
+- **[DynamoDB](./dynamodb.md)** - Adaptador para AWS DynamoDB
+  - **Reactive**: AWS SDK v2 DynamoDbAsyncClient con `Mono<T>`, `Flux<T>`
+  - **Imperative**: AWS SDK v2 DynamoDbClient con tipos síncronos
+  - Operaciones: CRUD completo, queries, scans
   
-- **MySQL** (Próximamente) - Adaptador reactivo para MySQL
-  - Framework planeado: Spring Data R2DBC con r2dbc-mysql
+- **MySQL** (Próximamente) - Adaptador para MySQL
+  - Framework planeado: Spring Data R2DBC con r2dbc-mysql (reactive) / Spring Data JPA (imperative)
 
 #### Clientes HTTP
 
 - **[HTTP Client](./http-client.md)** - Cliente HTTP para consumir APIs externas
-  - Framework: Spring WebFlux WebClient
+  - **Reactive**: Spring WebFlux WebClient con `Mono<T>`, `Flux<T>`
+  - **Imperative**: RestTemplate con tipos síncronos
   - Operaciones: GET, POST, PUT, DELETE, PATCH
   - Características: Retry, timeout, circuit breaker
-  - Retorna: `Mono<T>`, `Flux<T>`
 
 #### Mensajería
 
+- **SQS Producer** - Productor de mensajes para AWS SQS
+  - **Reactive**: AWS SDK v2 SqsAsyncClient con `Mono<T>`
+  - **Imperative**: AWS SDK v2 SqsClient con tipos síncronos
+  - Operaciones: Send, sendBatch, manejo de errores
+  
 - **Kafka** (En desarrollo) - Productor y consumidor de mensajes Kafka
-  - Framework: Reactor Kafka
+  - Framework: Reactor Kafka (reactive) / Spring Kafka (imperative)
   - Operaciones: Send, consume con backpressure
-  - Retorna: `Mono<T>`, `Flux<T>`
+  - Retorna: `Mono<T>`, `Flux<T>` (reactive) / tipos síncronos (imperative)
   
 - **RabbitMQ** (Próximamente) - Cliente para RabbitMQ
-  - Framework planeado: Spring AMQP Reactive
-  
-- **SQS** (Próximamente) - Productor de mensajes para AWS SQS
-  - Framework planeado: AWS SDK v2 con soporte reactivo
+  - Framework planeado: Spring AMQP Reactive / Spring AMQP
 
 ## Paradigmas Soportados
 
@@ -192,28 +206,42 @@ Cada adaptador incluye:
 
 ## Roadmap de Adaptadores
 
-### Q1 2026
+### Q1 2026 ✅ COMPLETADO
 - ✅ REST (Spring Reactive)
 - ✅ Redis (Spring Reactive)
 - ✅ MongoDB (Spring Reactive)
 - ✅ PostgreSQL (Spring Reactive)
+- ✅ HTTP Client (Spring Reactive)
+- ✅ DynamoDB (Spring Reactive)
+- ✅ SQS Producer (Spring Reactive)
+- ✅ SQS Consumer (Spring Reactive)
+- ✅ GraphQL (Spring Reactive)
+- ✅ gRPC (Spring Reactive)
 
-### Q2 2026
-- 🚧 REST Client (Spring Reactive)
-- 🚧 Kafka (Spring Reactive)
-- 🚧 REST (Spring Imperative)
-- 🚧 Redis (Spring Imperative)
+### Q2 2026 ✅ COMPLETADO
+- ✅ REST (Spring Imperative)
+- ✅ Redis (Spring Imperative)
+- ✅ MongoDB (Spring Imperative)
+- ✅ PostgreSQL (Spring Imperative)
+- ✅ HTTP Client (Spring Imperative)
+- ✅ DynamoDB (Spring Imperative)
+- ✅ SQS Producer (Spring Imperative)
+- ✅ SQS Consumer (Spring Imperative)
+- ✅ GraphQL (Spring Imperative)
+- ✅ gRPC (Spring Imperative)
 
 ### Q3 2026
-- 🔜 GraphQL (Spring Reactive)
-- 🔜 gRPC (Spring Reactive)
-- 🔜 DynamoDB (Spring Reactive)
+- 🚧 Kafka (Spring Reactive)
+- 🚧 Kafka (Spring Imperative)
 - 🔜 Quarkus Reactive (todos los adaptadores)
 
 ### Q4 2026
 - 🔜 WebSocket (Spring Reactive)
+- 🔜 WebSocket (Spring Imperative)
 - 🔜 RabbitMQ (Spring Reactive)
-- 🔜 SQS (Spring Reactive)
+- 🔜 RabbitMQ (Spring Imperative)
+- 🔜 MySQL (Spring Reactive)
+- 🔜 MySQL (Spring Imperative)
 - 🔜 Quarkus Imperative (todos los adaptadores)
 
 ## Próximos Pasos
