@@ -51,12 +51,28 @@ const sidebars = {
           label: 'Adapters',
           items: [
             'java/clean-arch/adapters/index',
-            'java/clean-arch/adapters/mongodb',
-            'java/clean-arch/adapters/postgresql',
-            'java/clean-arch/adapters/redis',
-            'java/clean-arch/adapters/dynamodb',
-            'java/clean-arch/adapters/rest-controller',
-            'java/clean-arch/adapters/http-client',
+            {
+              type: 'category',
+              label: 'Entry Points',
+              items: [
+                'java/clean-arch/adapters/entry-points/rest',
+                'java/clean-arch/adapters/entry-points/graphql',
+                'java/clean-arch/adapters/entry-points/grpc',
+                'java/clean-arch/adapters/entry-points/sqs-consumer',
+              ],
+            },
+            {
+              type: 'category',
+              label: 'Driven Adapters',
+              items: [
+                'java/clean-arch/adapters/driven-adapters/mongodb',
+                'java/clean-arch/adapters/driven-adapters/postgresql',
+                'java/clean-arch/adapters/driven-adapters/redis',
+                'java/clean-arch/adapters/driven-adapters/dynamodb',
+                'java/clean-arch/adapters/driven-adapters/http-client',
+                'java/clean-arch/adapters/driven-adapters/sqs-producer',
+              ],
+            },
           ],
         },
         {

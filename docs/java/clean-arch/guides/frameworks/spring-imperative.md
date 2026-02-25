@@ -216,7 +216,7 @@ spring:
 | Aspect | Reactive | Imperative |
 |--------|----------|------------|
 | **I/O Model** | Non-blocking | Blocking |
-| **Return Types** | Mono/Flux | Direct values (T, List<T>) |
+| **Return Types** | Mono/Flux | Direct values (T, List&lt;T&gt;) |
 | **Concurrency** | High (event loop) | Medium (thread pool) |
 | **Complexity** | Higher | Lower |
 | **Learning Curve** | Steeper | Gentler |
