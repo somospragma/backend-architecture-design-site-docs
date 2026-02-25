@@ -39,7 +39,7 @@ Los adaptadores son componentes que conectan el núcleo de tu aplicación con si
 
 Los adaptadores de entrada reciben solicitudes del exterior y las dirigen hacia tu aplicación:
 
-- **[REST Controller](./rest-controller.md)** - Expone endpoints HTTP REST para tu aplicación
+- **[REST Controller](./entry-points/rest.md)** - Expone endpoints HTTP REST para tu aplicación
   - **Reactive**: Spring WebFlux con `Mono<T>`, `Flux<T>`
   - **Imperative**: Spring MVC con tipos síncronos
   - Características: Validación, manejo de errores, códigos HTTP
@@ -68,22 +68,22 @@ Los adaptadores de salida permiten que tu aplicación se comunique con servicios
 
 #### Bases de Datos
 
-- **[MongoDB](./mongodb.md)** - Adaptador para base de datos NoSQL MongoDB
+- **[MongoDB](./driven-adapters/mongodb.md)** - Adaptador para base de datos NoSQL MongoDB
   - **Reactive**: Spring Data MongoDB Reactive con `Mono<T>`, `Flux<T>`
   - **Imperative**: Spring Data MongoDB con tipos síncronos
   - Operaciones: CRUD completo, queries personalizadas
   
-- **[Redis](./redis.md)** - Adaptador para caché y estructuras de datos Redis
+- **[Redis](./driven-adapters/redis.md)** - Adaptador para caché y estructuras de datos Redis
   - **Reactive**: Spring Data Redis Reactive con Lettuce, retorna `Mono<T>`, `Flux<T>`
   - **Imperative**: RedisTemplate con tipos síncronos
   - Operaciones: Get, Set, Delete, Exists, TTL
   
-- **[PostgreSQL](./postgresql.md)** - Adaptador para PostgreSQL
+- **[PostgreSQL](./driven-adapters/postgresql.md)** - Adaptador para PostgreSQL
   - **Reactive**: Spring Data R2DBC con `Mono<T>`, `Flux<T>`
   - **Imperative**: Spring Data JPA con HikariCP, tipos síncronos
   - Operaciones: CRUD completo, queries personalizadas
   
-- **[DynamoDB](./dynamodb.md)** - Adaptador para AWS DynamoDB
+- **[DynamoDB](./driven-adapters/dynamodb.md)** - Adaptador para AWS DynamoDB
   - **Reactive**: AWS SDK v2 DynamoDbAsyncClient con `Mono<T>`, `Flux<T>`
   - **Imperative**: AWS SDK v2 DynamoDbClient con tipos síncronos
   - Operaciones: CRUD completo, queries, scans
@@ -93,7 +93,7 @@ Los adaptadores de salida permiten que tu aplicación se comunique con servicios
 
 #### Clientes HTTP
 
-- **[HTTP Client](./http-client.md)** - Cliente HTTP para consumir APIs externas
+- **[HTTP Client](./driven-adapters/http-client.md)** - Cliente HTTP para consumir APIs externas
   - **Reactive**: Spring WebFlux WebClient con `Mono<T>`, `Flux<T>`
   - **Imperative**: RestTemplate con tipos síncronos
   - Operaciones: GET, POST, PUT, DELETE, PATCH
@@ -246,7 +246,7 @@ Cada adaptador incluye:
 
 ## Próximos Pasos
 
-- Explora los [detalles de cada adaptador](./mongodb.md) para ver ejemplos de uso
+- Explora los [detalles de cada adaptador](./driven-adapters/mongodb.md) para ver ejemplos de uso
 - Consulta la [guía de comandos](../commands/generate-output-adapter.md) para opciones avanzadas
 - Revisa la [referencia de configuración](../reference/cleanarch-yml.md) para personalizar adaptadores
-- Lee sobre [programación reactiva](../guides/frameworks/spring-reactive) para entender el paradigma reactivo
+- Lee sobre [programación reactiva](../guides/frameworks/spring-reactive.md) para entender el paradigma reactivo
