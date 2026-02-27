@@ -44,6 +44,74 @@ templates/
 
 ---
 
+## Catálogo de Adaptadores (index.json)
+
+Además del `metadata.yml`, cada directorio de adaptadores contiene un archivo `index.json` que actúa como catálogo de todos los adaptadores disponibles en ese nivel.
+
+### Ubicación del Catálogo
+
+```
+templates/
+└── frameworks/
+    └── spring/
+        └── reactive/
+            └── adapters/
+                ├── driven-adapters/
+                │   ├── index.json              ← Catálogo de driven adapters
+                │   ├── mongodb/
+                │   │   └── metadata.yml
+                │   ├── redis/
+                │   │   └── metadata.yml
+                │   └── postgresql/
+                │       └── metadata.yml
+                └── entry-points/
+                    ├── index.json              ← Catálogo de entry points
+                    ├── rest/
+                    │   └── metadata.yml
+                    └── websocket/
+                        └── metadata.yml
+```
+
+### Estructura del index.json
+
+```json
+{
+  "adapters": [
+    {
+      "name": "mongodb",
+      "displayName": "MongoDB Database",
+      "description": "Adaptador de base de datos MongoDB usando Spring Data MongoDB Reactive",
+      "type": "driven-adapter",
+      "tags": ["database", "mongodb", "reactive", "nosql"]
+    },
+    {
+      "name": "redis",
+      "displayName": "Redis Cache",
+      "description": "Adaptador de caché Redis usando Spring Data Redis Reactive",
+      "type": "driven-adapter",
+      "tags": ["cache", "redis", "reactive"]
+    }
+  ]
+}
+```
+
+### Propósito del Catálogo
+
+El archivo `index.json` permite al plugin:
+
+1. **Descubrimiento rápido**: Listar todos los adaptadores disponibles sin leer cada `metadata.yml`
+2. **Búsqueda por tags**: Filtrar adaptadores por categorías (database, cache, messaging, etc.)
+3. **Validación**: Verificar que un tipo de adaptador existe antes de intentar generarlo
+4. **Documentación**: Generar listados automáticos de adaptadores disponibles
+
+### Sincronización
+
+:::warning Importante
+El `index.json` debe mantenerse sincronizado con los directorios de adaptadores. Si agregas un nuevo adaptador, debes actualizar el `index.json` correspondiente.
+:::
+
+---
+
 ## Ejemplo Completo
 
 ```yaml
@@ -84,25 +152,23 @@ parameters:
 
 # Dependencias de producción
 dependencies:
-  gradle:
-    - groupId: org.springframework.boot
-      artifactId: spring-boot-starter-data-mongodb-reactive
-      version: 3.2.0
-    - groupId: org.springframework.boot
-      artifactId: spring-boot-starter-validation
-      version: 3.2.0
+  - group: org.springframework.boot
+    artifact: spring-boot-starter-data-mongodb-reactive
+    version: 3.2.0
+  - group: org.springframework.boot
+    artifact: spring-boot-starter-validation
+    version: 3.2.0
 
 # Dependencias de prueba
 testDependencies:
-  gradle:
-    - groupId: de.flapdoodle.embed
-      artifactId: de.flapdoodle.embed.mongo
-      version: 4.11.0
-      scope: test
-    - groupId: org.testcontainers
-      artifactId: mongodb
-      version: 1.19.3
-      scope: test
+  - group: de.flapdoodle.embed
+    artifact: de.flapdoodle.embed.mongo
+    version: 4.11.0
+    scope: test
+  - group: org.testcontainers
+    artifact: mongodb
+    version: 1.19.3
+    scope: test
 
 # Plantilla de propiedades de aplicación
 applicationPropertiesTemplate: application-properties.yml.ftl
@@ -254,71 +320,110 @@ parameters:
 
 ### dependencies
 
-Dependencias de producción que se agregan al `build.gradle`.
+Dependencias de producción que se agregan automáticamente al `build.gradle.kts` cuando se genera el adaptador.
 
-#### dependencies.gradle
+:::tip Adición Automática
+El plugin lee las dependencias del `metadata.yml` y las agrega automáticamente al archivo `build.gradle.kts` del proyecto con scope `implementation`. No necesitas agregarlas manualmente.
+:::
 
-Lista de dependencias Gradle.
+**Formato:**
+```yaml
+dependencies:
+  - group: <groupId>
+    artifact: <artifactId>
+    version: <version>
+```
 
 **Campos:**
-- `groupId`: Group ID de Maven
-- `artifactId`: Artifact ID
+- `group`: Group ID de Maven
+- `artifact`: Artifact ID
 - `version`: Versión de la dependencia
 
 **Ejemplo:**
 ```yaml
 dependencies:
-  gradle:
-    - groupId: org.springframework.boot
-      artifactId: spring-boot-starter-data-mongodb-reactive
-      version: 3.2.0
-    - groupId: org.springframework.boot
-      artifactId: spring-boot-starter-validation
-      version: 3.2.0
-    - groupId: io.projectreactor
-      artifactId: reactor-core
-      version: 3.6.0
+  - group: org.springframework.boot
+    artifact: spring-boot-starter-data-mongodb-reactive
+    version: 3.2.0
+  - group: org.springframework.boot
+    artifact: spring-boot-starter-validation
+    version: 3.2.0
+  - group: io.projectreactor
+    artifact: reactor-core
+    version: 3.6.0
+```
+
+**Resultado en build.gradle.kts:**
+```kotlin
+dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive:3.2.0")
+    implementation("org.springframework.boot:spring-boot-starter-validation:3.2.0")
+    implementation("io.projectreactor:reactor-core:3.6.0")
+    // ... otras dependencias existentes
+}
 ```
 
 ---
 
 ### testDependencies
 
-Dependencias de prueba que se agregan con scope `test`.
+Dependencias de prueba que se agregan automáticamente con scope `test`.
 
 :::info Importante
-Las dependencias de prueba se agregan automáticamente con scope `test` y no afectan el classpath de producción.
+Las dependencias de prueba se agregan automáticamente con scope `testImplementation` y no afectan el classpath de producción.
 :::
 
+**Formato:**
+```yaml
+testDependencies:
+  - group: <groupId>
+    artifact: <artifactId>
+    version: <version>
+    scope: test
+```
+
 **Campos:**
-- `groupId`: Group ID de Maven
-- `artifactId`: Artifact ID
+- `group`: Group ID de Maven
+- `artifact`: Artifact ID
 - `version`: Versión de la dependencia
 - `scope`: Scope de la dependencia (siempre `test`)
 
 **Ejemplo:**
 ```yaml
 testDependencies:
-  gradle:
-    - groupId: de.flapdoodle.embed
-      artifactId: de.flapdoodle.embed.mongo
-      version: 4.11.0
-      scope: test
-    - groupId: org.testcontainers
-      artifactId: mongodb
-      version: 1.19.3
-      scope: test
-    - groupId: io.projectreactor
-      artifactId: reactor-test
-      version: 3.6.0
-      scope: test
+  - group: de.flapdoodle.embed
+    artifact: de.flapdoodle.embed.mongo
+    version: 4.11.0
+    scope: test
+  - group: org.testcontainers
+    artifact: mongodb
+    version: 1.19.3
+    scope: test
+  - group: io.projectreactor
+    artifact: reactor-test
+    version: 3.6.0
+    scope: test
+```
+
+**Resultado en build.gradle.kts:**
+```kotlin
+dependencies {
+    testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.11.0")
+    testImplementation("org.testcontainers:mongodb:1.19.3")
+    testImplementation("io.projectreactor:reactor-test:3.6.0")
+    // ... otras dependencias de prueba
+}
 ```
 
 ---
 
 ### applicationPropertiesTemplate
 
-Ruta a la plantilla de propiedades de aplicación que se fusionará con `application.yml`.
+Ruta a la plantilla de propiedades de aplicación que se fusionará automáticamente con el `application.yml` existente del proyecto.
+
+:::tip Fusión Automática
+El plugin procesa la plantilla de propiedades y la fusiona automáticamente con el `application.yml` existente. Las propiedades nuevas se agregan y las existentes se preservan. Si hay conflictos, el plugin te notifica.
+:::
 
 **Tipo:** String (ruta relativa al directorio del adaptador)
 
@@ -338,6 +443,41 @@ spring:
       database: ${projectName}
       auto-index-creation: true
 
+logging:
+  level:
+    org.springframework.data.mongodb: DEBUG
+```
+
+**Proceso de fusión:**
+1. El plugin procesa la plantilla con el contexto del adaptador (nombre, paquete, etc.)
+2. Parsea el YAML resultante
+3. Lee el `application.yml` existente del proyecto
+4. Fusiona las propiedades nuevas con las existentes
+5. Escribe el resultado en `src/main/resources/application.yml`
+
+**Ejemplo de fusión:**
+
+`application.yml` existente:
+```yaml
+spring:
+  application:
+    name: my-app
+server:
+  port: 8080
+```
+
+Después de generar adaptador MongoDB:
+```yaml
+spring:
+  application:
+    name: my-app
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/my-app
+      database: my-app
+      auto-index-creation: true
+server:
+  port: 8080
 logging:
   level:
     org.springframework.data.mongodb: DEBUG
@@ -509,20 +649,18 @@ parameters:
       example: User
 
 dependencies:
-  gradle:
-    - groupId: org.springframework.boot
-      artifactId: spring-boot-starter-data-r2dbc
-      version: 3.2.0
-    - groupId: org.postgresql
-      artifactId: r2dbc-postgresql
-      version: 1.0.4.RELEASE
+  - group: org.springframework.boot
+    artifact: spring-boot-starter-data-r2dbc
+    version: 3.2.0
+  - group: org.postgresql
+    artifact: r2dbc-postgresql
+    version: 1.0.4.RELEASE
 
 testDependencies:
-  gradle:
-    - groupId: org.testcontainers
-      artifactId: postgresql
-      version: 1.19.3
-      scope: test
+  - group: org.testcontainers
+    artifact: postgresql
+    version: 1.19.3
+    scope: test
 
 applicationPropertiesTemplate: application-properties.yml.ftl
 
@@ -569,20 +707,18 @@ parameters:
       example: CreateUserUseCase
 
 dependencies:
-  gradle:
-    - groupId: org.springframework.boot
-      artifactId: spring-boot-starter-webflux
-      version: 3.2.0
-    - groupId: org.springframework.boot
-      artifactId: spring-boot-starter-validation
-      version: 3.2.0
+  - group: org.springframework.boot
+    artifact: spring-boot-starter-webflux
+    version: 3.2.0
+  - group: org.springframework.boot
+    artifact: spring-boot-starter-validation
+    version: 3.2.0
 
 testDependencies:
-  gradle:
-    - groupId: io.projectreactor
-      artifactId: reactor-test
-      version: 3.6.0
-      scope: test
+  - group: io.projectreactor
+    artifact: reactor-test
+    version: 3.6.0
+    scope: test
 
 applicationPropertiesTemplate: application-properties.yml.ftl
 
@@ -634,17 +770,15 @@ parameters:
       example: 60
 
 dependencies:
-  gradle:
-    - groupId: org.springframework.boot
-      artifactId: spring-boot-starter-webflux
-      version: 3.2.0
+  - group: org.springframework.boot
+    artifact: spring-boot-starter-webflux
+    version: 3.2.0
 
 testDependencies:
-  gradle:
-    - groupId: com.github.tomakehurst
-      artifactId: wiremock-jre8
-      version: 2.35.0
-      scope: test
+  - group: com.github.tomakehurst
+    artifact: wiremock-jre8
+    version: 2.35.0
+    scope: test
 
 applicationPropertiesTemplate: application-properties.yml.ftl
 

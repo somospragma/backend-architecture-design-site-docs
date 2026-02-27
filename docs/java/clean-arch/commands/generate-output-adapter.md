@@ -13,17 +13,28 @@ En arquitectura limpia, los adaptadores de salida se llaman **driven adapters** 
   --name=<NombreAdaptador> \
   --entity=<NombreEntidad> \
   --type=<tipoAdaptador> \
-  --packageName=<paquete>
+  [--packageName=<paquete>]
 ```
 
 ## Parámetros
 
-| Parámetro | Requerido | Descripción | Valores |
-|-----------|-----------|-------------|---------|
-| `--name` | Sí | Nombre del adaptador | ej., `UserRepository` |
-| `--entity` | Sí | Nombre de la entidad | ej., `User` |
+| Parámetro | Requerido | Descripción | Valor por Defecto |
+|-----------|-----------|-------------|-------------------|
+| `--name` | Sí | Nombre del adaptador | - |
+| `--entity` | Sí | Nombre de la entidad | - |
 | `--type` | Sí | Tipo de adaptador | `redis`, `mongodb`, `postgresql`, `rest_client`, `kafka` |
-| `--packageName` | Sí | Paquete completo | ej., `com.pragma.test.infrastructure.driven-adapters.redis` |
+| `--packageName` | No | Paquete completo (se infiere automáticamente de `.cleanarch.yml` y `structure.yml`) | Auto-inferido |
+
+:::info Inferencia Automática
+El parámetro `--packageName` es opcional. Si no se proporciona, el plugin lo infiere automáticamente desde:
+1. El `basePackage` definido en `.cleanarch.yml`
+2. La estructura de paquetes definida en `structure.yml` de la arquitectura
+3. El tipo de adaptador y su dirección (driving/driven)
+
+**Ejemplo:** Para arquitectura onion-single con `basePackage: com.pragma.user`:
+- Adaptador Redis → `com.pragma.user.infrastructure.adapter.out.redis`
+- Adaptador MongoDB → `com.pragma.user.infrastructure.adapter.out.mongodb`
+:::
 
 ## Adaptadores de Salida Disponibles
 
@@ -103,9 +114,13 @@ Todos los adaptadores de salida son compatibles con todas las arquitecturas:
 ### redis
 Adaptador de caché Redis con operaciones reactivas.
 
-**Dependencias agregadas:**
+**Dependencias agregadas automáticamente:**
 - `spring-boot-starter-data-redis-reactive`
 - `lettuce-core`
+
+:::tip Adición Automática
+El plugin lee las dependencias del `metadata.yml` del adaptador y las agrega automáticamente al `build.gradle.kts` del proyecto. No necesitas agregarlas manualmente.
+:::
 
 **Operaciones generadas:**
 - `save(entity)`: Guardar en caché
@@ -117,10 +132,10 @@ Adaptador de caché Redis con operaciones reactivas.
 ### mongodb
 Adaptador de repositorio MongoDB con Spring Data Reactive.
 
-**Dependencias agregadas:**
+**Dependencias agregadas automáticamente:**
 - `spring-boot-starter-data-mongodb-reactive`
 
-**Dependencias de prueba:**
+**Dependencias de prueba agregadas automáticamente:**
 - `de.flapdoodle.embed:de.flapdoodle.embed.mongo` (MongoDB embebido para tests)
 
 **Operaciones generadas:**
@@ -131,7 +146,7 @@ Adaptador de repositorio MongoDB con Spring Data Reactive.
 ### postgresql
 Adaptador de repositorio PostgreSQL con R2DBC.
 
-**Dependencias agregadas:**
+**Dependencias agregadas automáticamente:**
 - `spring-boot-starter-data-r2dbc`
 - `r2dbc-postgresql`
 
@@ -143,7 +158,7 @@ Adaptador de repositorio PostgreSQL con R2DBC.
 ### rest_client
 Cliente HTTP REST para consumir APIs externas.
 
-**Dependencias agregadas:**
+**Dependencias agregadas automáticamente:**
 - `spring-boot-starter-webflux` (WebClient)
 
 **Operaciones generadas:**
@@ -154,7 +169,7 @@ Cliente HTTP REST para consumir APIs externas.
 ### kafka
 Productor Kafka para enviar mensajes.
 
-**Dependencias agregadas:**
+**Dependencias agregadas automáticamente:**
 - `spring-kafka`
 - `reactor-kafka`
 
@@ -171,9 +186,10 @@ Productor Kafka para enviar mensajes.
 ./gradlew generateOutputAdapter \
   --name=UserRepository \
   --entity=User \
-  --type=redis \
-  --packageName=com.pragma.test.infrastructure.driven-adapters.redis
+  --type=redis
 ```
+
+**Nota:** El paquete se infiere automáticamente desde `.cleanarch.yml` y `structure.yml`.
 
 **Archivos generados:**
 
@@ -238,8 +254,7 @@ spring:
 ./gradlew generateOutputAdapter \
   --name=ProductRepository \
   --entity=Product \
-  --type=mongodb \
-  --packageName=com.pragma.test.infrastructure.driven-adapters.mongodb
+  --type=mongodb
 ```
 
 **Archivos generados:**
@@ -294,8 +309,7 @@ spring:
 ./gradlew generateOutputAdapter \
   --name=OrderRepository \
   --entity=Order \
-  --type=postgresql \
-  --packageName=com.pragma.test.infrastructure.driven-adapters.postgresql
+  --type=postgresql
 ```
 
 **Archivos generados:**
@@ -324,8 +338,7 @@ spring:
 ./gradlew generateOutputAdapter \
   --name=PaymentClient \
   --entity=Payment \
-  --type=rest_client \
-  --packageName=com.pragma.test.infrastructure.driven-adapters.rest
+  --type=rest_client
 ```
 
 **Archivos generados:**
@@ -370,8 +383,7 @@ public class PaymentClientAdapter implements PaymentGateway {
 ./gradlew generateOutputAdapter \
   --name=NotificationPublisher \
   --entity=Notification \
-  --type=kafka \
-  --packageName=com.pragma.test.infrastructure.driven-adapters.kafka
+  --type=kafka
 ```
 
 **Archivos generados:**
@@ -405,9 +417,28 @@ El plugin coloca automáticamente los adaptadores en la ubicación correcta seg�
 | `hexagonal-multi-granular` | `adapters/src/main/java/{package}/{name}` |
 | `onion-single` | `infrastructure/adapter/out/{name}` |
 
-## Fusión Inteligente de Configuración
+## Características Adicionales
 
-El plugin fusiona automáticamente las propiedades del adaptador en `application.yml`:
+### Dependencias Automáticas
+
+El plugin agrega automáticamente las dependencias necesarias al `build.gradle.kts` según el tipo de adaptador:
+
+**Para adaptador MongoDB:**
+- `spring-boot-starter-data-mongodb-reactive`
+- `de.flapdoodle.embed:de.flapdoodle.embed.mongo` (test)
+
+**Ejemplo de dependencias agregadas:**
+```kotlin
+dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive:3.2.0")
+    testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.11.0")
+    // ... otras dependencias
+}
+```
+
+### Configuración Automática
+
+El plugin también fusiona automáticamente la configuración del adaptador con el `application.yml` existente:
 
 - ✅ Preserva propiedades existentes
 - ✅ Solo agrega propiedades nuevas
@@ -444,15 +475,13 @@ Puedes agregar múltiples adaptadores a un proyecto existente:
 ./gradlew generateOutputAdapter \
   --name=UserCache \
   --entity=User \
-  --type=redis \
-  --packageName=com.pragma.test.infrastructure.driven-adapters.redis
+  --type=redis
 
 # Agregar MongoDB
 ./gradlew generateOutputAdapter \
   --name=UserRepository \
   --entity=User \
-  --type=mongodb \
-  --packageName=com.pragma.test.infrastructure.driven-adapters.mongodb
+  --type=mongodb
 ```
 
 El plugin:

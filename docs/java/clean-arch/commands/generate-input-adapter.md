@@ -11,10 +11,10 @@ En arquitectura limpia, los adaptadores de entrada se llaman **entry points** po
 ```bash
 ./gradlew generateInputAdapter \
   --name=<NombreAdaptador> \
-  --useCase=<NombreCasoDeUso> \
+  --type=<tipoAdaptador> \
   --endpoints=<endpoint1|endpoint2> \
-  --packageName=<paquete> \
-  [--type=<tipoAdaptador>]
+  [--useCase=<NombreCasoDeUso>] \
+  [--packageName=<paquete>]
 ```
 
 ## Parámetros
@@ -22,10 +22,30 @@ En arquitectura limpia, los adaptadores de entrada se llaman **entry points** po
 | Parámetro | Requerido | Descripción | Valor por Defecto |
 |-----------|-----------|-------------|-------------------|
 | `--name` | Sí | Nombre del adaptador | - |
-| `--useCase` | Sí | Caso de uso a inyectar | - |
+| `--type` | Sí | Tipo de adaptador | `rest` |
 | `--endpoints` | Sí | Definiciones de endpoints | - |
-| `--packageName` | Sí | Paquete completo | - |
-| `--type` | No | Tipo de adaptador | `rest` |
+| `--useCase` | No | Caso de uso a inyectar (opcional, para documentación/referencia) | - |
+| `--packageName` | No | Paquete completo (se infiere automáticamente de `.cleanarch.yml` y `structure.yml`) | Auto-inferido |
+
+:::info Inferencia Automática
+El parámetro `--packageName` es opcional. Si no se proporciona, el plugin lo infiere automáticamente desde:
+1. El `basePackage` definido en `.cleanarch.yml`
+2. La estructura de paquetes definida en `structure.yml` de la arquitectura
+3. El tipo de adaptador y su dirección (driving/driven)
+
+**Ejemplo:** Para arquitectura onion-single con `basePackage: com.pragma.user`:
+- Adaptador REST → `com.pragma.user.infrastructure.adapter.in.rest`
+- Adaptador GraphQL → `com.pragma.user.infrastructure.adapter.in.graphql`
+:::
+
+:::tip Caso de Uso Opcional
+El parámetro `--useCase` es opcional porque los controladores pueden:
+- Inyectar múltiples casos de uso
+- No tener casos de uso inicialmente (se agregan después)
+- Usar el parámetro solo para documentación/referencia
+
+El código generado incluye comentarios TODO para que agregues los casos de uso que necesites.
+:::
 
 ## Adaptadores de Entrada Disponibles
 
@@ -179,11 +199,11 @@ Separa múltiples endpoints con `|`:
 ```bash
 ./gradlew generateInputAdapter \
   --name=User \
-  --useCase=CreateUserUseCase \
-  --endpoints="/users:POST:execute:User:userData:BODY:UserData" \
-  --packageName=com.pragma.test.infrastructure.entry-points.rest \
-  --type=rest
+  --type=rest \
+  --endpoints="/users:POST:execute:User:userData:BODY:UserData"
 ```
+
+**Nota:** El paquete se infiere automáticamente desde `.cleanarch.yml` y `structure.yml`.
 
 **Archivo generado (UserController.java):**
 
@@ -192,19 +212,22 @@ Separa múltiples endpoints con `|`:
 @RequestMapping("/users")
 public class UserController {
     
-    private final CreateUserUseCase createUserUseCase;
+    // TODO: Inject use case ports
+    // private final CreateUserUseCase createUserUseCase;
     
-    public UserController(CreateUserUseCase createUserUseCase) {
-        this.createUserUseCase = createUserUseCase;
+    public UserController() {
+        // TODO: Initialize with use cases
     }
     
     @PostMapping
     public Mono<ResponseEntity<User>> createUser(
         @RequestBody @Valid UserData userData
     ) {
-        return createUserUseCase.execute(userData)
-            .map(user -> ResponseEntity.status(HttpStatus.CREATED).body(user))
-            .onErrorResume(this::handleError);
+        // TODO: Implement using injected use case
+        // return createUserUseCase.execute(userData)
+        //     .map(user -> ResponseEntity.status(HttpStatus.CREATED).body(user))
+        //     .onErrorResume(this::handleError);
+        return Mono.just(ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build());
     }
     
     private Mono<ResponseEntity<User>> handleError(Throwable error) {
@@ -219,10 +242,8 @@ public class UserController {
 ```bash
 ./gradlew generateInputAdapter \
   --name=Product \
-  --useCase=ProductUseCase \
-  --endpoints="/products:POST:create:Product:productData:BODY:ProductRequest|/products/{id}:GET:findById:Product:id:PATH:String|/products:GET:findAll:List" \
-  --packageName=com.pragma.test.infrastructure.entry-points.rest \
-  --type=rest
+  --type=rest \
+  --endpoints="/products:POST:create:Product:productData:BODY:ProductRequest|/products/{id}:GET:findById:Product:id:PATH:String|/products:GET:findAll:List"
 ```
 
 **Archivo generado (ProductController.java):**
@@ -277,10 +298,8 @@ public class ProductController {
 ```bash
 ./gradlew generateInputAdapter \
   --name=Order \
-  --useCase=OrderUseCase \
-  --endpoints="/orders:GET:search:List:status:QUERY:String:userId:QUERY:String" \
-  --packageName=com.pragma.test.infrastructure.entry-points.rest \
-  --type=rest
+  --type=rest \
+  --endpoints="/orders:GET:search:List:status:QUERY:String:userId:QUERY:String"
 ```
 
 **Archivo generado (OrderController.java):**
@@ -318,10 +337,8 @@ public class OrderController {
 ```bash
 ./gradlew generateInputAdapter \
   --name=Payment \
-  --useCase=PaymentUseCase \
-  --endpoints="/payments/{orderId}:POST:processPayment:PaymentResult:orderId:PATH:String:paymentData:BODY:PaymentRequest" \
-  --packageName=com.pragma.test.infrastructure.entry-points.rest \
-  --type=rest
+  --type=rest \
+  --endpoints="/payments/{orderId}:POST:processPayment:PaymentResult:orderId:PATH:String:paymentData:BODY:PaymentRequest"
 ```
 
 **Archivo generado (PaymentController.java):**
@@ -358,10 +375,8 @@ public class PaymentController {
 ```bash
 ./gradlew generateInputAdapter \
   --name=Customer \
-  --useCase=CustomerUseCase \
-  --endpoints="/customers:POST:create:Customer:data:BODY:CustomerRequest|/customers/{id}:GET:findById:Customer:id:PATH:String|/customers:GET:findAll:List|/customers/{id}:PUT:update:Customer:id:PATH:String:data:BODY:CustomerRequest|/customers/{id}:DELETE:delete:Void:id:PATH:String" \
-  --packageName=com.pragma.test.infrastructure.entry-points.rest \
-  --type=rest
+  --type=rest \
+  --endpoints="/customers:POST:create:Customer:data:BODY:CustomerRequest|/customers/{id}:GET:findById:Customer:id:PATH:String|/customers:GET:findAll:List|/customers/{id}:PUT:update:Customer:id:PATH:String:data:BODY:CustomerRequest|/customers/{id}:DELETE:delete:Void:id:PATH:String"
 ```
 
 Este comando genera un controlador REST completo con operaciones CRUD:
@@ -460,16 +475,55 @@ Puedes agregar múltiples entry points a un proyecto existente:
 # Entry point para usuarios
 ./gradlew generateInputAdapter \
   --name=User \
-  --useCase=UserUseCase \
-  --endpoints="/users:POST:create:User:data:BODY:UserRequest" \
-  --packageName=com.pragma.test.infrastructure.entry-points.rest
+  --type=rest \
+  --endpoints="/users:POST:create:User:data:BODY:UserRequest"
 
 # Entry point para productos
 ./gradlew generateInputAdapter \
   --name=Product \
-  --useCase=ProductUseCase \
-  --endpoints="/products:GET:findAll:List" \
-  --packageName=com.pragma.test.infrastructure.entry-points.rest
+  --type=rest \
+  --endpoints="/products:GET:findAll:List"
+```
+
+## Características Adicionales
+
+### Dependencias Automáticas
+
+El plugin agrega automáticamente las dependencias necesarias al `build.gradle.kts` según el tipo de adaptador:
+
+**Para adaptador REST:**
+- `spring-boot-starter-web` (o `spring-boot-starter-webflux` para reactive)
+- `spring-boot-starter-validation`
+- `springdoc-openapi-starter-webmvc-ui` (documentación OpenAPI)
+
+**Ejemplo de dependencias agregadas:**
+```kotlin
+dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-web:3.2.0")
+    implementation("org.springframework.boot:spring-boot-starter-validation:3.2.0")
+    implementation("io.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
+    // ... otras dependencias
+}
+```
+
+### Configuración Automática
+
+El plugin también fusiona automáticamente la configuración del adaptador con el `application.yml` existente:
+
+**Configuración agregada para REST:**
+```yaml
+spring:
+  mvc:
+    servlet:
+      path: /api
+  web:
+    resources:
+      add-mappings: true
+
+logging:
+  level:
+    org.springframework.web: INFO
+    org.springframework.web.servlet: INFO
 ```
 
 ## Validación
