@@ -2,6 +2,10 @@
 
 Referencia completa del archivo `metadata.yml` que define las propiedades, dependencias y configuración de los adaptadores.
 
+:::info Schema Version
+Esta documentación describe el **Schema v2.0** de `metadata.yml`, que unifica la configuración para adaptadores de entrada (input/entry-points) y salida (output/driven-adapters).
+:::
+
 ---
 
 ## Descripción General
@@ -9,14 +13,17 @@ Referencia completa del archivo `metadata.yml` que define las propiedades, depen
 El archivo `metadata.yml` describe un adaptador y contiene toda la información necesaria para generarlo:
 
 - Información básica (nombre, descripción, tipo)
-- Parámetros requeridos y opcionales
+- Sufijo de clase generada
 - Dependencias de producción y prueba
 - Plantilla de propiedades de aplicación
 - Clases de configuración adicionales
-- Archivos de plantilla a procesar
-- Ejemplos de uso
+- Recursos adicionales (schemas, protos, etc.)
+- Plugins y configuración de build
+- Validaciones automáticas
 
 Este archivo se encuentra en cada directorio de adaptador dentro del repositorio de plantillas.
+
+**Importante**: El mismo schema aplica tanto para adaptadores de entrada (input) como de salida (output). La única diferencia es el campo `type` que indica la dirección del adaptador.
 
 ---
 
@@ -112,45 +119,70 @@ El `index.json` debe mantenerse sincronizado con los directorios de adaptadores.
 
 ---
 
-## Ejemplo Completo
+## Schema v2.0 - Campos Unificados
+
+### Campos Obligatorios
+
+| Campo | Tipo | Descripción | Ejemplo |
+|-------|------|-------------|---------|
+| `name` | String | Identificador del adaptador (lowercase, hyphen-separated) | `rest`, `mongodb`, `grpc` |
+| `type` | String | Dirección del adaptador: `input` o `output` | `input`, `output` |
+| `description` | String | Descripción del adaptador | `REST API controller using Spring MVC` |
+
+### Campos Opcionales
+
+#### Generación de Archivos
+| Campo | Tipo | Descripción | Default | Ejemplo |
+|-------|------|-------------|---------|---------|
+| `suffix` | String | Sufijo para clase generada | `"Adapter"` | `"Controller"`, `"Repository"` |
+
+#### Dependencias
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `dependencies` | List | Dependencias de implementación (Gradle) |
+| `testDependencies` | List | Dependencias de test |
+
+#### Configuración
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `applicationPropertiesTemplate` | String | Path al template de application.yml |
+| `configurationClasses` | List | Clases @Configuration a generar |
+
+#### Recursos Adicionales
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `additionalResources` | List | Archivos adicionales (schemas, protos, etc.) |
+
+#### Build
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `buildPlugins` | List | Plugins de Gradle requeridos |
+| `buildConfiguration` | String | Configuración de build.gradle.kts (Kotlin DSL) |
+
+---
+
+## Ejemplo Completo - Schema v2.0
 
 ```yaml
-# Información básica del adaptador
-name: mongodb
-displayName: MongoDB Database
-description: Adaptador de base de datos MongoDB usando Spring Data MongoDB Reactive
-framework: spring
-paradigm: reactive
-type: driven-adapter
-version: 1.0.0
-author: Pragma Team
-maintainers:
-  - pragma@pragma.com.co
+# ============================================================================
+# METADATA.YML - SCHEMA v2.0 (UNIFIED FOR INPUT AND OUTPUT ADAPTERS)
+# ============================================================================
 
-# Parámetros del adaptador
-parameters:
-  required:
-    - name: name
-      type: string
-      description: Nombre del adaptador
-      example: UserPersistence
-    - name: entityName
-      type: string
-      description: Nombre de la entidad del dominio
-      example: User
-  optional:
-    - name: collectionName
-      type: string
-      description: Nombre de la colección en MongoDB
-      default: "{entityName?lower_case}s"
-      example: users
-    - name: databaseName
-      type: string
-      description: Nombre de la base de datos
-      default: "{projectName}"
-      example: myapp
+# ----------------------------------------------------------------------------
+# REQUIRED FIELDS
+# ----------------------------------------------------------------------------
+name: mongodb                   # Adapter identifier (lowercase, hyphen-separated)
+type: output                    # "input" for entry-points, "output" for driven-adapters
+description: MongoDB database adapter using Spring Data MongoDB Reactive
 
-# Dependencias de producción
+# ----------------------------------------------------------------------------
+# OPTIONAL - FILE GENERATION
+# ----------------------------------------------------------------------------
+suffix: "Adapter"              # Class name suffix: {AdapterName}{Suffix}.java
+
+# ----------------------------------------------------------------------------
+# OPTIONAL - DEPENDENCIES
+# ----------------------------------------------------------------------------
 dependencies:
   - group: org.springframework.boot
     artifact: spring-boot-starter-data-mongodb-reactive
@@ -159,82 +191,442 @@ dependencies:
     artifact: spring-boot-starter-validation
     version: 3.2.0
 
-# Dependencias de prueba
 testDependencies:
   - group: de.flapdoodle.embed
     artifact: de.flapdoodle.embed.mongo
     version: 4.11.0
-    scope: test
   - group: org.testcontainers
     artifact: mongodb
     version: 1.19.3
-    scope: test
 
-# Plantilla de propiedades de aplicación
+# ----------------------------------------------------------------------------
+# OPTIONAL - APPLICATION CONFIGURATION
+# ----------------------------------------------------------------------------
 applicationPropertiesTemplate: application-properties.yml.ftl
 
-# Clases de configuración adicionales
+# ----------------------------------------------------------------------------
+# OPTIONAL - CONFIGURATION CLASSES
+# ----------------------------------------------------------------------------
 configurationClasses:
   - name: MongoConfig
     packagePath: config
-    templatePath: MongoConfig.java.ftl
-  - name: MongoHealthIndicator
-    packagePath: health
-    templatePath: MongoHealthIndicator.java.ftl
+    templatePath: Config.java.ftl
 
-# Archivos de plantilla a procesar
-files:
-  - name: Adapter.java.ftl
-    output: "{adapterName}MongoAdapter.java"
-    description: Implementación del adaptador MongoDB
-  - name: Repository.java.ftl
-    output: "{adapterName}MongoRepository.java"
-    description: Repositorio reactivo de MongoDB
-  - name: Entity.java.ftl
-    output: "{entityName}Data.java"
-    description: Entidad de datos de MongoDB
-  - name: Mapper.java.ftl
-    output: "{entityName}Mapper.java"
-    description: Mapper entre entidad de dominio y datos
+# ----------------------------------------------------------------------------
+# OPTIONAL - ADDITIONAL RESOURCES
+# ----------------------------------------------------------------------------
+additionalResources:
+  - name: schema.graphqls
+    targetPath: graphql
+    templatePath: schema.graphqls.ftl
 
-# Ejemplos de uso
-examples:
-  - name: Persistencia básica
-    description: Adaptador de persistencia MongoDB con configuración por defecto
-    command: |
-      ./gradlew generateOutputAdapter \
-        --type=mongodb \
-        --name=UserPersistence \
-        --entityName=User
-  - name: Persistencia con colección personalizada
-    description: Adaptador con nombre de colección específico
-    command: |
-      ./gradlew generateOutputAdapter \
-        --type=mongodb \
-        --name=ProductPersistence \
-        --entityName=Product \
-        --collectionName=products_catalog
+# ----------------------------------------------------------------------------
+# OPTIONAL - BUILD CONFIGURATION
+# ----------------------------------------------------------------------------
+buildPlugins:
+  - id: com.google.protobuf
+    version: 0.9.4
 
-# Compatibilidad
-compatibility:
-  plugin: ">=0.1.0"
-  spring: ">=3.0.0"
-  java: ">=17"
-
-# Etiquetas para búsqueda
-tags:
-  - database
-  - mongodb
-  - reactive
-  - nosql
-  - persistence
+buildConfiguration: |
+  protobuf {
+      protoc {
+          artifact = "com.google.protobuf:protoc:3.24.0"
+      }
+  }
 ```
+
+---
+
+## Validaciones Automáticas
+
+El plugin valida automáticamente el `metadata.yml` con **28 validaciones** antes de generar el adaptador:
+
+### Validaciones de Templates (1-7)
+1. ✓ Adapter metadata existe
+2. ✓ Main template existe y es válido
+3. ✓ Entity template existe (si needsMapper)
+4. ✓ Mapper template existe (si needsMapper)
+5. ✓ Application properties template existe (si definido)
+6. ✓ Configuration class templates existen (si definidos)
+7. ✓ Module build template existe (si adaptersAsModules)
+
+### Validaciones de Metadata Básico (8-20)
+8. ✓ `name != null && !name.isBlank()`
+9. ✓ `direction != null`
+10. ✓ `type` debe ser: "input", "output", "driving", o "driven"
+11. ✓ `dependencies` debe ser List válida
+12. ✓ `testDependencies` debe ser List válida
+13. ✓ `configurationClasses` debe ser List válida
+14. ✓ `additionalResources` debe ser List válida
+15. ✓ `buildPlugins` debe ser List válida
+16. ✓ Cada `dependency` debe tener: group, artifact, version
+17. ✓ Cada `configurationClass` debe tener: name, packagePath, templatePath
+18. ✓ Cada `additionalResource` debe tener: name, templatePath
+19. ✓ Cada `buildPlugin` debe tener: id, version
+20. ✓ Templates referenciados deben existir
+
+### Validaciones Adicionales (21-28)
+21. ✓ `suffix` no debe estar vacío si se especifica
+22. ✓ `applicationPropertiesTemplate` debe existir si se especifica
+23. ✓ `buildConfiguration` debe ser válido Kotlin DSL si se especifica
+24. ✓ `additionalResources.targetPath` debe ser válido (no null, no vacío)
+25. ✓ `dependencies` no deben tener duplicados (group:artifact)
+26. ✓ `testDependencies` no deben tener duplicados (group:artifact)
+27. ✓ `configurationClasses.name` debe ser válido como nombre de clase Java
+28. ✓ `configurationClasses.packagePath` debe ser válido como paquete Java
+
+:::tip Validation-Before-Modification
+Todas las validaciones se ejecutan **antes** de modificar cualquier archivo del proyecto. Si alguna validación falla, el plugin muestra todos los errores y no realiza ningún cambio.
+:::
 
 ---
 
 ## Campos del Archivo
 
-### Información Básica
+### name (Obligatorio)
+
+**Tipo:** String  
+**Descripción:** Identificador único del adaptador (lowercase, hyphen-separated)  
+**Ejemplos:** `rest`, `mongodb`, `grpc`, `redis`, `graphql`
+
+```yaml
+name: mongodb
+```
+
+### type (Obligatorio)
+
+**Tipo:** String  
+**Valores:** `input` | `output` | `driving` (legacy) | `driven` (legacy)  
+**Descripción:** Dirección del adaptador
+
+- `input`: Para entry-points (adaptadores de entrada)
+- `output`: Para driven-adapters (adaptadores de salida)
+- `driving`/`driven`: Valores legacy, se recomienda usar `input`/`output`
+
+```yaml
+type: output
+```
+
+:::info Migración de Legacy Values
+Si tu metadata.yml usa `type: driving` o `type: driven`, considera actualizarlos a `input` y `output` respectivamente. Los valores legacy siguen siendo soportados por compatibilidad.
+:::
+
+### description (Obligatorio)
+
+**Tipo:** String  
+**Descripción:** Descripción clara del adaptador
+
+```yaml
+description: MongoDB database adapter using Spring Data MongoDB Reactive
+```
+
+---
+
+### suffix (Opcional)
+
+**Tipo:** String  
+**Default:** `"Adapter"`  
+**Descripción:** Sufijo para la clase generada. Se usa para generar: `{AdapterName}{Suffix}.java`
+
+**Ejemplos:**
+- `"Controller"` → `UserController.java`
+- `"Repository"` → `UserRepository.java`
+- `"Service"` → `UserService.java`
+- `"Adapter"` → `UserAdapter.java`
+
+```yaml
+suffix: "Repository"
+```
+
+:::warning Validación
+Si especificas `suffix`, no debe estar vacío. Un suffix vacío causará un error de validación.
+:::
+
+---
+
+### dependencies (Opcional)
+
+**Tipo:** List<Dependency>  
+**Descripción:** Dependencias de implementación que se agregan automáticamente al `build.gradle.kts`
+
+**Estructura de cada dependency:**
+```yaml
+dependencies:
+  - group: <groupId>        # Maven group ID (requerido)
+    artifact: <artifactId>  # Maven artifact ID (requerido)
+    version: <version>      # Versión (requerido)
+```
+
+**Ejemplo:**
+```yaml
+dependencies:
+  - group: org.springframework.boot
+    artifact: spring-boot-starter-data-mongodb-reactive
+    version: 3.2.0
+  - group: org.springframework.boot
+    artifact: spring-boot-starter-validation
+    version: 3.2.0
+```
+
+**Resultado en build.gradle.kts:**
+```kotlin
+dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive:3.2.0")
+    implementation("org.springframework.boot:spring-boot-starter-validation:3.2.0")
+}
+```
+
+:::tip Adición Automática
+El plugin agrega las dependencias automáticamente. No necesitas editarlas manualmente en build.gradle.kts.
+:::
+
+:::warning Validaciones
+- Cada dependency debe tener: `group`, `artifact`, `version`
+- No debe haber duplicados (se valida por `group:artifact`)
+:::
+
+---
+
+### testDependencies (Opcional)
+
+**Tipo:** List<Dependency>  
+**Descripción:** Dependencias de test que se agregan con scope `testImplementation`
+
+**Estructura:**
+```yaml
+testDependencies:
+  - group: <groupId>
+    artifact: <artifactId>
+    version: <version>
+```
+
+**Ejemplo:**
+```yaml
+testDependencies:
+  - group: de.flapdoodle.embed
+    artifact: de.flapdoodle.embed.mongo
+    version: 4.11.0
+  - group: org.testcontainers
+    artifact: mongodb
+    version: 1.19.3
+```
+
+**Resultado en build.gradle.kts:**
+```kotlin
+dependencies {
+    testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.11.0")
+    testImplementation("org.testcontainers:mongodb:1.19.3")
+}
+```
+
+:::warning Validaciones
+- Cada testDependency debe tener: `group`, `artifact`, `version`
+- No debe haber duplicados (se valida por `group:artifact`)
+:::
+
+---
+
+### applicationPropertiesTemplate (Opcional)
+
+**Tipo:** String  
+**Descripción:** Path al template de application.yml (relativo al directorio del adaptador)
+
+El plugin procesa el template con FreeMarker y lo fusiona automáticamente con el `application.yml` existente.
+
+**Ejemplo:**
+```yaml
+applicationPropertiesTemplate: application-properties.yml.ftl
+```
+
+**Contenido del template (`application-properties.yml.ftl`):**
+```yaml
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/${projectName}
+      database: ${projectName}
+```
+
+**Variables disponibles en el template:**
+- `${adapterName}`: Nombre del adaptador
+- `${packageName}`: Package completo
+- `${projectName}`: Nombre del proyecto
+- `${adapterType}`: Tipo del adaptador
+
+:::warning Validación
+Si especificas `applicationPropertiesTemplate`, el archivo debe existir en el directorio del adaptador.
+:::
+
+---
+
+### configurationClasses (Opcional)
+
+**Tipo:** List<ConfigurationClass>  
+**Descripción:** Clases @Configuration adicionales a generar
+
+**Estructura de cada clase:**
+```yaml
+configurationClasses:
+  - name: <ClassName>           # Nombre de la clase (requerido)
+    packagePath: <subpackage>   # Sub-paquete relativo (requerido)
+    templatePath: <template>    # Path al template (requerido)
+```
+
+**Ejemplo:**
+```yaml
+configurationClasses:
+  - name: MongoConfig
+    packagePath: config
+    templatePath: Config.java.ftl
+  - name: MongoHealthIndicator
+    packagePath: health
+    templatePath: HealthIndicator.java.ftl
+```
+
+**Resultado:** Si el adaptador se genera en `com.pragma.infrastructure.drivenadapters.mongodb`:
+- `com.pragma.infrastructure.drivenadapters.mongodb.config.MongoConfig`
+- `com.pragma.infrastructure.drivenadapters.mongodb.health.MongoHealthIndicator`
+
+:::warning Validaciones
+- Cada configurationClass debe tener: `name`, `packagePath`, `templatePath`
+- `name` debe ser un nombre de clase Java válido (empieza con mayúscula, solo letras/números/underscore)
+- `packagePath` debe ser un paquete Java válido (lowercase, separado por puntos)
+- El template referenciado debe existir
+:::
+
+---
+
+### additionalResources (Opcional)
+
+**Tipo:** List<AdditionalResource>  
+**Descripción:** Archivos adicionales a generar (schemas GraphQL, protos gRPC, etc.)
+
+**Estructura:**
+```yaml
+additionalResources:
+  - name: <filename>            # Nombre del archivo (requerido)
+    targetPath: <directory>     # Directorio destino en resources (requerido)
+    templatePath: <template>    # Path al template (requerido)
+```
+
+**Ejemplo:**
+```yaml
+additionalResources:
+  - name: schema.graphqls
+    targetPath: graphql
+    templatePath: schema.graphqls.ftl
+  - name: service.proto
+    targetPath: proto
+    templatePath: service.proto.ftl
+```
+
+**Resultado:** Los archivos se generan en:
+- `src/main/resources/graphql/schema.graphqls`
+- `src/main/resources/proto/service.proto`
+
+:::warning Validaciones
+- Cada additionalResource debe tener: `name`, `templatePath`
+- `targetPath` debe ser válido (no null, no vacío)
+- El template referenciado debe existir
+:::
+
+---
+
+### buildPlugins (Opcional)
+
+**Tipo:** List<BuildPlugin>  
+**Descripción:** Plugins de Gradle requeridos por el adaptador
+
+**Estructura:**
+```yaml
+buildPlugins:
+  - id: <plugin-id>      # ID del plugin (requerido)
+    version: <version>   # Versión (requerido)
+```
+
+**Ejemplo:**
+```yaml
+buildPlugins:
+  - id: com.google.protobuf
+    version: 0.9.4
+```
+
+**Resultado en build.gradle.kts:**
+```kotlin
+plugins {
+    id("com.google.protobuf") version "0.9.4"
+}
+```
+
+:::warning Validaciones
+- Cada buildPlugin debe tener: `id`, `version`
+:::
+
+---
+
+### buildConfiguration (Opcional)
+
+**Tipo:** String (multi-line)  
+**Descripción:** Configuración adicional de build.gradle.kts en Kotlin DSL
+
+El contenido se procesa con FreeMarker y se agrega al final del `build.gradle.kts`.
+
+**Variables disponibles:**
+- `${resourcesPath}`: Path a resources desde structure.yml
+- `${adapterName}`: Nombre del adaptador
+- `${packageName}`: Package completo
+- `${adapterType}`: Tipo del adaptador
+
+**Ejemplo:**
+```yaml
+buildConfiguration: |
+  protobuf {
+      protoc {
+          artifact = "com.google.protobuf:protoc:3.24.0"
+      }
+      plugins {
+          create("grpc") {
+              artifact = "io.grpc:protoc-gen-grpc-java:1.58.0"
+          }
+      }
+  }
+  
+  sourceSets {
+      main {
+          proto {
+              srcDir("${resourcesPath}/proto")
+          }
+      }
+  }
+```
+
+:::warning Validación
+Si especificas `buildConfiguration`, debe ser Kotlin DSL válido (validación básica de sintaxis).
+:::
+
+---
+
+## Información Básica (Legacy - Deprecated)
+
+Los siguientes campos eran parte del schema anterior y están deprecados en v2.0:
+
+| Campo | Estado | Alternativa |
+|-------|--------|-------------|
+| `displayName` | Deprecated | Usar `name` |
+| `framework` | Deprecated | Se detecta automáticamente |
+| `paradigm` | Deprecated | Se detecta automáticamente |
+| `version` | Deprecated | No necesario |
+| `author` | Deprecated | No necesario |
+| `maintainers` | Deprecated | No necesario |
+| `parameters` | Deprecated | Se pasan como argumentos del comando |
+| `files` | Deprecated | Se detectan automáticamente |
+| `examples` | Deprecated | Ver documentación de comandos |
+| `compatibility` | Deprecated | No necesario |
+| `tags` | Deprecated | No necesario |
+
+---
+
+## Información Básica
 
 | Campo | Tipo | Requerido | Descripción |
 |-------|------|-----------|-------------|
@@ -836,14 +1228,282 @@ Missing required field 'name' in metadata.yml.
 
 ## Mejores Prácticas
 
-1. **Usa nombres descriptivos** - `displayName` debe ser claro y conciso
-2. **Documenta parámetros** - Proporciona descripciones y ejemplos claros
+## Ejemplos Completos por Tipo
+
+### Ejemplo 1: REST Input Adapter (Imperative)
+
+```yaml
+name: rest
+type: input
+description: REST API controller using Spring MVC
+suffix: "Controller"
+
+dependencies:
+  - group: org.springframework.boot
+    artifact: spring-boot-starter-web
+    version: 3.2.0
+  - group: org.springframework.boot
+    artifact: spring-boot-starter-validation
+    version: 3.2.0
+
+testDependencies:
+  - group: org.springframework.boot
+    artifact: spring-boot-starter-test
+    version: 3.2.0
+
+applicationPropertiesTemplate: application-properties.yml.ftl
+```
+
+### Ejemplo 2: gRPC Input Adapter con Build Configuration
+
+```yaml
+name: grpc
+type: input
+description: gRPC entry point using gRPC Spring Boot Starter
+suffix: GrpcService
+
+dependencies:
+  - group: net.devh
+    artifact: grpc-server-spring-boot-starter
+    version: 2.15.0.RELEASE
+  - group: io.grpc
+    artifact: grpc-stub
+    version: 1.58.0
+
+testDependencies:
+  - group: net.devh
+    artifact: grpc-client-spring-boot-starter
+    version: 2.15.0.RELEASE
+
+applicationPropertiesTemplate: application-properties.yml.ftl
+
+additionalResources:
+  - name: service.proto
+    targetPath: proto
+    templatePath: service.proto.ftl
+
+buildPlugins:
+  - id: com.google.protobuf
+    version: 0.9.4
+
+buildConfiguration: |
+  protobuf {
+      protoc {
+          artifact = "com.google.protobuf:protoc:3.24.0"
+      }
+      plugins {
+          create("grpc") {
+              artifact = "io.grpc:protoc-gen-grpc-java:1.58.0"
+          }
+      }
+      generateProtoTasks {
+          all().forEach { task ->
+              task.plugins {
+                  create("grpc")
+              }
+          }
+      }
+  }
+  
+  sourceSets {
+      main {
+          proto {
+              srcDir("${resourcesPath}/proto")
+          }
+      }
+  }
+```
+
+### Ejemplo 3: GraphQL Input Adapter
+
+```yaml
+name: graphql
+type: input
+description: GraphQL entry point using Spring for GraphQL
+suffix: GraphQLController
+
+dependencies:
+  - group: org.springframework.boot
+    artifact: spring-boot-starter-graphql
+    version: 3.2.0
+  - group: org.springframework.boot
+    artifact: spring-boot-starter-web
+    version: 3.2.0
+
+testDependencies:
+  - group: org.springframework.graphql
+    artifact: spring-graphql-test
+    version: 1.2.0
+
+applicationPropertiesTemplate: application-properties.yml.ftl
+
+additionalResources:
+  - name: schema.graphqls
+    targetPath: graphql
+    templatePath: schema.graphqls.ftl
+```
+
+### Ejemplo 4: MongoDB Output Adapter
+
+```yaml
+name: mongodb
+type: output
+description: MongoDB database adapter using Spring Data MongoDB Reactive
+suffix: Adapter
+
+dependencies:
+  - group: org.springframework.boot
+    artifact: spring-boot-starter-data-mongodb-reactive
+    version: 3.2.0
+
+testDependencies:
+  - group: de.flapdoodle.embed
+    artifact: de.flapdoodle.embed.mongo
+    version: 4.11.0
+  - group: org.testcontainers
+    artifact: mongodb
+    version: 1.19.3
+
+applicationPropertiesTemplate: application-properties.yml.ftl
+
+configurationClasses:
+  - name: MongoConfig
+    packagePath: config
+    templatePath: Config.java.ftl
+```
+
+### Ejemplo 5: Redis Output Adapter
+
+```yaml
+name: redis
+type: output
+description: Redis cache adapter using Spring Data Redis
+suffix: Adapter
+
+dependencies:
+  - group: org.springframework.boot
+    artifact: spring-boot-starter-data-redis
+    version: 3.2.0
+  - group: io.lettuce
+    artifact: lettuce-core
+    version: 6.3.0.RELEASE
+
+testDependencies:
+  - group: it.ozimov
+    artifact: embedded-redis
+    version: 0.7.3
+
+applicationPropertiesTemplate: application-properties.yml.ftl
+
+configurationClasses:
+  - name: RedisConfig
+    packagePath: config
+    templatePath: Config.java.ftl
+```
+
+### Ejemplo 6: PostgreSQL Output Adapter
+
+```yaml
+name: postgresql
+type: output
+description: PostgreSQL database adapter using Spring Data JPA
+suffix: Repository
+
+dependencies:
+  - group: org.springframework.boot
+    artifact: spring-boot-starter-data-jpa
+    version: 3.2.0
+  - group: org.postgresql
+    artifact: postgresql
+    version: 42.7.1
+
+testDependencies:
+  - group: com.h2database
+    artifact: h2
+    version: 2.2.224
+
+applicationPropertiesTemplate: application-properties.yml.ftl
+
+configurationClasses:
+  - name: JpaConfig
+    packagePath: config
+    templatePath: JpaConfig.java.ftl
+```
+
+---
+
+## Mejores Prácticas
+
+1. **Usa el schema v2.0** - Sigue el schema unificado para input y output adapters
+2. **Especifica suffix** - Ayuda a identificar el propósito de la clase generada
 3. **Incluye dependencias de prueba** - Facilita testing desde el inicio
-4. **Agrega advertencias de seguridad** - En plantillas de propiedades con credenciales
-5. **Proporciona ejemplos** - Ayuda a los usuarios a entender cómo usar el adaptador
-6. **Usa tags apropiados** - Facilita la búsqueda y categorización
-7. **Versiona tus adaptadores** - Mantén control de cambios
-8. **Valida antes de publicar** - Usa `./gradlew validateTemplates`
+4. **Agrega applicationPropertiesTemplate** - Proporciona configuración por defecto
+5. **Valida nombres Java** - Asegúrate que configurationClasses.name sea válido
+6. **Evita duplicados** - No repitas dependencies o testDependencies
+7. **Usa buildConfiguration para casos especiales** - gRPC, protobuf, etc.
+8. **Documenta additionalResources** - Schemas GraphQL, protos gRPC, etc.
+
+---
+
+## Errores Comunes y Soluciones
+
+### Error: "suffix cannot be empty if specified"
+```yaml
+# ❌ Incorrecto
+suffix: ""
+
+# ✅ Correcto
+suffix: "Adapter"
+# o simplemente omitir el campo
+```
+
+### Error: "Duplicate dependency found"
+```yaml
+# ❌ Incorrecto
+dependencies:
+  - group: org.springframework.boot
+    artifact: spring-boot-starter-web
+    version: 3.2.0
+  - group: org.springframework.boot
+    artifact: spring-boot-starter-web
+    version: 3.1.0
+
+# ✅ Correcto
+dependencies:
+  - group: org.springframework.boot
+    artifact: spring-boot-starter-web
+    version: 3.2.0
+```
+
+### Error: "Invalid Java class name"
+```yaml
+# ❌ Incorrecto
+configurationClasses:
+  - name: mongoConfig  # Debe empezar con mayúscula
+    packagePath: config
+    templatePath: Config.java.ftl
+
+# ✅ Correcto
+configurationClasses:
+  - name: MongoConfig
+    packagePath: config
+    templatePath: Config.java.ftl
+```
+
+### Error: "Invalid Java package name"
+```yaml
+# ❌ Incorrecto
+configurationClasses:
+  - name: MongoConfig
+    packagePath: Config  # Debe ser lowercase
+    templatePath: Config.java.ftl
+
+# ✅ Correcto
+configurationClasses:
+  - name: MongoConfig
+    packagePath: config
+    templatePath: Config.java.ftl
+```
 
 ---
 
