@@ -132,7 +132,7 @@ public class PaymentRepositoryAdapter implements PaymentRepository {
 
 | Adapter | Status | Description |
 |---------|--------|-------------|
-| **REST** | ✅ | Spring MVC controllers with `ResponseEntity<T>` |
+| **REST** | ✅ | Spring MVC controllers with `ResponseEntity&lt;T&gt;` |
 | **GraphQL** | ✅ | Spring GraphQL with synchronous resolvers |
 | **gRPC** | ✅ | gRPC server with BlockingStub |
 | **SQS Consumer** | ✅ | AWS SQS consumer with @SqsListener |
@@ -216,7 +216,7 @@ spring:
 | Aspect | Reactive | Imperative |
 |--------|----------|------------|
 | **I/O Model** | Non-blocking | Blocking |
-| **Return Types** | Mono/Flux | Direct values (T, List<T>) |
+| **Return Types** | Mono/Flux | Direct values (T, List&lt;T&gt;) |
 | **Concurrency** | High (event loop) | Medium (thread pool) |
 | **Complexity** | Higher | Lower |
 | **Learning Curve** | Steeper | Gentler |
@@ -256,10 +256,10 @@ public class ProcessPaymentUseCase {
 ```
 
 **Key Changes:**
-1. Remove `Mono<T>` and `Flux<T>` return types
+1. Remove `Mono&lt;T&gt;` and `Flux&lt;T&gt;` return types
 2. Replace `flatMap` with direct method calls
-3. Use `List<T>` instead of `Flux<T>`
-4. Use `Optional<T>` instead of `Mono<T>` for nullable values
+3. Use `List&lt;T&gt;` instead of `Flux&lt;T&gt;`
+4. Use `Optional&lt;T&gt;` instead of `Mono&lt;T&gt;` for nullable values
 5. Change database dependencies from R2DBC to JPA
 6. Replace WebClient with RestTemplate
 7. Update configuration from reactive to blocking

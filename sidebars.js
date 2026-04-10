@@ -51,12 +51,28 @@ const sidebars = {
           label: 'Adapters',
           items: [
             'java/clean-arch/adapters/index',
-            'java/clean-arch/adapters/mongodb',
-            'java/clean-arch/adapters/postgresql',
-            'java/clean-arch/adapters/redis',
-            'java/clean-arch/adapters/dynamodb',
-            'java/clean-arch/adapters/rest-controller',
-            'java/clean-arch/adapters/http-client',
+            {
+              type: 'category',
+              label: 'Entry Points',
+              items: [
+                'java/clean-arch/adapters/entry-points/rest',
+                'java/clean-arch/adapters/entry-points/graphql',
+                'java/clean-arch/adapters/entry-points/grpc',
+                'java/clean-arch/adapters/entry-points/sqs-consumer',
+              ],
+            },
+            {
+              type: 'category',
+              label: 'Driven Adapters',
+              items: [
+                'java/clean-arch/adapters/driven-adapters/mongodb',
+                'java/clean-arch/adapters/driven-adapters/postgresql',
+                'java/clean-arch/adapters/driven-adapters/redis',
+                'java/clean-arch/adapters/driven-adapters/dynamodb',
+                'java/clean-arch/adapters/driven-adapters/http-client',
+                'java/clean-arch/adapters/driven-adapters/sqs-producer',
+              ],
+            },
           ],
         },
         {
@@ -151,7 +167,49 @@ const sidebars = {
     {
       type: 'doc',
       id: 'nodejs/intro',
-      label: 'Node.js Libraries',
+      label: 'Librerías Node.js',
+    },
+    {
+      type: 'category',
+      label: 'EMVCode',
+      collapsed: false,
+      items: [
+        'nodejs/emvcode/intro',
+        {
+          type: 'category',
+          label: 'Getting Started',
+          items: [
+            'nodejs/emvcode/getting-started/installation',
+            'nodejs/emvcode/getting-started/quick-start',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'API Reference',
+          items: [
+            'nodejs/emvcode/api/emv-builder',
+            'nodejs/emvcode/api/semantic-builder',
+            'nodejs/emvcode/api/crc-service',
+            'nodejs/emvcode/api/hash-service',
+            'nodejs/emvcode/api/qr-service',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Guías',
+          items: [
+            'nodejs/emvcode/guides/qr-with-taxes',
+            'nodejs/emvcode/guides/dynamic-qr-security',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Referencia',
+          items: [
+            'nodejs/emvcode/reference/emv-tags',
+          ],
+        },
+      ],
     },
   ],
   pythonSidebar: [

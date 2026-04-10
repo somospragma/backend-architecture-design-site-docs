@@ -189,8 +189,9 @@ const config = {
             position: 'left',
             items: [
               {
-                to: '/docs/nodejs/intro',
-                label: 'Coming Soon',
+                type: 'docSidebar',
+                sidebarId: 'nodejsSidebar',
+                label: 'EMVCode (QR EMVCo)',
               },
             ],
           },
@@ -235,7 +236,7 @@ const config = {
               },
               {
                 label: 'Node.js Libs',
-                to: '/docs/nodejs/intro',
+                to: '/docs/nodejs/emvcode/intro',
               },
               {
                 label: 'Python Libs',
@@ -271,7 +272,7 @@ const config = {
       prism: {
         theme: prismThemes.github,
         darkTheme: prismThemes.dracula,
-        additionalLanguages: ['java', 'kotlin', 'gradle', 'yaml'],
+        additionalLanguages: ['java', 'kotlin', 'gradle', 'yaml', 'typescript', 'json', 'bash'],
       },
     }),
 };
