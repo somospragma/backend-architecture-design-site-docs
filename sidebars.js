@@ -167,7 +167,49 @@ const sidebars = {
     {
       type: 'doc',
       id: 'nodejs/intro',
-      label: 'Node.js Libraries',
+      label: 'Librerías Node.js',
+    },
+    {
+      type: 'category',
+      label: 'EMVCode',
+      collapsed: false,
+      items: [
+        'nodejs/emvcode/intro',
+        {
+          type: 'category',
+          label: 'Getting Started',
+          items: [
+            'nodejs/emvcode/getting-started/installation',
+            'nodejs/emvcode/getting-started/quick-start',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'API Reference',
+          items: [
+            'nodejs/emvcode/api/emv-builder',
+            'nodejs/emvcode/api/semantic-builder',
+            'nodejs/emvcode/api/crc-service',
+            'nodejs/emvcode/api/hash-service',
+            'nodejs/emvcode/api/qr-service',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Guías',
+          items: [
+            'nodejs/emvcode/guides/qr-with-taxes',
+            'nodejs/emvcode/guides/dynamic-qr-security',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Referencia',
+          items: [
+            'nodejs/emvcode/reference/emv-tags',
+          ],
+        },
+      ],
     },
   ],
   pythonSidebar: [
