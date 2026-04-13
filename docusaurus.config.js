@@ -193,6 +193,11 @@ const config = {
                 sidebarId: 'nodejsSidebar',
                 label: 'EMVCode (QR EMVCo)',
               },
+              {
+                type: 'docSidebar',
+                sidebarId: 'nodejsSidebar',
+                label: 'Arquetipo Hexagonal (SAM)',
+              },
             ],
           },
           {

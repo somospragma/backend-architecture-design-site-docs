@@ -211,6 +211,48 @@ const sidebars = {
         },
       ],
     },
+    {
+      type: 'category',
+      label: 'Arquetipo Node.js Hexagonal',
+      collapsed: false,
+      items: [
+        'nodejs/node-hexagonal/intro',
+        {
+          type: 'category',
+          label: 'Getting Started',
+          items: [
+            'nodejs/node-hexagonal/getting-started/installation',
+            'nodejs/node-hexagonal/getting-started/quick-start',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Arquitectura',
+          items: [
+            'nodejs/node-hexagonal/architecture/overview',
+            'nodejs/node-hexagonal/architecture/layers',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Guías',
+          items: [
+            'nodejs/node-hexagonal/guides/adding-handlers',
+            'nodejs/node-hexagonal/guides/database-adapters',
+            'nodejs/node-hexagonal/guides/testing',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Referencia',
+          items: [
+            'nodejs/node-hexagonal/reference/project-structure',
+            'nodejs/node-hexagonal/reference/configuration',
+            'nodejs/node-hexagonal/reference/design-patterns',
+          ],
+        },
+      ],
+    },
   ],
   pythonSidebar: [
     {

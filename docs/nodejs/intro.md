@@ -35,11 +35,41 @@ Librería TypeScript completa para trabajar con códigos QR EMVCo, tags EMV, val
 
 ---
 
+## ⚡ Serverless y Arquitectura
+
+### Arquetipo Node.js Hexagonal
+
+**Proyecto base serverless con AWS SAM y arquitectura hexagonal**
+
+Arquetipo TypeScript para crear funciones AWS Lambda siguiendo la arquitectura hexagonal (Puertos y Adaptadores) de AWS. Incluye un CRUD completo como ejemplo y es totalmente personalizable.
+
+**Características principales:**
+- ✅ Arquitectura Hexagonal con separación en capas (domain, adapters, entrypoints, libraries)
+- ✅ AWS SAM para despliegue serverless con Lambda y API Gateway
+- ✅ CQRS (Command Query Responsibility Segregation)
+- ✅ Validación de schemas con Zod
+- ✅ Observabilidad integrada (Logger, Tracer, Metrics)
+- ✅ Patrones de diseño: Factory, Proxy, Builder
+- ✅ Testing con Jest y cobertura de código
+- ✅ Scripts de instalación automatizados
+
+**Casos de uso:**
+- Crear microservicios serverless con arquitectura limpia
+- APIs REST con AWS Lambda y API Gateway
+- Proyectos que requieran separación estricta de responsabilidades
+- Equipos que buscan un punto de partida estandarizado
+
+**Tecnologías:**
+- TypeScript + Node.js 18+
+- AWS SAM + Lambda + API Gateway
+- Sequelize / SQLite
+- Jest + ESLint (Antfu)
+
+[Ver documentación completa →](./node-hexagonal/intro.md)
+
+---
+
 ## 📚 Próximas Librerías
-
-### Clean Architecture Generator for Node.js (Próximamente)
-
-Generador de proyectos con arquitectura limpia y soporte TypeScript.
 
 ### API Scaffolding Tools (Próximamente)
 
