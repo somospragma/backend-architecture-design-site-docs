@@ -1,0 +1,14 @@
+# Ignore all documentation files from test coverage
+docs/**
+blog/**
+src/pages/**
+static/**
+build/**
+.docusaurus/**
+node_modules/**
+
+# Only test custom components if any
+!src/components/**/*.test.js
+!src/components/**/*.test.jsx
+!src/components/**/*.test.ts
+!src/components/**/*.test.tsx
