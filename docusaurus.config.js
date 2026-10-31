@@ -180,6 +180,10 @@ const config = {
                 sidebarId: 'javaSidebar',
                 label: 'Clean Architecture Generator',
               },
+              {
+                to: '/docs/java/pragma-log/intro',
+                label: 'Pragma Log Library',
+              },
               // Add more Java libraries here as they become available
             ],
           },

@@ -21,6 +21,43 @@ const sidebars = {
     },
     {
       type: 'category',
+      label: 'Pragma Log Library',
+      collapsed: false,
+      items: [
+        'java/pragma-log/intro',
+        {
+          type: 'category',
+          label: 'Getting Started',
+          items: [
+            'java/pragma-log/getting-started/spring-boot',
+            'java/pragma-log/getting-started/spring-webflux',
+            'java/pragma-log/getting-started/java-pure',
+            'java/pragma-log/getting-started/quarkus',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Configuración',
+          items: [
+            'java/pragma-log/configuration/reference',
+            'java/pragma-log/configuration/fields',
+            'java/pragma-log/configuration/masking',
+            'java/pragma-log/configuration/formatters',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Avanzado',
+          items: [
+            'java/pragma-log/advanced/hooks',
+            'java/pragma-log/advanced/custom-formatter',
+            'java/pragma-log/advanced/override-logback',
+          ],
+        },
+      ],
+    },
+    {
+      type: 'category',
       label: 'Clean Architecture Generator',
       collapsed: false,
       items: [

@@ -346,7 +346,7 @@ Si especificas `suffix`, no debe estar vacío. Un suffix vacío causará un erro
 
 ### dependencies (Opcional)
 
-**Tipo:** List<Dependency>  
+**Tipo:** List\<Dependency\>  
 **Descripción:** Dependencias de implementación que se agregan automáticamente al `build.gradle.kts`
 
 **Estructura de cada dependency:**
@@ -389,7 +389,7 @@ El plugin agrega las dependencias automáticamente. No necesitas editarlas manua
 
 ### testDependencies (Opcional)
 
-**Tipo:** List<Dependency>  
+**Tipo:** List\<Dependency\>  
 **Descripción:** Dependencias de test que se agregan con scope `testImplementation`
 
 **Estructura:**
@@ -461,7 +461,7 @@ Si especificas `applicationPropertiesTemplate`, el archivo debe existir en el di
 
 ### configurationClasses (Opcional)
 
-**Tipo:** List<ConfigurationClass>  
+**Tipo:** List\<ConfigurationClass\>  
 **Descripción:** Clases @Configuration adicionales a generar
 
 **Estructura de cada clase:**
@@ -498,7 +498,7 @@ configurationClasses:
 
 ### additionalResources (Opcional)
 
-**Tipo:** List<AdditionalResource>  
+**Tipo:** List\<AdditionalResource\>  
 **Descripción:** Archivos adicionales a generar (schemas GraphQL, protos gRPC, etc.)
 
 **Estructura:**
@@ -534,7 +534,7 @@ additionalResources:
 
 ### buildPlugins (Opcional)
 
-**Tipo:** List<BuildPlugin>  
+**Tipo:** List\<BuildPlugin\>  
 **Descripción:** Plugins de Gradle requeridos por el adaptador
 
 **Estructura:**
