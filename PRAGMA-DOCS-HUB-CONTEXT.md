@@ -181,7 +181,8 @@ En la otra sesión conviene usar:
 ## Decisiones pendientes
 
 1. Aprobación de los valores de la paleta clara y oscura, sobre todo el fondo oscuro.
-2. Más adelante: cómo traer las docs `hosted` que viven en otros repos (copiarlas, traerlas en el build o que cada repo las publique con una Action) y si habrá versionado de docs por artefacto.
+2. Al migrar el contenido legacy: revisar las ramas remotas `feature/backend-diseno-arquitectura-fnc-ts-archetype-node-hexagonal` y `feature/emvcode-package`, que no están en la historia de `legacy/docusaurus`.
+3. Más adelante: cómo traer las docs `hosted` que viven en otros repos (copiarlas, traerlas en el build o que cada repo las publique con una Action) y si habrá versionado de docs por artefacto.
 
 ## Fuera de alcance de esta sesión
 

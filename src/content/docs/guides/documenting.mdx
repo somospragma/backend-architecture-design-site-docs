@@ -1,0 +1,47 @@
+---
+title: Cómo documentar un proyecto
+description: Lo mínimo que necesita la documentación de un artefacto de Pragma.
+sidebar:
+  label: Documentar un proyecto
+  order: 1
+---
+
+import { Aside, FileTree } from '@astrojs/starlight/components';
+
+Todo artefacto empieza por un buen README. Con eso basta para entrar al hub en modo `indexed`.
+
+## README mínimo
+
+Usa la plantilla `templates/README.template.md`. Debe tener, en este orden:
+
+1. **Qué es:** una frase sobre qué resuelve y para quién.
+2. **Instalación:** el comando o la dependencia exacta.
+3. **Uso rápido:** un ejemplo que funcione al copiarlo y pegarlo.
+4. **Configuración:** opciones y valores por defecto.
+5. **Contribución:** cómo proponer cambios.
+6. **Licencia.**
+7. **Owners:** quién responde por el artefacto.
+
+## Documentación `hosted`
+
+Si el artefacto necesita guías y referencia, su documentación puede vivir en el hub. Usa la estructura de `templates/docs-hosted/`:
+
+<FileTree>
+- src/content/docs/artifacts/mi-artefacto/
+  - index.md introducción
+  - quick-start.md
+  - guides/
+  - reference/
+  - faq.md
+  - changelog.md
+</FileTree>
+
+## Estilo
+
+- Escribe frases cortas, en voz activa y en segunda persona.
+- Nombra las versiones con versionado semántico: `1.4.0`, no "la última".
+- Todo ejemplo de código debe funcionar tal cual y llevar el lenguaje en el bloque.
+
+<Aside type="danger" title="Qué no se publica">
+	Secretos, tokens, URLs internas, nombres o datos de clientes. Usa valores de ejemplo como `example.com` o `my-app`.
+</Aside>

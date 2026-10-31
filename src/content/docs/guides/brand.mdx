@@ -1,0 +1,63 @@
+---
+title: Cómo usar la marca
+description: Paleta, tipografía y logo de Pragma, con las reglas de contraste.
+sidebar:
+  label: Marca
+  order: 2
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+La marca de Pragma vive en un solo archivo: `src/styles/tokens.json`. De ahí salen los colores del sitio y el chequeo de contraste del CI. Si un color no está en ese archivo, no se usa.
+
+## Paleta
+
+**Principales**
+
+| Color | Hex |
+|---|---|
+| Pragma Purple | `#6429CD` |
+| Deep Violet | `#531DBC` |
+| Midnight | `#330072` |
+| Lavender | `#E4A4FF` |
+| Black | `#1D1D1B` |
+
+**Secundarios**, para gráficas e ilustración: `#9610FF`, `#7500A0`, `#DD52DD`, `#B6B6FF` y `#D7E2FF`.
+
+## Contraste
+
+Todo texto debe tener un contraste de al menos 4.5:1 con su fondo (WCAG AA).
+
+| Color | Sobre blanco | Sobre `#1D1D1B` |
+|---|---|---|
+| `#6429CD` Pragma Purple | 7.66 ✅ | 2.20 ❌ |
+| `#330072` Midnight | 15.18 ✅ | 1.11 ❌ |
+| `#9610FF` | 5.50 ✅ | 3.07 ⚠️ solo texto grande |
+| `#DD52DD` | 3.32 ⚠️ solo texto grande | 5.09 ✅ |
+| `#E4A4FF` Lavender | 1.90 ❌ | 8.89 ✅ |
+| `#D7E2FF` Ice Blue | 1.30 ❌ | 13.03 ✅ |
+
+<Aside type="caution" title="Reglas">
+	- Pragma Purple, Deep Violet, Midnight y `#7500A0` nunca van como texto en modo oscuro.
+	- Lavender, `#B6B6FF` e Ice Blue nunca van como texto en modo claro.
+	- `#DD52DD` es solo decorativo, o texto grande en modo claro.
+</Aside>
+
+## Tipografía
+
+Solo **Poppins**: Bold para títulos, SemiBold o Medium para énfasis y Regular para el cuerpo.
+
+## Logo
+
+- El wordmark "pragma" lleva la "g" morada. En fondos oscuros se usa la versión blanca.
+- El isotipo es una "g" blanca en un círculo `#6429CD`.
+- Deja alrededor un espacio libre igual a la altura de la "g".
+- No cambies los colores, no lo deformes ni le agregues efectos.
+
+Tagline: **Keep moving**.
+
+## Cambiar un color del sitio
+
+1. Edita `src/styles/tokens.json`.
+2. Corre `pnpm check:contrast`. Si algún par baja del mínimo, el comando falla.
+3. Revisa el sitio en modo claro y oscuro con `pnpm dev`.

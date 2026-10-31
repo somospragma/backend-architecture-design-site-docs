@@ -1,0 +1,54 @@
+---
+title: Cómo agregar un artefacto
+description: Pasos y criterios para que un artefacto entre al hub.
+sidebar:
+  label: Agregar un artefacto
+  order: 2
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+Un artefacto entra al hub con un pull request que agrega su ficha. Si la ficha no cumple el schema, el build falla y el PR no se puede fusionar.
+
+## Criterios de entrada
+
+- El repositorio es accesible para quien lo va a usar.
+- El README explica la instalación y trae al menos un ejemplo.
+- Tiene licencia. Si es de comunidad, una licencia open source.
+- Tiene owners reales que responden por él.
+- No tiene secretos ni datos de clientes.
+
+<Aside type="caution" title="Trabajo hecho para un cliente">
+	Algo creado para un cliente solo entra si Pragma tiene derecho a publicarlo.
+</Aside>
+
+## Pasos
+
+<Steps>
+
+1. Deja el README del artefacto como pide la guía de [cómo documentar un proyecto](../guides/documenting/).
+
+2. Crea la ficha en `src/content/artifacts/<slug>.md` a partir de la plantilla `templates/artifact.template.md`.
+
+3. Si eliges el modo `hosted`, agrega la documentación en `src/content/docs/artifacts/<slug>/` con la estructura de `templates/docs-hosted/`.
+
+4. Corre `pnpm build` en local para validar la ficha.
+
+5. Abre el PR y completa el checklist de la plantilla.
+
+</Steps>
+
+## Estados
+
+| Estado | Qué significa |
+|---|---|
+| `experimental` | Se puede probar, pero puede cambiar sin aviso. |
+| `beta` | La API está casi cerrada y se aceptan reportes de errores. |
+| `stable` | Listo para producción, con versionado semántico. |
+| `deprecated` | No se recomienda. La ficha indica qué usar en su lugar. |
+
+Los owners del artefacto proponen el estado y quienes aprueban fichas lo confirman en el PR.
+
+## Retirar un artefacto
+
+Primero se marca como `deprecated`, con un reemplazo o una nota que explique por qué. Después de un tiempo razonable, sus owners pueden pedir que se quite la ficha.

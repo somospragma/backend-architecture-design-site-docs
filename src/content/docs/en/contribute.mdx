@@ -1,0 +1,54 @@
+---
+title: How to add an artifact
+description: Steps and criteria for an artifact to join the hub.
+sidebar:
+  label: Add an artifact
+  order: 2
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+An artifact joins the hub through a pull request that adds its entry. If the entry doesn't match the schema, the build fails and the PR can't be merged.
+
+## Entry criteria
+
+- The repository is accessible to the people who will use it.
+- The README explains installation and includes at least one example.
+- It has a license. Community artifacts need an open source license.
+- It has real owners who are accountable for it.
+- It contains no secrets and no client data.
+
+<Aside type="caution" title="Work made for a client">
+	Something built for a client can only join if Pragma has the right to publish it.
+</Aside>
+
+## Steps
+
+<Steps>
+
+1. Get the artifact's README in shape following [how to document a project](../guides/documenting/).
+
+2. Create the entry at `src/content/artifacts/<slug>.md` from the `templates/artifact.template.md` template.
+
+3. If you choose `hosted` mode, add the docs under `src/content/docs/artifacts/<slug>/` using the `templates/docs-hosted/` structure.
+
+4. Run `pnpm build` locally to validate the entry.
+
+5. Open the PR and complete the template checklist.
+
+</Steps>
+
+## Statuses
+
+| Status | Meaning |
+|---|---|
+| `experimental` | You can try it, but it may change without notice. |
+| `beta` | The API is nearly settled and bug reports are welcome. |
+| `stable` | Production ready, with semantic versioning. |
+| `deprecated` | Not recommended. The entry says what to use instead. |
+
+The artifact's owners propose the status and the entry approvers confirm it in the PR.
+
+## Retiring an artifact
+
+It's first marked `deprecated`, with a replacement or a note explaining why. After a reasonable period, its owners can ask for the entry to be removed.

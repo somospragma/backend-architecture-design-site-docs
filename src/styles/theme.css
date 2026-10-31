@@ -1,0 +1,29 @@
+/*
+ * Ajustes de tema de Starlight que no son colores.
+ * Los colores viven en tokens.json → tokens.css. Aquí solo se referencian con var().
+ */
+
+:root {
+	/* Los avisos "tip" de Starlight usan el tono morado; se alinea con Pragma Purple. */
+	--sl-hue-purple: 262;
+}
+
+/* Poppins: Bold para títulos, SemiBold para énfasis, Regular para el cuerpo. */
+.sl-markdown-content :is(h1, h2, h3, h4, h5, h6),
+h1#_top,
+.hero h1 {
+	font-weight: 700;
+}
+
+.sl-markdown-content :is(strong, b) {
+	font-weight: 600;
+}
+
+/*
+ * El SVG del wordmark ya incluye el espacio libre de marca alrededor (≈ altura de la "g"),
+ * por eso la caja es más alta que las letras. No recortar el viewBox.
+ */
+.site-title img {
+	height: 2.75rem;
+	width: auto;
+}

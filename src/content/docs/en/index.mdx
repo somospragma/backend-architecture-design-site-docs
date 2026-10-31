@@ -1,0 +1,43 @@
+---
+title: Pragma Hub
+description: Libraries, plugins, templates and tools built by Pragma and its community.
+template: splash
+hero:
+  tagline: Everything we build at Pragma, in one place. Keep moving.
+  actions:
+    - text: Browse the catalog
+      link: catalog/
+      icon: right-arrow
+    - text: Add an artifact
+      link: contribute/
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## What's here
+
+The hub brings together the artifacts Pragma builds: libraries, plugins, templates, CLIs and tools. Each one has an entry that says what it solves, who maintains it, its status and where to find it.
+
+<CardGrid>
+	<Card title="Official" icon="approve-check">
+		Lives in Pragma accounts, such as the `somospragma` GitHub organization, and has a team that owns it.
+	</Card>
+	<Card title="Community" icon="star">
+		Open source, created by a Pragma member in their personal account, and useful to others. [What this means](community/).
+	</Card>
+</CardGrid>
+
+## How much of each artifact lives in the hub
+
+| Mode | What the hub publishes |
+|---|---|
+| `indexed` | Only the entry. The docs live in the artifact's repository. |
+| `hosted` | The entry plus full usage docs: guides, reference and examples. |
+
+## How to use the hub
+
+- **Looking for something:** go to the [catalog](catalog/) and filter by kind, ecosystem or status.
+- **Built something:** follow [how to add an artifact](contribute/).
+- **Documenting a project:** use the [documentation guide](guides/documenting/).
+- **Using the brand:** check the [brand guide](guides/brand/).

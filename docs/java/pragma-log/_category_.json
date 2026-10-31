@@ -1,8 +1,0 @@
-{
-  "label": "Pragma Log",
-  "position": 2,
-  "link": {
-    "type": "generated-index",
-    "description": "Librería de logging estructurado para aplicaciones Java."
-  }
-}
