@@ -75,6 +75,17 @@ Reglas del schema:
 - `docs.mode: hosted` exige que exista `src/content/docs/artifacts/<slug>/`.
 - `lastReviewed` con más de 12 meses → aviso en CI (no falla) para que el owner la revise.
 
+**Implementado (fase 3).** El schema vive en `src/content/artifact-schema.ts`. Estos son los cambios frente a la propuesta de arriba:
+- No hay campo `slug`: el nombre del archivo es el slug. Así no pueden quedar distintos.
+- `summary` es `{ es, en }` y los dos idiomas son obligatorios. Se agregó `description: { es, en }`, que es opcional. Las fichas no tienen cuerpo en Markdown.
+- `owners` es obligatorio en todas las fichas, no solo en las de comunidad, porque es un criterio de entrada. Acepta un usuario de GitHub (`dev-user`) o un equipo (`org/team`).
+- `license` debe ser un identificador SPDX válido. En las fichas de comunidad, además, debe estar aprobado por OSI. Las fichas oficiales pueden usar `UNLICENSED` para artefactos internos.
+- `docs.url` es obligatorio en `indexed`. En `hosted` no se usa, porque la ruta sale del slug.
+- `deprecationNote` es `{ es, en }`. `replacedBy` acepta el slug de otra ficha o una URL `https`.
+- `kind`, `ecosystems` y `registry.type` son listas cerradas. Para agregar un valor se edita la lista en el schema dentro del mismo PR de la ficha.
+- Las fichas con `draft: true` solo se ven con `pnpm dev`; el build de producción las excluye.
+- El aviso por `lastReviewed` vencido lo da `pnpm check:reviews`. En GitHub Actions emite anotaciones `::warning`.
+
 ### 3. Reglas de aporte
 - `CONTRIBUTING.md`:
   - cómo proponer un artefacto (PR con una ficha);

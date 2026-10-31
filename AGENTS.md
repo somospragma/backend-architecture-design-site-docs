@@ -26,3 +26,4 @@ Consult these guides before working on related tasks:
 - Contexto, decisiones y plan del hub: `PRAGMA-DOCS-HUB-CONTEXT.md`.
 - Los colores solo se cambian en `src/styles/tokens.json`. Después de cambiarlos, corre `pnpm check:contrast`.
 - Toda página nueva va en español (`src/content/docs/`) y en inglés (`src/content/docs/en/`).
+- El schema de las fichas está en `src/content/artifact-schema.ts`. Para validar una ficha, corre `pnpm build`; si no cumple el schema, falla.

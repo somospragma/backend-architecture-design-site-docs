@@ -1,0 +1,165 @@
+---
+// Lista de fichas del catálogo, con filtros por tipo, ecosistema, origen y estado.
+// Se usa desde catalog.mdx en cada idioma: <Catalog lang="es" />.
+import { Aside, Badge } from '@astrojs/starlight/components';
+import { ECOSYSTEMS, KINDS, ORIGINS, STATUSES } from '../content/artifact-schema';
+import { kindLabels, originLabels, statusLabels, statusVariant, ui, type Lang } from '../i18n/catalog';
+import { artifactPath, getVisibleArtifacts, sitePath } from '../lib/artifacts';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = ui[lang];
+const artifacts = await getVisibleArtifacts();
+
+const filters = [
+	{ key: 'kind', label: t.filterKind, options: KINDS.map((v) => [v, kindLabels[lang][v]]) },
+	{ key: 'ecosystem', label: t.filterEcosystem, options: ECOSYSTEMS.map((v) => [v, v]) },
+	{ key: 'origin', label: t.filterOrigin, options: ORIGINS.map((v) => [v, originLabels[lang][v]]) },
+	{ key: 'status', label: t.filterStatus, options: STATUSES.map((v) => [v, statusLabels[lang][v]]) },
+];
+---
+
+{
+	artifacts.length === 0 ? (
+		<Aside type="note" title={t.emptyTitle}>
+			{t.emptyBody} <a href={sitePath(lang, 'contribute/')}>{t.emptyLink}</a>.
+		</Aside>
+	) : (
+		<pragma-catalog data-count-one={t.count(1)} data-count-many={t.count(2).replace('2', '{n}')}>
+			<form class="filters not-content" aria-label={t.filtersLabel}>
+				{filters.map((f) => (
+					<label>
+						<span>{f.label}</span>
+						<select name={f.key}>
+							<option value="">{t.filterAll}</option>
+							{f.options.map(([value, label]) => (
+								<option value={value}>{label}</option>
+							))}
+						</select>
+					</label>
+				))}
+			</form>
+			<p class="count" aria-live="polite">{t.count(artifacts.length)}</p>
+			<ul class="grid not-content">
+				{artifacts.map(({ id, data }) => (
+					<li
+						data-kind={data.kind}
+						data-ecosystem={data.ecosystems.join(' ')}
+						data-origin={data.origin}
+						data-status={data.status}
+					>
+						<a href={artifactPath(lang, id)} class="card">
+							<span class="name">{data.name}</span>
+							<span class="summary">{data.summary[lang]}</span>
+							<span class="badges">
+								<Badge text={statusLabels[lang][data.status]} variant={statusVariant[data.status]} />
+								<Badge text={kindLabels[lang][data.kind]} />
+								<Badge text={originLabels[lang][data.origin]} variant={data.origin === 'official' ? 'tip' : 'default'} />
+								{data.draft && <Badge text={t.draft} variant="caution" />}
+							</span>
+							<span class="ecosystems">{data.ecosystems.join(' · ')}</span>
+						</a>
+					</li>
+				))}
+			</ul>
+			<p class="no-matches" hidden>
+				{t.noMatches}
+			</p>
+		</pragma-catalog>
+	)
+}
+
+<script>
+	class PragmaCatalog extends HTMLElement {
+		connectedCallback() {
+			const form = this.querySelector('form')!;
+			const items = [...this.querySelectorAll<HTMLLIElement>('li[data-kind]')];
+			const count = this.querySelector('.count')!;
+			const empty = this.querySelector<HTMLElement>('.no-matches')!;
+			const { countOne, countMany } = this.dataset;
+
+			form.addEventListener('change', () => {
+				const active = [...new FormData(form)].filter(([, v]) => v !== '');
+				let visible = 0;
+				for (const item of items) {
+					const show = active.every(([key, value]) => item.dataset[key]!.split(' ').includes(String(value)));
+					item.hidden = !show;
+					if (show) visible++;
+				}
+				count.textContent = visible === 1 ? countOne! : countMany!.replace('{n}', String(visible));
+				empty.hidden = visible > 0;
+			});
+		}
+	}
+	customElements.define('pragma-catalog', PragmaCatalog);
+</script>
+
+<style>
+	.filters {
+		margin-top: 1.5rem;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+		gap: 0.75rem;
+	}
+	.filters label {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+		font-size: var(--sl-text-sm);
+		color: var(--sl-color-gray-2);
+	}
+	.filters select {
+		padding: 0.4rem 0.5rem;
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 0.375rem;
+		background: var(--sl-color-black);
+		color: var(--sl-color-white);
+		font: inherit;
+	}
+	.count {
+		font-size: var(--sl-text-sm);
+		color: var(--sl-color-gray-3);
+	}
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+		gap: 1rem;
+		padding: 0;
+		list-style: none;
+	}
+	.card {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		height: 100%;
+		padding: 1rem;
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 0.5rem;
+		color: var(--sl-color-gray-2);
+		text-decoration: none;
+	}
+	.card:hover,
+	.card:focus-visible {
+		border-color: var(--sl-color-accent);
+	}
+	.name {
+		font-size: var(--sl-text-lg);
+		font-weight: 600;
+		color: var(--sl-color-white);
+	}
+	.summary {
+		flex-grow: 1;
+	}
+	.badges {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem;
+	}
+	.ecosystems {
+		font-size: var(--sl-text-xs);
+		color: var(--sl-color-gray-3);
+	}
+</style>

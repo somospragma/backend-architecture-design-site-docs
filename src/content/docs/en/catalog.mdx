@@ -5,17 +5,8 @@ sidebar:
   order: 1
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import Catalog from '../../../components/Catalog.astro';
 
-<Aside type="note" title="No artifacts yet">
-	The catalog is ready but has no entries yet. If you built something others can use, [add it](../contribute/).
-</Aside>
+Libraries, plugins, templates, CLIs and tools from Pragma and its community. Filter by kind, ecosystem, origin or status, and open each entry to see who maintains it and where its docs live.
 
-Each artifact in the catalog shows:
-
-- what it solves, in one sentence;
-- kind: library, plugin, CLI, template, tool, SDK or action;
-- ecosystems, such as Java, Node or AWS;
-- origin: official or community;
-- status: `experimental`, `beta`, `stable` or `deprecated`;
-- who maintains it and where the code lives.
+<Catalog lang="en" />
