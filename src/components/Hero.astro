@@ -1,0 +1,111 @@
+---
+// Reemplaza el Hero de Starlight. Solo lo usa la página inicial (la única con `hero` en el frontmatter).
+// El círculo es el del isotipo de Pragma; sobre él vive un armador de fichas que funciona de verdad.
+import { AREAS, KINDS } from '../content/taxonomy.mjs';
+import { home } from './home/copy';
+import { sitePath } from '../lib/artifacts';
+
+const lang = Astro.locals.starlightRoute.lang === 'en' ? 'en' : 'es';
+const t = home[lang];
+const b = t.builder;
+// Starlight enlaza "volver arriba" y el salto de contenido a este id (PAGE_TITLE_ID, no exportado).
+const PAGE_TITLE_ID = '_top';
+---
+
+<section class="ph-hero not-content" data-lang={lang}>
+	<div class="ph-hero__text">
+		<h1 id={PAGE_TITLE_ID}>{t.title}</h1>
+		<p class="ph-lead">{t.lead}</p>
+		<a class="ph-btn" href={sitePath(lang, 'catalog/')}>{t.action}</a>
+	</div>
+
+	<div class="ph-hero__stage">
+		<div class="ph-disc ph-shutter" aria-hidden="true"></div>
+		<pragma-builder class="ph-builder" data-ui data-summary={b.summary} data-copied={b.copied}>
+			<p class="ph-builder__title">{b.title}</p>
+			<div class="ph-builder__fields">
+				<label>
+					<span>{b.name}</span>
+					<input name="name" type="text" value="Pragma Log" placeholder={b.placeholder} autocomplete="off" />
+				</label>
+				<label>
+					<span>{b.area}</span>
+					<select name="area">
+						{Object.entries(AREAS).map(([id, l]) => <option value={id}>{l[lang]}</option>)}
+					</select>
+				</label>
+				<label>
+					<span>{b.kind}</span>
+					<select name="kind">
+						{Object.entries(KINDS).map(([id, l]) => <option value={id}>{l[lang]}</option>)}
+					</select>
+				</label>
+			</div>
+			<div class="ph-builder__card">
+				<span class="ph-builder__name" data-out="name">Pragma Log</span>
+				<span class="ph-builder__summary">{b.summary}</span>
+				<span class="ph-builder__badges">
+					<span class="ph-badge" data-out="area">{AREAS.java[lang]}</span>
+					<span class="ph-badge" data-out="kind">{KINDS.library[lang]}</span>
+					<span class="ph-badge ph-badge--soft">experimental</span>
+				</span>
+			</div>
+			<pre class="ph-builder__yaml"><code data-out="yaml">{`# src/content/artifacts/pragma-log.md
+name: Pragma Log
+area: java
+kind: library
+origin: official
+status: experimental`}</code></pre>
+			<button type="button" class="ph-builder__copy">{b.copy}</button>
+		</pragma-builder>
+	</div>
+</section>
+
+<script>
+	const slugify = (s: string) =>
+		s
+			.normalize('NFD')
+			.replace(/[̀-ͯ]/g, '')
+			.toLowerCase()
+			.replace(/[^a-z0-9]+/g, '-')
+			.replace(/^-|-$/g, '') || 'mi-artefacto';
+
+	class PragmaBuilder extends HTMLElement {
+		connectedCallback() {
+			const field = (n: string) => this.querySelector<HTMLInputElement | HTMLSelectElement>(`[name="${n}"]`)!;
+			const out = (n: string) => this.querySelector<HTMLElement>(`[data-out="${n}"]`)!;
+			const copy = this.querySelector<HTMLButtonElement>('.ph-builder__copy')!;
+			const copyLabel = copy.textContent;
+
+			const render = () => {
+				const name = field('name').value.trim() || field('name').getAttribute('placeholder')!;
+				const area = field('area') as HTMLSelectElement;
+				const kind = field('kind') as HTMLSelectElement;
+				out('name').textContent = name;
+				out('area').textContent = area.selectedOptions[0].text;
+				out('kind').textContent = kind.selectedOptions[0].text;
+				out('yaml').textContent = [
+					`# src/content/artifacts/${slugify(name)}.md`,
+					`name: ${name}`,
+					`area: ${area.value}`,
+					`kind: ${kind.value}`,
+					'origin: official',
+					'status: experimental',
+				].join('\n');
+			};
+
+			this.addEventListener('input', render);
+			copy.addEventListener('click', async () => {
+				try {
+					await navigator.clipboard.writeText(out('yaml').textContent ?? '');
+					copy.textContent = this.dataset.copied!;
+					setTimeout(() => (copy.textContent = copyLabel), 1600);
+				} catch {
+					/* Sin permiso de portapapeles: el YAML sigue visible para copiarlo a mano. */
+				}
+			});
+			render();
+		}
+	}
+	customElements.define('pragma-builder', PragmaBuilder);
+</script>

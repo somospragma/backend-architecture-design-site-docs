@@ -2,42 +2,13 @@
 title: Pragma Hub
 description: Librerías, plugins, plantillas y herramientas que construye Pragma y su comunidad.
 template: splash
+# El contenido del hero lo arma src/components/Hero.astro; aquí solo se activa.
 hero:
-  tagline: Todo lo que construimos en Pragma, en un solo lugar. Keep moving.
-  actions:
-    - text: Ver el catálogo
-      link: catalog/
-      icon: right-arrow
-    - text: Agregar un artefacto
-      link: contribute/
-      variant: minimal
+  title: Todo lo que construye Pragma
+editUrl: false
+lastUpdated: false
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import HomeSections from '../../components/home/HomeSections.astro';
 
-## Qué hay aquí
-
-El hub reúne los artefactos que crea Pragma: librerías, plugins, plantillas, CLIs y herramientas. Cada uno tiene una ficha con qué resuelve, quién lo mantiene, en qué estado está y dónde encontrarlo.
-
-<CardGrid>
-	<Card title="Oficial" icon="approve-check">
-		Vive en cuentas de Pragma, como la organización `somospragma` en GitHub, y tiene un equipo que responde por él.
-	</Card>
-	<Card title="Comunidad" icon="star">
-		Es open source, lo crea un pragmático en su cuenta personal y le sirve a otros. [Qué significa](community/).
-	</Card>
-</CardGrid>
-
-## Cuánto vive cada artefacto en el hub
-
-| Modo | Qué publica el hub |
-|---|---|
-| `indexed` | Solo la ficha. La documentación está en el repo del artefacto. |
-| `hosted` | La ficha y la documentación completa de uso: guías, referencia y ejemplos. |
-
-## Cómo usar el hub
-
-- **Buscas algo:** entra al [catálogo](catalog/) y filtra por tipo, ecosistema o estado.
-- **Construiste algo:** sigue [cómo agregar un artefacto](contribute/).
-- **Vas a documentar un proyecto:** usa la guía de [cómo documentar](guides/documenting/).
-- **Vas a usar la marca:** revisa la [guía de marca](guides/brand/).
+<HomeSections lang="es" />

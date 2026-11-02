@@ -1,7 +1,11 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import starlightSidebarTopics from 'starlight-sidebar-topics';
+import { buildTopics } from './src/navigation.mjs';
 
+// En `astro dev` se muestran las fichas draft; en `astro build` no.
+const isDev = process.argv.includes('dev');
 const REPO_URL = 'https://github.com/somospragma/backend-architecture-design-site-docs';
 
 // https://astro.build/config
@@ -16,6 +20,8 @@ export default defineConfig({
 				light: './src/assets/brand/pragma-logo.svg',
 				dark: './src/assets/brand/pragma-logo-white.svg',
 				alt: 'Pragma',
+				// El wordmark ya dice "pragma"; el título queda solo para lectores de pantalla.
+				replacesTitle: true,
 			},
 			favicon: '/favicon.svg',
 			defaultLocale: 'root',
@@ -33,22 +39,16 @@ export default defineConfig({
 				'@fontsource/poppins/700.css',
 				'./src/styles/tokens.css',
 				'./src/styles/theme.css',
+				'./src/styles/home.css',
 			],
-			sidebar: [
-				{
-					label: 'Hub',
-					items: [
-						{ slug: 'catalog' },
-						{ slug: 'contribute' },
-						{ slug: 'community' },
-					],
-				},
-				{
-					label: 'Guías',
-					translations: { en: 'Guides' },
-					items: [{ autogenerate: { directory: 'guides' } }],
-				},
-			],
+			components: {
+				// Agrega las áreas a la barra superior en pantallas anchas.
+				SiteTitle: './src/components/SiteTitle.astro',
+				// La página inicial usa su propio hero (el círculo de Pragma con el armador de fichas).
+				Hero: './src/components/Hero.astro',
+			},
+			// La navegación se arma desde las fichas: un tema "Hub" y uno por cada área con fichas.
+			plugins: [starlightSidebarTopics(buildTopics({ includeDrafts: isDev }))],
 		}),
 	],
 });

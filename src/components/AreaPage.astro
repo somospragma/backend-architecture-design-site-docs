@@ -1,0 +1,50 @@
+---
+// Página de un área: sus artefactos agrupados por tipo, en el mismo orden que la barra lateral.
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import ArtifactCard from './ArtifactCard.astro';
+import { KINDS } from '../content/taxonomy.mjs';
+import { areaLabels, ui, type Lang } from '../i18n/catalog';
+import { sitePath, type ArtifactEntry } from '../lib/artifacts';
+
+interface Props {
+	lang: Lang;
+	area: string;
+	entries: ArtifactEntry[];
+}
+
+const { lang, area, entries } = Astro.props;
+const t = ui[lang];
+const groups = Object.entries(KINDS)
+	.map(([kind, labels]) => ({ label: labels.group[lang], items: entries.filter((e) => e.data.kind === kind) }))
+	.filter((g) => g.items.length > 0);
+---
+
+<StarlightPage frontmatter={{ title: areaLabels[lang][area], tableOfContents: false }}>
+	<p>
+		{t.areaIntro} <a href={sitePath(lang, 'catalog/')}>{t.catalogLink}</a>.
+	</p>
+	{
+		groups.map((group) => (
+			<section>
+				<h2>{group.label}</h2>
+				<ul class="grid not-content">
+					{group.items.map((entry) => (
+						<li>
+							<ArtifactCard lang={lang} entry={entry} />
+						</li>
+					))}
+				</ul>
+			</section>
+		))
+	}
+</StarlightPage>
+
+<style>
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+		gap: 1rem;
+		padding: 0;
+		list-style: none;
+	}
+</style>

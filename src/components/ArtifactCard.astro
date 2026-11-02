@@ -1,0 +1,61 @@
+---
+// Tarjeta de un artefacto. La usan el catálogo y las páginas de área.
+import { Badge } from '@astrojs/starlight/components';
+import { kindLabels, originLabels, statusLabels, statusVariant, ui, type Lang } from '../i18n/catalog';
+import { artifactPath, type ArtifactEntry } from '../lib/artifacts';
+
+interface Props {
+	lang: Lang;
+	entry: ArtifactEntry;
+}
+
+const { lang, entry } = Astro.props;
+const { id, data } = entry;
+---
+
+<a href={artifactPath(lang, id)} class="card">
+	<span class="name">{data.name}</span>
+	<span class="summary">{data.summary[lang]}</span>
+	<span class="badges">
+		<Badge text={statusLabels[lang][data.status]} variant={statusVariant[data.status]} />
+		<Badge text={kindLabels[lang][data.kind]} />
+		<Badge text={originLabels[lang][data.origin]} variant={data.origin === 'official' ? 'tip' : 'default'} />
+		{data.draft && <Badge text={ui[lang].draft} variant="caution" />}
+	</span>
+	<span class="ecosystems">{data.ecosystems.join(' · ')}</span>
+</a>
+
+<style>
+	.card {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		height: 100%;
+		padding: 1rem;
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 0.5rem;
+		color: var(--sl-color-gray-2);
+		text-decoration: none;
+	}
+	.card:hover,
+	.card:focus-visible {
+		border-color: var(--sl-color-accent);
+	}
+	.name {
+		font-size: var(--sl-text-lg);
+		font-weight: 600;
+		color: var(--sl-color-white);
+	}
+	.summary {
+		flex-grow: 1;
+	}
+	.badges {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem;
+	}
+	.ecosystems {
+		font-size: var(--sl-text-xs);
+		color: var(--sl-color-gray-3);
+	}
+</style>

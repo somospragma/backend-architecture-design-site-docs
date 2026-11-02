@@ -8,6 +8,13 @@
 	--sl-hue-purple: 262;
 }
 
+/* En pantallas anchas las áreas están en la barra superior (SiteTitle.astro); se quitan de la lateral. */
+@media (min-width: 72rem) {
+	.starlight-sidebar-topics {
+		display: none;
+	}
+}
+
 /* Poppins: Bold para títulos, SemiBold para énfasis, Regular para el cuerpo. */
 .sl-markdown-content :is(h1, h2, h3, h4, h5, h6),
 h1#_top,

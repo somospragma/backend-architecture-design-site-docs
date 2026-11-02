@@ -1,4 +1,5 @@
 import type { Artifact } from '../content/artifact-schema';
+import { AREAS, KINDS } from '../content/taxonomy.mjs';
 
 export type Lang = 'es' | 'en';
 
@@ -9,6 +10,7 @@ export const ui = {
 		emptyBody: 'El catálogo está listo, pero todavía no tiene fichas. Si construiste algo que le sirve a otros,',
 		emptyLink: 'agrégalo',
 		filtersLabel: 'Filtros del catálogo',
+		filterArea: 'Área',
 		filterKind: 'Tipo',
 		filterEcosystem: 'Ecosistema',
 		filterOrigin: 'Origen',
@@ -17,6 +19,7 @@ export const ui = {
 		noMatches: 'Ningún artefacto coincide con los filtros.',
 		count: (n: number) => (n === 1 ? '1 artefacto' : `${n} artefactos`),
 		draft: 'borrador',
+		fieldArea: 'Área',
 		fieldKind: 'Tipo',
 		fieldEcosystems: 'Ecosistemas',
 		fieldOrigin: 'Origen',
@@ -31,12 +34,15 @@ export const ui = {
 		deprecatedTitle: 'Artefacto en desuso',
 		replacedBy: 'Usa en su lugar:',
 		backToCatalog: 'Volver al catálogo',
+		areaIntro: 'Artefactos de esta área, agrupados por tipo. También puedes filtrarlos en el',
+		catalogLink: 'catálogo completo',
 	},
 	en: {
 		emptyTitle: 'No artifacts yet',
 		emptyBody: 'The catalog is ready but has no entries yet. If you built something others can use,',
 		emptyLink: 'add it',
 		filtersLabel: 'Catalog filters',
+		filterArea: 'Area',
 		filterKind: 'Kind',
 		filterEcosystem: 'Ecosystem',
 		filterOrigin: 'Origin',
@@ -45,6 +51,7 @@ export const ui = {
 		noMatches: 'No artifacts match the filters.',
 		count: (n: number) => (n === 1 ? '1 artifact' : `${n} artifacts`),
 		draft: 'draft',
+		fieldArea: 'Area',
 		fieldKind: 'Kind',
 		fieldEcosystems: 'Ecosystems',
 		fieldOrigin: 'Origin',
@@ -59,31 +66,19 @@ export const ui = {
 		deprecatedTitle: 'Deprecated artifact',
 		replacedBy: 'Use instead:',
 		backToCatalog: 'Back to the catalog',
+		areaIntro: 'Artifacts in this area, grouped by kind. You can also filter them in the',
+		catalogLink: 'full catalog',
 	},
 } as const;
 
-export const kindLabels: Record<Lang, Record<Artifact['kind'], string>> = {
-	es: {
-		library: 'Librería',
-		plugin: 'Plugin',
-		cli: 'CLI',
-		template: 'Plantilla',
-		tool: 'Herramienta',
-		sdk: 'SDK',
-		action: 'Action',
-		other: 'Otro',
-	},
-	en: {
-		library: 'Library',
-		plugin: 'Plugin',
-		cli: 'CLI',
-		template: 'Template',
-		tool: 'Tool',
-		sdk: 'SDK',
-		action: 'Action',
-		other: 'Other',
-	},
-};
+const labelsFor = <T extends Record<string, { es: string; en: string }>>(source: T) =>
+	({
+		es: Object.fromEntries(Object.entries(source).map(([id, l]) => [id, l.es])),
+		en: Object.fromEntries(Object.entries(source).map(([id, l]) => [id, l.en])),
+	}) as Record<Lang, Record<string, string>>;
+
+export const kindLabels = labelsFor(KINDS);
+export const areaLabels = labelsFor(AREAS);
 
 export const originLabels: Record<Lang, Record<Artifact['origin'], string>> = {
 	es: { official: 'Oficial', community: 'Comunidad' },

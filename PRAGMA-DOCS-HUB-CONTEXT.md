@@ -189,6 +189,9 @@ En la otra sesión conviene usar:
 5. **Modo claro/oscuro:** se usa el selector de tema que trae Starlight. No se construye uno propio; solo se define la paleta de cada modo con los tokens.
 6. **Logos:** los SVG de Pragma que están en `static/img/` se pueden usar en el sitio.
 
+7. **Navegación por áreas** (2026-11-02). La barra superior tiene un tema "Hub" y un tema por cada área con al menos una ficha publicada. Las áreas son `java`, `node`, `python`, `dotnet`, `mobile`, `cloud` y `tools`, y están en `src/content/taxonomy.mjs`. Cada ficha tiene un `area` obligatorio: el lugar donde la busca quien la va a usar, no el lenguaje en que está escrita. `ecosystems` queda para filtrar. Dentro de cada área, la barra lateral se agrupa por tipo y en orden alfabético. Se implementa con `starlight-sidebar-topics` y con un `SiteTitle` propio que pone las áreas arriba en pantallas anchas; en celular quedan en el menú lateral.
+8. **Página inicial**. Se hace con componentes Astro, sin React, y conserva la barra superior y el buscador de Starlight. El motivo visual es el círculo del isotipo de Pragma. Incluye un armador de fichas en vivo, el selector de áreas, el flujo de aporte y un diálogo que abre el PR en GitHub con la ficha prellenada.
+
 ## Decisiones pendientes
 
 1. Aprobación de los valores de la paleta clara y oscura, sobre todo el fondo oscuro.

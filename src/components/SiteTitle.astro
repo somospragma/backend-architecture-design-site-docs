@@ -1,0 +1,57 @@
+---
+// Logo de Starlight más las áreas del hub en la barra superior.
+// En pantallas angostas las áreas se ocultan aquí y quedan en el menú lateral (ver theme.css).
+import Default from '@astrojs/starlight/components/SiteTitle.astro';
+
+const topics = Astro.locals.starlightSidebarTopics?.topics ?? [];
+---
+
+<div class="title-and-areas">
+	<Default />
+	{
+		topics.length > 1 && (
+			<nav class="areas" aria-label={Astro.currentLocale === 'en' ? 'Areas' : 'Áreas'}>
+				{topics.map((topic) => (
+					<a href={topic.link} aria-current={topic.isCurrent ? 'page' : undefined}>
+						{topic.label}
+					</a>
+				))}
+			</nav>
+		)
+	}
+</div>
+
+<style>
+	.title-and-areas {
+		display: flex;
+		align-items: center;
+		gap: 1.5rem;
+		min-width: 0;
+	}
+	.areas {
+		display: none;
+	}
+	@media (min-width: 72rem) {
+		.areas {
+			display: flex;
+			gap: 0.25rem;
+		}
+	}
+	.areas a {
+		padding: 0.3rem 0.75rem;
+		border-radius: 999px;
+		font-size: var(--sl-text-sm);
+		font-weight: 500;
+		color: var(--sl-color-gray-2);
+		text-decoration: none;
+		white-space: nowrap;
+	}
+	.areas a:hover {
+		color: var(--sl-color-white);
+		background: var(--sl-color-gray-6);
+	}
+	.areas a[aria-current='page'] {
+		color: var(--sl-color-text-invert);
+		background: var(--sl-color-text-accent);
+	}
+</style>

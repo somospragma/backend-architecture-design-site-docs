@@ -22,3 +22,6 @@ pnpm-debug.log*
 
 # generado desde src/styles/tokens.json
 src/styles/tokens.css
+
+# artefactos de trabajo de la skill de diseño
+.taste-skill/

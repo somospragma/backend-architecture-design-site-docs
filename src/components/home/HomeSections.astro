@@ -1,0 +1,260 @@
+---
+// Secciones de la página inicial, debajo del Hero. Se usa desde index.mdx de cada idioma.
+import { AREAS, KINDS } from '../../content/taxonomy.mjs';
+import type { Lang } from '../../i18n/catalog';
+import { REPO_URL, areaExamples, home } from './copy';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = home[lang];
+const areaIds = Object.keys(AREAS);
+// Cada área toma un color de la paleta para su disco; el texto va siempre sobre la tarjeta, no sobre el disco.
+const discColors = ['#6429CD', '#330072', '#531DBC', '#7500A0', '#9610FF', '#E4A4FF', '#B6B6FF'];
+const kindGroups = (area: string) =>
+	areaExamples[area] ??
+	({
+		node: ['library', 'sdk', 'template'],
+		python: ['library', 'cli'],
+		dotnet: ['library', 'template'],
+		mobile: ['library', 'plugin'],
+		cloud: ['template', 'action'],
+		tools: ['cli', 'tool'],
+	}[area] ?? []).map((k) => ({ group: KINDS[k].group, items: [] as string[] }));
+
+const issueTemplate = (origin: string) =>
+	[
+		'---',
+		'name: NOMBRE',
+		'summary:',
+		'  es: Una frase de qué resuelve.',
+		'  en: One sentence on what it solves.',
+		'area: java',
+		'kind: library',
+		'ecosystems: [java]',
+		`origin: ${origin}`,
+		'owners: [tu-usuario-de-github]',
+		'repository: https://github.com/ORG/REPO',
+		'status: experimental',
+		'license: Apache-2.0',
+		'docs:',
+		'  mode: indexed',
+		'  url: https://github.com/ORG/REPO#readme',
+		`lastReviewed: ${new Date().toISOString().slice(0, 10)}`,
+		'---',
+		'',
+	].join('\n');
+---
+
+<div class="ph-sections not-content" data-lang={lang}>
+	<section class="ph-areas" aria-labelledby="ph-areas-h">
+		<pragma-areas class="ph-areas__inner">
+			<div class="ph-areas__col">
+			<h2 id="ph-areas-h">{t.areas.heading}</h2>
+			<ul class="ph-areas__list" role="list">
+				{
+					areaIds.map((id, i) => (
+						<li>
+							<button type="button" data-area={id} aria-pressed={i === 0 ? 'true' : 'false'}>
+								{AREAS[id][lang]}
+							</button>
+						</li>
+					))
+				}
+			</ul>
+			</div>
+			<div class="ph-areas__stage">
+				{
+					areaIds.map((id, i) => (
+						<div class="ph-areas__slide" data-slide={id} hidden={i !== 0} style={`--disc:${discColors[i]}`}>
+							<div class="ph-areas__disc" aria-hidden="true" />
+							<div class="ph-sidebar" data-ui>
+								<p class="ph-sidebar__area">{AREAS[id][lang]}</p>
+								{kindGroups(id).map((g) => (
+									<div class="ph-sidebar__group">
+										<p class="ph-sidebar__label">{g.group[lang]}</p>
+										{g.items.length > 0 ? (
+											g.items.map((item) => <p class="ph-sidebar__item">{item}</p>)
+										) : (
+											<p class="ph-sidebar__item ph-sidebar__item--empty">{t.areas.empty}</p>
+										)}
+									</div>
+								))}
+							</div>
+							<p class="ph-areas__fact">{t.areas.facts[id as keyof typeof t.areas.facts]}</p>
+						</div>
+					))
+				}
+			</div>
+		</pragma-areas>
+	</section>
+
+	<section class="ph-steps" aria-labelledby="ph-steps-h">
+		{
+			t.steps.items.map((clause, i) => (
+				<div class={`ph-steps__field ph-steps__field--${i + 1}`}>
+					{i === 0 && <h2 id="ph-steps-h">{t.steps.heading}</h2>}
+					<div class="ph-ticket" data-ui>
+						<p class="ph-ticket__name">aws-sso-sessions.md</p>
+						{i >= 1 && <p class="ph-ticket__row">owners: dev-user</p>}
+						{i >= 1 && <p class="ph-ticket__row">license: MIT</p>}
+						{i >= 1 && <p class="ph-ticket__ok">{t.steps.checks}</p>}
+						{i >= 2 && <p class="ph-ticket__ok">{t.steps.approved}</p>}
+						{i >= 3 && <p class="ph-ticket__done">{t.steps.published} · {AREAS.tools[lang]}</p>}
+					</div>
+					<p class="ph-steps__clause">{clause}</p>
+				</div>
+			))
+		}
+	</section>
+
+	<section class="ph-board" aria-labelledby="ph-board-h">
+		<div class="ph-tile ph-tile--heading">
+			<h2 id="ph-board-h">{t.features.heading}</h2>
+		</div>
+		<div class="ph-tile ph-tile--owners">
+			<div class="ph-tile__ui ph-discs" data-ui aria-hidden="true">
+				<span>DY</span><span>AM</span><span>+2</span>
+			</div>
+			<p class="ph-tile__name">{t.features.owners[0]}</p>
+			<p class="ph-tile__line">{t.features.owners[1]}</p>
+		</div>
+		<div class="ph-tile ph-tile--docs">
+			<div class="ph-tile__ui ph-toggle" data-ui aria-hidden="true">
+				<span>indexed</span><span class="is-on">hosted</span>
+			</div>
+			<p class="ph-tile__name">{t.features.docs[0]}</p>
+			<p class="ph-tile__line">{t.features.docs[1]}</p>
+		</div>
+		<div class="ph-tile ph-tile--status">
+			<div class="ph-tile__ui ph-status" data-ui aria-hidden="true">
+				<span class="is-prev">beta</span>
+				<span>stable</span>
+			</div>
+			<p class="ph-tile__name">{t.features.status[0]}</p>
+			<p class="ph-tile__line">{t.features.status[1]}</p>
+		</div>
+		<div class="ph-tile ph-tile--search">
+			<div class="ph-tile__ui ph-keys" data-ui aria-hidden="true">
+				<kbd>Ctrl</kbd><kbd>K</kbd>
+			</div>
+			<p class="ph-tile__name">{t.features.search[0]}</p>
+			<p class="ph-tile__line">{t.features.search[1]}</p>
+		</div>
+		<div class="ph-tile ph-tile--langs">
+			<div class="ph-tile__ui ph-langs" data-ui aria-hidden="true">
+				<span class={lang === 'es' ? 'is-on' : ''}>ES</span><span class={lang === 'en' ? 'is-on' : ''}>EN</span>
+			</div>
+			<p class="ph-tile__name">{t.features.langs[0]}</p>
+			<p class="ph-tile__line">{t.features.langs[1]}</p>
+		</div>
+	</section>
+
+	<section class="ph-cta" aria-labelledby="ph-cta-h">
+		<div class="ph-cta__text">
+			<h2 id="ph-cta-h">{t.cta.heading}</h2>
+			<p>{t.cta.body}</p>
+		</div>
+		<pragma-propose
+			class="ph-dialog"
+			data-ui
+			data-repo={REPO_URL}
+			data-template-official={issueTemplate('official')}
+			data-template-community={issueTemplate('community')}
+		>
+			<p class="ph-dialog__title">{t.cta.dialog}</p>
+			<label class="ph-dialog__field">
+				<span>{t.cta.field}</span>
+				<input name="artifact" type="text" value="aws-sso-sessions" autocomplete="off" />
+			</label>
+			<fieldset class="ph-dialog__choice">
+				<legend>{t.cta.origin}</legend>
+				<label><input type="radio" name="origin" value="official" checked /><span>{t.cta.official}</span></label>
+				<label><input type="radio" name="origin" value="community" /><span>{t.cta.community}</span></label>
+			</fieldset>
+			<a
+				class="ph-dialog__go"
+				href={`${REPO_URL}/new/main/src/content/artifacts?filename=aws-sso-sessions.md&value=${encodeURIComponent(issueTemplate('official'))}`}
+			>
+				{t.cta.button}
+			</a>
+		</pragma-propose>
+	</section>
+</div>
+
+<script>
+	// Entradas al hacer scroll: título, texto y fragmento de cada sección, escalonados.
+	const groups = [
+		'#ph-areas-h, .ph-areas__list li, .ph-areas__stage',
+		'.ph-steps__field',
+		'.ph-tile',
+		'.ph-cta__text, .ph-dialog',
+	];
+	if ('IntersectionObserver' in window) {
+		document.documentElement.classList.add('ph-js');
+		const io = new IntersectionObserver(
+			(entries) => {
+				for (const entry of entries) {
+					if (entry.isIntersecting) {
+						entry.target.classList.add('is-in');
+						io.unobserve(entry.target);
+					}
+				}
+			},
+			{ rootMargin: '0px 0px -10% 0px' },
+		);
+		for (const selector of groups) {
+			document.querySelectorAll<HTMLElement>(selector).forEach((el, i) => {
+				el.dataset.reveal = '';
+				el.style.setProperty('--i', String(i));
+				io.observe(el);
+			});
+		}
+		// Respaldo: si el observador no llega a correr (pestaña en segundo plano, navegador viejo),
+		// nada se queda oculto.
+		setTimeout(() => {
+			document.querySelectorAll('[data-reveal]').forEach((el) => el.classList.add('is-in'));
+			io.disconnect();
+		}, 2500);
+	}
+
+	class PragmaAreas extends HTMLElement {
+		connectedCallback() {
+			const buttons = [...this.querySelectorAll<HTMLButtonElement>('button[data-area]')];
+			const slides = [...this.querySelectorAll<HTMLElement>('[data-slide]')];
+			for (const button of buttons) {
+				button.addEventListener('click', () => {
+					for (const b of buttons) b.setAttribute('aria-pressed', String(b === button));
+					for (const s of slides) s.hidden = s.dataset.slide !== button.dataset.area;
+				});
+			}
+		}
+	}
+	customElements.define('pragma-areas', PragmaAreas);
+
+	class PragmaPropose extends HTMLElement {
+		connectedCallback() {
+			const input = this.querySelector<HTMLInputElement>('input[name="artifact"]')!;
+			const link = this.querySelector<HTMLAnchorElement>('.ph-dialog__go')!;
+			const update = () => {
+				const slug =
+					input.value
+						.normalize('NFD')
+						.replace(/[̀-ͯ]/g, '')
+						.toLowerCase()
+						.replace(/[^a-z0-9]+/g, '-')
+						.replace(/^-|-$/g, '') || 'mi-artefacto';
+				const origin = this.querySelector<HTMLInputElement>('input[name="origin"]:checked')!.value;
+				const template = origin === 'community' ? this.dataset.templateCommunity! : this.dataset.templateOfficial!;
+				const value = template.replace('name: NOMBRE', `name: ${input.value.trim() || slug}`);
+				link.href = `${this.dataset.repo}/new/main/src/content/artifacts?filename=${slug}.md&value=${encodeURIComponent(value)}`;
+			};
+			this.addEventListener('input', update);
+			this.addEventListener('change', update);
+			update();
+		}
+	}
+	customElements.define('pragma-propose', PragmaPropose);
+</script>
