@@ -195,6 +195,8 @@ En la otra sesión conviene usar:
 9. **Paleta** (2026-11-02). Se aprueban los valores claro y oscuro de `src/styles/tokens.json`.
 10. **Reglas de aporte** (2026-11-03). Aprueba todo el equipo `@somospragma/backend-architecture`; CODEOWNERS separa fichas, docs `hosted` y marca para poder repartirlas después. Las vulnerabilidades se reportan por el reporte privado de GitHub (Security Advisories), sin correo. Los problemas de conducta se reportan por mensaje privado a alguien del equipo. Las docs `hosted` de una ficha en borrador solo se generan con `pnpm dev`.
 
+11. **Skills** (2026-11-03). Las cinco skills están en `.claude/skills/`. `pragma-brand` es la fuente de marca para fuera del hub; dentro del hub gana `tokens.json`. `document-project` es autocontenida para poder copiarla a cualquier repo de artefacto.
+
 ## Decisiones pendientes
 
 1. Confirmar el slug del equipo que aprueba (`somospragma/backend-architecture`) y activar el reporte privado de vulnerabilidades en la configuración del repo.
