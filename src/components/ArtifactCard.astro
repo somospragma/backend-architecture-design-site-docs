@@ -1,6 +1,7 @@
 ---
-// Tarjeta de un artefacto. La usan el catálogo y las páginas de área.
+// Tarjeta de un artefacto. La usan el catálogo y las páginas de cada tipo.
 import { Badge } from '@astrojs/starlight/components';
+import { LANGUAGES, TECHNOLOGIES } from '../content/taxonomy.mjs';
 import { kindLabels, originLabels, statusLabels, statusVariant, ui, type Lang } from '../i18n/catalog';
 import { artifactPath, type ArtifactEntry } from '../lib/artifacts';
 
@@ -11,6 +12,7 @@ interface Props {
 
 const { lang, entry } = Astro.props;
 const { id, data } = entry;
+const stack = [...data.languages.map((l) => LANGUAGES[l]), ...data.technologies.map((x) => TECHNOLOGIES[x])];
 ---
 
 <a href={artifactPath(lang, id)} class="card">
@@ -22,7 +24,7 @@ const { id, data } = entry;
 		<Badge text={originLabels[lang][data.origin]} variant={data.origin === 'official' ? 'tip' : 'default'} />
 		{data.draft && <Badge text={ui[lang].draft} variant="caution" />}
 	</span>
-	<span class="ecosystems">{data.ecosystems.join(' · ')}</span>
+	<span class="stack">{stack.join(' · ')}</span>
 </a>
 
 <style>
@@ -54,7 +56,7 @@ const { id, data } = entry;
 		flex-wrap: wrap;
 		gap: 0.25rem;
 	}
-	.ecosystems {
+	.stack {
 		font-size: var(--sl-text-xs);
 		color: var(--sl-color-gray-3);
 	}

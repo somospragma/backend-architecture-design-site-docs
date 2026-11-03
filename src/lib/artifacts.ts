@@ -45,6 +45,12 @@ export function registryHref(registry: NonNullable<Artifact['registry']>) {
 			return `https://www.nuget.org/packages/${id}`;
 		case 'pub-dev':
 			return `https://pub.dev/packages/${id}`;
+		case 'rubygems':
+			return `https://rubygems.org/gems/${id}`;
+		case 'crates-io':
+			return `https://crates.io/crates/${id}`;
+		case 'vscode-marketplace':
+			return `https://marketplace.visualstudio.com/items?itemName=${id}`;
 		default:
 			return undefined;
 	}

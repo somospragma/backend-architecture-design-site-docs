@@ -5,7 +5,7 @@ Estructura para un artefacto con `docs.mode: hosted`. Copia esta carpeta a:
 - `src/content/docs/artifacts/<slug>/` para español (obligatorio).
 - `src/content/docs/en/artifacts/<slug>/` para inglés. Si falta una página en inglés, Starlight muestra la de español con un aviso.
 
-No copies este README. Las páginas aparecen solas en la barra lateral del área del artefacto, en el orden de `sidebar.order`.
+No copies este README. Las páginas aparecen solas en la barra lateral del tipo del artefacto, en el orden de `sidebar.order`.
 
 | Archivo | Qué va |
 |---|---|

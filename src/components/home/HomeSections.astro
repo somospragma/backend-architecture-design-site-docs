@@ -1,8 +1,8 @@
 ---
 // Secciones de la página inicial, debajo del Hero. Se usa desde index.mdx de cada idioma.
-import { AREAS, KINDS } from '../../content/taxonomy.mjs';
+import { DISCIPLINES, KINDS } from '../../content/taxonomy.mjs';
 import type { Lang } from '../../i18n/catalog';
-import { REPO_URL, areaExamples, home } from './copy';
+import { REPO_URL, home, typeExamples, typeStacks } from './copy';
 
 interface Props {
 	lang: Lang;
@@ -10,19 +10,9 @@ interface Props {
 
 const { lang } = Astro.props;
 const t = home[lang];
-const areaIds = Object.keys(AREAS);
-// Cada área toma un color de la paleta para su disco; el texto va siempre sobre la tarjeta, no sobre el disco.
-const discColors = ['#6429CD', '#330072', '#531DBC', '#7500A0', '#9610FF', '#E4A4FF', '#B6B6FF'];
-const kindGroups = (area: string) =>
-	areaExamples[area] ??
-	({
-		node: ['library', 'sdk', 'template'],
-		python: ['library', 'cli'],
-		dotnet: ['library', 'template'],
-		mobile: ['library', 'plugin'],
-		cloud: ['template', 'action'],
-		tools: ['cli', 'tool'],
-	}[area] ?? []).map((k) => ({ group: KINDS[k].group, items: [] as string[] }));
+const typeIds = Object.keys(KINDS);
+// Cada tipo toma un color de la paleta para su disco; el texto va siempre sobre la tarjeta, no sobre el disco.
+const discColors = ['#6429CD', '#330072', '#531DBC', '#7500A0', '#9610FF'];
 
 const issueTemplate = (origin: string) =>
 	[
@@ -31,9 +21,9 @@ const issueTemplate = (origin: string) =>
 		'summary:',
 		'  es: Una frase de qué resuelve.',
 		'  en: One sentence on what it solves.',
-		'area: java',
 		'kind: library',
-		'ecosystems: [java]',
+		'disciplines: [backend]',
+		'languages: [java]',
 		`origin: ${origin}`,
 		'owners: [tu-usuario-de-github]',
 		'repository: https://github.com/ORG/REPO',
@@ -49,46 +39,52 @@ const issueTemplate = (origin: string) =>
 ---
 
 <div class="ph-sections not-content" data-lang={lang}>
-	<section class="ph-areas" aria-labelledby="ph-areas-h">
-		<pragma-areas class="ph-areas__inner">
-			<div class="ph-areas__col">
-			<h2 id="ph-areas-h">{t.areas.heading}</h2>
-			<ul class="ph-areas__list" role="list">
+	<section class="ph-types" aria-labelledby="ph-types-h">
+		<pragma-types class="ph-types__inner">
+			<div class="ph-types__col">
+			<h2 id="ph-types-h">{t.types.heading}</h2>
+			<ul class="ph-types__list" role="list">
 				{
-					areaIds.map((id, i) => (
+					typeIds.map((id, i) => (
 						<li>
-							<button type="button" data-area={id} aria-pressed={i === 0 ? 'true' : 'false'}>
-								{AREAS[id][lang]}
+							<button type="button" data-type={id} aria-pressed={i === 0 ? 'true' : 'false'}>
+								{KINDS[id].group[lang]}
 							</button>
 						</li>
 					))
 				}
 			</ul>
 			</div>
-			<div class="ph-areas__stage">
+			<div class="ph-types__stage">
 				{
-					areaIds.map((id, i) => (
-						<div class="ph-areas__slide" data-slide={id} hidden={i !== 0} style={`--disc:${discColors[i]}`}>
-							<div class="ph-areas__disc" aria-hidden="true" />
+					typeIds.map((id, i) => (
+						<div class="ph-types__slide" data-slide={id} hidden={i !== 0} style={`--disc:${discColors[i]}`}>
+							<div class="ph-types__disc" aria-hidden="true" />
 							<div class="ph-sidebar" data-ui>
-								<p class="ph-sidebar__area">{AREAS[id][lang]}</p>
-								{kindGroups(id).map((g) => (
+								<p class="ph-sidebar__title">{KINDS[id].group[lang]}</p>
+								{typeExamples[id].map((g) => (
 									<div class="ph-sidebar__group">
-										<p class="ph-sidebar__label">{g.group[lang]}</p>
+										<p class="ph-sidebar__label">{DISCIPLINES[g.discipline][lang]}</p>
 										{g.items.length > 0 ? (
 											g.items.map((item) => <p class="ph-sidebar__item">{item}</p>)
 										) : (
-											<p class="ph-sidebar__item ph-sidebar__item--empty">{t.areas.empty}</p>
+											<p class="ph-sidebar__item ph-sidebar__item--empty">{t.types.empty}</p>
 										)}
 									</div>
 								))}
 							</div>
-							<p class="ph-areas__fact">{t.areas.facts[id as keyof typeof t.areas.facts]}</p>
+							<div class="ph-types__facts">
+								<p class="ph-types__fact">{t.types.facts[id as keyof typeof t.types.facts]}</p>
+								<p class="ph-types__stack-label">{t.types.stack}</p>
+								<ul class="ph-chips" role="list">
+									{typeStacks[id].map((chip) => <li>{chip}</li>)}
+								</ul>
+							</div>
 						</div>
 					))
 				}
 			</div>
-		</pragma-areas>
+		</pragma-types>
 	</section>
 
 	<section class="ph-steps" aria-labelledby="ph-steps-h">
@@ -102,7 +98,7 @@ const issueTemplate = (origin: string) =>
 						{i >= 1 && <p class="ph-ticket__row">license: MIT</p>}
 						{i >= 1 && <p class="ph-ticket__ok">{t.steps.checks}</p>}
 						{i >= 2 && <p class="ph-ticket__ok">{t.steps.approved}</p>}
-						{i >= 3 && <p class="ph-ticket__done">{t.steps.published} · {AREAS.tools[lang]}</p>}
+						{i >= 3 && <p class="ph-ticket__done">{t.steps.published} · {KINDS.tool.group[lang]}</p>}
 					</div>
 					<p class="ph-steps__clause">{clause}</p>
 				</div>
@@ -187,7 +183,7 @@ const issueTemplate = (origin: string) =>
 <script>
 	// Entradas al hacer scroll: título, texto y fragmento de cada sección, escalonados.
 	const groups = [
-		'#ph-areas-h, .ph-areas__list li, .ph-areas__stage',
+		'#ph-types-h, .ph-types__list li, .ph-types__stage',
 		'.ph-steps__field',
 		'.ph-tile',
 		'.ph-cta__text, .ph-dialog',
@@ -220,19 +216,19 @@ const issueTemplate = (origin: string) =>
 		}, 2500);
 	}
 
-	class PragmaAreas extends HTMLElement {
+	class PragmaTypes extends HTMLElement {
 		connectedCallback() {
-			const buttons = [...this.querySelectorAll<HTMLButtonElement>('button[data-area]')];
+			const buttons = [...this.querySelectorAll<HTMLButtonElement>('button[data-type]')];
 			const slides = [...this.querySelectorAll<HTMLElement>('[data-slide]')];
 			for (const button of buttons) {
 				button.addEventListener('click', () => {
 					for (const b of buttons) b.setAttribute('aria-pressed', String(b === button));
-					for (const s of slides) s.hidden = s.dataset.slide !== button.dataset.area;
+					for (const s of slides) s.hidden = s.dataset.slide !== button.dataset.type;
 				});
 			}
 		}
 	}
-	customElements.define('pragma-areas', PragmaAreas);
+	customElements.define('pragma-types', PragmaTypes);
 
 	class PragmaPropose extends HTMLElement {
 		connectedCallback() {

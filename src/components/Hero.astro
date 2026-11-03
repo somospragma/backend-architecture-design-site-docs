@@ -1,7 +1,7 @@
 ---
 // Reemplaza el Hero de Starlight. Solo lo usa la página inicial (la única con `hero` en el frontmatter).
 // El círculo es el del isotipo de Pragma; sobre él vive un armador de fichas que funciona de verdad.
-import { AREAS, KINDS } from '../content/taxonomy.mjs';
+import { DISCIPLINES, KINDS } from '../content/taxonomy.mjs';
 import { home } from './home/copy';
 import { sitePath } from '../lib/artifacts';
 
@@ -29,15 +29,15 @@ const PAGE_TITLE_ID = '_top';
 					<input name="name" type="text" value="Pragma Log" placeholder={b.placeholder} autocomplete="off" />
 				</label>
 				<label>
-					<span>{b.area}</span>
-					<select name="area">
-						{Object.entries(AREAS).map(([id, l]) => <option value={id}>{l[lang]}</option>)}
-					</select>
-				</label>
-				<label>
 					<span>{b.kind}</span>
 					<select name="kind">
 						{Object.entries(KINDS).map(([id, l]) => <option value={id}>{l[lang]}</option>)}
+					</select>
+				</label>
+				<label>
+					<span>{b.discipline}</span>
+					<select name="discipline">
+						{Object.entries(DISCIPLINES).map(([id, l]) => <option value={id}>{l[lang]}</option>)}
 					</select>
 				</label>
 			</div>
@@ -45,15 +45,15 @@ const PAGE_TITLE_ID = '_top';
 				<span class="ph-builder__name" data-out="name">Pragma Log</span>
 				<span class="ph-builder__summary">{b.summary}</span>
 				<span class="ph-builder__badges">
-					<span class="ph-badge" data-out="area">{AREAS.java[lang]}</span>
 					<span class="ph-badge" data-out="kind">{KINDS.library[lang]}</span>
+					<span class="ph-badge" data-out="discipline">{DISCIPLINES.backend[lang]}</span>
 					<span class="ph-badge ph-badge--soft">experimental</span>
 				</span>
 			</div>
 			<pre class="ph-builder__yaml"><code data-out="yaml">{`# src/content/artifacts/pragma-log.md
 name: Pragma Log
-area: java
 kind: library
+disciplines: [backend]
 origin: official
 status: experimental`}</code></pre>
 			<button type="button" class="ph-builder__copy">{b.copy}</button>
@@ -79,16 +79,16 @@ status: experimental`}</code></pre>
 
 			const render = () => {
 				const name = field('name').value.trim() || field('name').getAttribute('placeholder')!;
-				const area = field('area') as HTMLSelectElement;
 				const kind = field('kind') as HTMLSelectElement;
+				const discipline = field('discipline') as HTMLSelectElement;
 				out('name').textContent = name;
-				out('area').textContent = area.selectedOptions[0].text;
 				out('kind').textContent = kind.selectedOptions[0].text;
+				out('discipline').textContent = discipline.selectedOptions[0].text;
 				out('yaml').textContent = [
 					`# src/content/artifacts/${slugify(name)}.md`,
 					`name: ${name}`,
-					`area: ${area.value}`,
 					`kind: ${kind.value}`,
+					`disciplines: [${discipline.value}]`,
 					'origin: official',
 					'status: experimental',
 				].join('\n');

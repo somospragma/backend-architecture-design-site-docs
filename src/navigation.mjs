@@ -3,7 +3,7 @@
 // por eso lee el frontmatter directamente. La validación completa la hace el schema en el build.
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { parse } from 'yaml';
-import { AREAS, KINDS } from './content/taxonomy.mjs';
+import { DISCIPLINES, KINDS } from './content/taxonomy.mjs';
 
 const ARTIFACTS_DIR = new URL('./content/artifacts/', import.meta.url);
 
@@ -16,7 +16,7 @@ function readArtifacts(includeDrafts) {
 			const frontmatter = readFileSync(new URL(file, ARTIFACTS_DIR), 'utf8').match(/^---\n([\s\S]*?)\n---/)?.[1];
 			return { slug: file.replace(/\.md$/, ''), ...parse(frontmatter ?? '') };
 		})
-		.filter((a) => a.area in AREAS && a.kind in KINDS && (includeDrafts || !a.draft));
+		.filter((a) => a.kind in KINDS && (includeDrafts || !a.draft));
 }
 
 /** Slugs de las fichas en borrador. Sus docs hosted no se publican en el build de producción. */
@@ -45,24 +45,21 @@ function artifactItem(artifact) {
 	return { label: artifact.name, link: `/catalog/${artifact.slug}/` };
 }
 
-/** Barra lateral de un área: un grupo por tipo, en el orden de KINDS, con los artefactos en orden alfabético. */
-function areaSidebar(artifacts) {
-	return Object.entries(KINDS)
-		.map(([kind, labels]) => ({
-			label: labels.group.es,
-			translations: { en: labels.group.en },
+/** Disciplina principal de una ficha: la primera de su lista. */
+const primaryDiscipline = (artifact) => artifact.disciplines?.[0];
+
+/** Barra lateral de un tipo: un grupo por disciplina principal, en el orden de DISCIPLINES, con los artefactos en orden alfabético. */
+function kindSidebar(artifacts) {
+	return Object.entries(DISCIPLINES)
+		.map(([discipline, label]) => ({
+			label: label.es,
+			translations: { en: label.en },
 			items: artifacts
-				.filter((a) => a.kind === kind)
+				.filter((a) => primaryDiscipline(a) === discipline)
 				.sort((a, b) => a.name.localeCompare(b.name))
 				.map(artifactItem),
 		}))
 		.filter((group) => group.items.length > 0);
-}
-
-/** Lista de áreas con al menos una ficha visible. */
-export function populatedAreas({ includeDrafts }) {
-	const artifacts = readArtifacts(includeDrafts);
-	return Object.keys(AREAS).filter((area) => artifacts.some((a) => a.area === area));
 }
 
 export function buildTopics({ includeDrafts }) {
@@ -84,15 +81,15 @@ export function buildTopics({ includeDrafts }) {
 		],
 	};
 
-	const areas = Object.entries(AREAS)
-		.map(([area, label]) => ({ area, label, artifacts: artifacts.filter((a) => a.area === area) }))
+	const kinds = Object.entries(KINDS)
+		.map(([kind, labels]) => ({ kind, labels, artifacts: artifacts.filter((a) => a.kind === kind) }))
 		.filter(({ artifacts }) => artifacts.length > 0)
-		.map(({ area, label, artifacts }) => ({
-			id: area,
-			label: { es: label.es, en: label.en },
-			link: `/areas/${area}/`,
-			items: areaSidebar(artifacts),
+		.map(({ kind, labels, artifacts }) => ({
+			id: kind,
+			label: { es: labels.group.es, en: labels.group.en },
+			link: `/types/${kind}/`,
+			items: kindSidebar(artifacts),
 		}));
 
-	return [hub, ...areas];
+	return [hub, ...kinds];
 }

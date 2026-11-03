@@ -38,15 +38,30 @@ An artifact joins the hub through a pull request that adds its entry. If the ent
 
 </Steps>
 
-## Choosing the area
+## How to classify an artifact
 
-The area is where the people who will use the artifact look for it, not the language it is written in. Answer in order:
+### Type: how it is used
 
-1. Is it imported or used from a language? That language's area: `java`, `node`, `python`, `dotnet` or `mobile`.
-2. Does it deploy or configure infrastructure? `cloud`.
-3. Does it run on the developer's machine? `tools`.
+The type is the top navigation and does not depend on the language. Answer in order and keep the first yes:
 
-A Gradle plugin goes in `java`. A CLI written in Go that Java teams use goes in `tools`.
+1. Is it added as a dependency? `library` (packages, SDKs, Terraform modules, charts).
+2. Is it installed inside another tool? `plugin` (Gradle, Maven, IDE, ESLint, Backstage).
+3. Is it copied or generated to start a project? `template` (archetypes, starters, scaffolds).
+4. Does it run on its own? `tool` (CLIs, desktop apps, internal services, bots).
+5. Does it run in the CI/CD pipeline? `automation` (GitHub Actions, reusable workflows, policies).
+
+A Gradle plugin that generates code is a `plugin`, not a `template`. A CLI that creates projects from an archetype is a `tool`; the archetype is a `template`.
+
+### Discipline: what work it serves
+
+At least one: `backend`, `frontend`, `mobile`, `data`, `ai`, `quality`, `integration`, `cloudops`, `devsecops` or `dx`. **The first one is the primary** and sets the sidebar group.
+
+### Languages and technologies: filters
+
+- `languages` (at least one): the language the consumer uses it from. A YAML action is `yaml`; a Spring library is `java` or `kotlin`.
+- `technologies` (optional): frameworks, platforms and build tools, such as `spring-webflux`, `nestjs`, `aws` or `gradle`.
+
+If a language or technology is missing (say `ruby`), add it to `src/content/taxonomy.mjs` in the same PR. Navigation does not change.
 
 ## Statuses
 

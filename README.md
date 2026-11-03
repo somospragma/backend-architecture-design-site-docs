@@ -22,7 +22,7 @@ src/
 ├── content/
 │   ├── artifacts/       # una ficha por artefacto: <slug>.md
 │   ├── artifact-schema.ts  # schema de las fichas (el build falla si no se cumple)
-│   ├── taxonomy.mjs     # áreas y tipos
+│   ├── taxonomy.mjs     # tipos, disciplinas, lenguajes y tecnologías
 │   └── docs/            # páginas en español (raíz) y en/ para inglés
 ├── styles/
 │   ├── tokens.json      # única fuente de la marca: colores, neutros, fuente y pares de contraste
@@ -48,6 +48,16 @@ En [.claude/skills/](.claude/skills/) hay skills para que cualquier asistente ha
 | `add-artifact` | Crear una ficha, validarla y armar el PR. |
 | `document-project` | Documentar un artefacto en su propio repo. Se puede copiar a cualquier proyecto. |
 | `release-docs` | Qué actualizar cuando un artefacto saca versión. |
+
+## CI y despliegue
+
+| Workflow | Cuándo | Qué hace |
+|---|---|---|
+| `ci.yml` | Cada PR y `main` | Build (valida el schema de las fichas), contraste de la marca, fichas sin revisar y enlaces internos rotos. |
+| `security.yml` | Cada PR, `main` y los lunes | Secretos con gitleaks en toda la historia, CodeQL para TypeScript y para los workflows, zizmor, `pnpm audit` y revisión de dependencias nuevas en el PR. |
+| `deploy.yml` | `main` | Valida (CI y seguridad), construye, **espera aprobación** en el environment `production-approval` y publica en GitHub Pages. Está apagado hasta que exista la variable `DEPLOY_ENABLED=true`. |
+
+Las acciones están fijadas por SHA y Dependabot las mantiene al día. Los falsos positivos de gitleaks van en `.gitleaksignore` con su huella exacta.
 
 ## Marca
 

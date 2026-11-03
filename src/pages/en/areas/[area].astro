@@ -1,8 +1,0 @@
----
-import AreaPage from '../../../components/AreaPage.astro';
-import { getAreaPaths } from '../../../lib/area-paths';
-
-export const getStaticPaths = getAreaPaths;
----
-
-<AreaPage lang="en" area={Astro.props.area} entries={Astro.props.entries} />

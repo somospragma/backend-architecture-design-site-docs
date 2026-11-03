@@ -1,6 +1,6 @@
 /*
  * Página inicial. El motivo es el círculo del isotipo de Pragma: escenario del hero,
- * disco de las áreas, forma de los botones y viñeta de la lista.
+ * disco de los tipos, forma de los botones y viñeta de la lista.
  * Colores: solo var(--pragma-*) y var(--sl-color-*) de tokens.css. Tamaños de texto: los cinco de abajo.
  */
 
@@ -244,25 +244,25 @@
 
 /* ---------- Áreas ---------- */
 
-.ph-areas {
+.ph-types {
 	padding: 160px var(--ph-margin) 0;
 }
-.ph-areas__inner {
+.ph-types__inner {
 	display: grid;
 	grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
 	align-items: center;
 	gap: 2rem;
 }
-.ph-areas__list {
+.ph-types__list {
 	margin: 0;
 	padding: 0;
 	list-style: none;
 }
-.ph-areas__col h2 {
+.ph-types__col h2 {
 	margin-bottom: 0.3em;
 	color: var(--sl-color-gray-3);
 }
-.ph-areas__list button {
+.ph-types__list button {
 	display: inline-flex;
 	align-items: center;
 	gap: 0.45em;
@@ -278,7 +278,7 @@
 	cursor: pointer;
 	transition: color 160ms var(--ph-ease), transform 160ms var(--ph-ease);
 }
-.ph-areas__list button::before {
+.ph-types__list button::before {
 	content: '';
 	width: 0.32em;
 	aspect-ratio: 1;
@@ -290,36 +290,36 @@
 		opacity 200ms var(--ph-ease),
 		transform 200ms var(--ph-ease);
 }
-.ph-areas__list button:hover {
+.ph-types__list button:hover {
 	color: var(--sl-color-white);
 }
-.ph-areas__list button[aria-pressed='true'] {
+.ph-types__list button[aria-pressed='true'] {
 	color: var(--sl-color-white);
 }
-.ph-areas__list button[aria-pressed='true']::before {
+.ph-types__list button[aria-pressed='true']::before {
 	background: var(--sl-color-text-accent);
 	opacity: 1;
 	transform: scale(1);
 }
-.ph-areas__list button:focus-visible {
+.ph-types__list button:focus-visible {
 	outline: 2px solid var(--sl-color-accent);
 	outline-offset: 4px;
 }
-.ph-areas__stage {
+.ph-types__stage {
 	position: relative;
 	min-height: min(68vh, 640px);
 }
-.ph-areas__slide {
+.ph-types__slide {
 	position: absolute;
 	inset: 0;
 	display: grid;
 	place-items: center;
 	animation: ph-fade 300ms var(--ph-ease);
 }
-.ph-areas__slide[hidden] {
+.ph-types__slide[hidden] {
 	display: none;
 }
-.ph-areas__disc {
+.ph-types__disc {
 	position: absolute;
 	width: min(64vh, 100%);
 	aspect-ratio: 1;
@@ -336,7 +336,7 @@
 	background: var(--sl-color-black);
 	font-size: var(--ph-small);
 }
-.ph-sidebar__area {
+.ph-sidebar__title {
 	margin: 0 0 12px;
 	font-size: var(--ph-body);
 	font-weight: 600;
@@ -358,35 +358,59 @@
 	background: var(--sl-color-text-accent);
 	color: var(--sl-color-text-invert);
 }
-.ph-areas__fact {
+.ph-types__facts {
 	position: absolute;
 	right: 0;
 	bottom: 4vh;
-	max-width: 22ch;
+	max-width: 24ch;
+}
+.ph-types__fact {
 	margin: 0;
 	font-size: 17px;
 }
+.ph-types__stack-label {
+	margin: 16px 0 8px;
+	font-size: var(--ph-small);
+	font-weight: 600;
+	color: var(--sl-color-gray-3);
+}
+.ph-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.ph-chips li {
+	margin: 0;
+	padding: 3px 10px;
+	border: 1px solid var(--sl-color-gray-5);
+	border-radius: 999px;
+	font-size: var(--ph-small);
+	color: var(--sl-color-gray-2);
+}
 
 @media (max-width: 60rem) {
-	.ph-areas {
+	.ph-types {
 		padding-top: 96px;
 	}
-	.ph-areas__inner {
+	.ph-types__inner {
 		grid-template-columns: 1fr;
 		gap: 24px;
 	}
-	/* En celular: el disco primero, luego la fila de áreas y el dato debajo. */
-	.ph-areas__stage {
+	/* En celular: el disco primero, luego la fila de tipos y el dato debajo. */
+	.ph-types__stage {
 		order: -1;
 		min-height: 0;
 	}
-	.ph-areas__slide {
+	.ph-types__slide {
 		position: relative;
 		inset: auto;
 		display: block;
 		padding-top: calc(86vw + 20px);
 	}
-	.ph-areas__disc {
+	.ph-types__disc {
 		top: 0;
 		left: calc(50% - 43vw);
 		width: 86vw;
@@ -398,27 +422,29 @@
 		width: min(300px, 64vw);
 		margin: 0 0 0 calc(min(300px, 64vw) / -2);
 	}
-	.ph-areas__fact {
+	.ph-types__facts {
 		position: static;
 		max-width: none;
+	}
+	.ph-types__fact {
 		font-size: 16px;
 	}
-	.ph-areas__list {
+	.ph-types__list {
 		display: flex;
 		flex-wrap: nowrap;
 		gap: 24px;
 		overflow-x: auto;
 		padding-bottom: 8px;
 	}
-	.ph-areas__col {
+	.ph-types__col {
 		display: contents;
 	}
-	.ph-areas__col h2 {
+	.ph-types__col h2 {
 		order: -2;
 		margin: 0;
 		color: var(--sl-color-white);
 	}
-	.ph-areas__list button {
+	.ph-types__list button {
 		font-size: 26px;
 		white-space: nowrap;
 	}
@@ -932,7 +958,7 @@
 		transform: none;
 	}
 	/* Movimiento continuo: el disco de las áreas respira despacio. */
-	.ph-areas__disc {
+	.ph-types__disc {
 		animation: ph-breathe 8s ease-in-out infinite alternate;
 	}
 	@keyframes ph-breathe {

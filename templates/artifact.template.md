@@ -17,19 +17,26 @@ summary:
 #   es: ...
 #   en: ...
 
-# Dónde lo busca quien lo va a usar, no el lenguaje en que está escrito:
-# 1. ¿Se importa o se usa desde un lenguaje? java | node | python | dotnet | mobile
-# 2. ¿Despliega o configura infraestructura? cloud
-# 3. ¿Se corre en la máquina del desarrollador? tools
-area: java
-
-# library | plugin | sdk | template | cli | tool | action | other
+# Tipo: cómo se usa. Quédate con el primer sí:
+# ¿Se agrega como dependencia?                → library
+# ¿Se instala dentro de otra herramienta?      → plugin
+# ¿Se copia o genera para empezar un proyecto? → template
+# ¿Se ejecuta?                                 → tool
+# ¿Corre en el pipeline de CI/CD?              → automation
 kind: library
 
-# Al menos uno. Lista cerrada en src/content/artifact-schema.ts:
-# java, kotlin, spring, quarkus, gradle, maven, node, typescript, python, dotnet, go,
-# flutter, aws, azure, gcp, terraform, kubernetes, github-actions
-ecosystems: [java]
+# Para qué trabajo sirve. La primera es la principal (grupo en la barra lateral).
+# backend | frontend | mobile | data | ai | quality | integration | cloudops | devsecops | dx
+disciplines: [backend]
+
+# En qué lenguaje lo usa quien lo consume. Al menos uno. Lista en src/content/taxonomy.mjs:
+# java, kotlin, groovy, scala, javascript, typescript, python, csharp, go, rust, dart,
+# swift, ruby, php, hcl, shell, yaml, sql. Si falta uno, agrégalo allí en el mismo PR.
+languages: [java]
+
+# Opcional. Frameworks, plataformas y herramientas de build (lista en taxonomy.mjs),
+# por ejemplo spring-boot, spring-webflux, gradle, nestjs, react, flutter, aws, terraform.
+technologies: []
 
 # official: vive en una organización de Pragma. community: cuenta personal y open source.
 origin: official
@@ -40,7 +47,8 @@ owners: [somospragma/backend-architecture]
 repository: https://github.com/somospragma/mi-artefacto
 
 # Opcional. Dónde se publica. type: maven-central | gradle-plugin-portal | npm | pypi | nuget |
-# pub-dev | github-packages | docker-hub | terraform-registry | github-marketplace
+# pub-dev | rubygems | crates-io | artifact-hub | vscode-marketplace | github-packages |
+# docker-hub | terraform-registry | github-marketplace
 registry:
   type: maven-central
   id: com.pragma:mi-artefacto

@@ -1,5 +1,5 @@
 import type { Artifact } from '../content/artifact-schema';
-import { AREAS, KINDS } from '../content/taxonomy.mjs';
+import { DISCIPLINES, KINDS } from '../content/taxonomy.mjs';
 
 export type Lang = 'es' | 'en';
 
@@ -10,18 +10,20 @@ export const ui = {
 		emptyBody: 'El catálogo está listo, pero todavía no tiene fichas. Si construiste algo que le sirve a otros,',
 		emptyLink: 'agrégalo',
 		filtersLabel: 'Filtros del catálogo',
-		filterArea: 'Área',
 		filterKind: 'Tipo',
-		filterEcosystem: 'Ecosistema',
+		filterDiscipline: 'Disciplina',
+		filterLanguage: 'Lenguaje',
+		filterTechnology: 'Tecnología',
 		filterOrigin: 'Origen',
 		filterStatus: 'Estado',
 		filterAll: 'Todos',
 		noMatches: 'Ningún artefacto coincide con los filtros.',
 		count: (n: number) => (n === 1 ? '1 artefacto' : `${n} artefactos`),
 		draft: 'borrador',
-		fieldArea: 'Área',
 		fieldKind: 'Tipo',
-		fieldEcosystems: 'Ecosistemas',
+		fieldDisciplines: 'Disciplinas',
+		fieldLanguages: 'Lenguajes',
+		fieldTechnologies: 'Tecnologías',
 		fieldOrigin: 'Origen',
 		fieldOwners: 'Owners',
 		fieldRepository: 'Repositorio',
@@ -34,7 +36,7 @@ export const ui = {
 		deprecatedTitle: 'Artefacto en desuso',
 		replacedBy: 'Usa en su lugar:',
 		backToCatalog: 'Volver al catálogo',
-		areaIntro: 'Artefactos de esta área, agrupados por tipo. También puedes filtrarlos en el',
+		typeIntro: 'Aquí están agrupados por disciplina. También puedes filtrarlos por lenguaje o tecnología en el',
 		catalogLink: 'catálogo completo',
 	},
 	en: {
@@ -42,18 +44,20 @@ export const ui = {
 		emptyBody: 'The catalog is ready but has no entries yet. If you built something others can use,',
 		emptyLink: 'add it',
 		filtersLabel: 'Catalog filters',
-		filterArea: 'Area',
-		filterKind: 'Kind',
-		filterEcosystem: 'Ecosystem',
+		filterKind: 'Type',
+		filterDiscipline: 'Discipline',
+		filterLanguage: 'Language',
+		filterTechnology: 'Technology',
 		filterOrigin: 'Origin',
 		filterStatus: 'Status',
 		filterAll: 'All',
 		noMatches: 'No artifacts match the filters.',
 		count: (n: number) => (n === 1 ? '1 artifact' : `${n} artifacts`),
 		draft: 'draft',
-		fieldArea: 'Area',
-		fieldKind: 'Kind',
-		fieldEcosystems: 'Ecosystems',
+		fieldKind: 'Type',
+		fieldDisciplines: 'Disciplines',
+		fieldLanguages: 'Languages',
+		fieldTechnologies: 'Technologies',
 		fieldOrigin: 'Origin',
 		fieldOwners: 'Owners',
 		fieldRepository: 'Repository',
@@ -66,7 +70,7 @@ export const ui = {
 		deprecatedTitle: 'Deprecated artifact',
 		replacedBy: 'Use instead:',
 		backToCatalog: 'Back to the catalog',
-		areaIntro: 'Artifacts in this area, grouped by kind. You can also filter them in the',
+		typeIntro: 'Here they are grouped by discipline. You can also filter them by language or technology in the',
 		catalogLink: 'full catalog',
 	},
 } as const;
@@ -78,7 +82,7 @@ const labelsFor = <T extends Record<string, { es: string; en: string }>>(source:
 	}) as Record<Lang, Record<string, string>>;
 
 export const kindLabels = labelsFor(KINDS);
-export const areaLabels = labelsFor(AREAS);
+export const disciplineLabels = labelsFor(DISCIPLINES);
 
 export const originLabels: Record<Lang, Record<Artifact['origin'], string>> = {
 	es: { official: 'Oficial', community: 'Comunidad' },

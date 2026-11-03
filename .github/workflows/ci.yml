@@ -1,0 +1,62 @@
+# Validaciones del sitio: schema de las fichas (en el build), contraste de la marca,
+# fichas sin revisar y enlaces internos rotos. Corre en cada PR y lo reutiliza deploy.yml.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_call:
+
+permissions: {}
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    name: Build y validaciones
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # lastUpdated de Starlight necesita la historia
+          persist-credentials: false
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Contraste de la marca
+        run: pnpm check:contrast
+
+      - name: Fichas sin revisar en 12 meses
+        run: pnpm check:reviews
+
+      - name: Build (valida el schema de las fichas)
+        run: pnpm build
+
+      # Los enlaces del sitio llevan el base del repo; se monta dist/ debajo de él para resolverlos.
+      - name: Preparar el sitio para revisar enlaces
+        run: |
+          mkdir -p _site
+          cp -R dist "_site/${GITHUB_REPOSITORY#*/}"
+
+      - name: Enlaces internos rotos
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
+        with:
+          args: --offline --no-progress --root-dir ${{ github.workspace }}/_site '_site/**/*.html'
+          fail: true

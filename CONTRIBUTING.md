@@ -26,19 +26,22 @@ Un artefacto entra al hub si cumple todo esto:
 
 1. Deja el README del artefacto como pide la plantilla.
 2. Copia [`templates/artifact.template.md`](templates/artifact.template.md) a `src/content/artifacts/<slug>.md`. El nombre del archivo es el slug y la URL de la ficha: minúsculas y guiones, sin el prefijo de la organización.
-3. Elige el **área** con esta regla, en orden:
-   1. ¿Se importa o se usa desde un lenguaje? El área de ese lenguaje (`java`, `node`, `python`, `dotnet`, `mobile`).
-   2. ¿Despliega o configura infraestructura? `cloud`.
-   3. ¿Se corre en la máquina del desarrollador? `tools`.
-
-   El área es dónde lo busca quien lo va a usar, no el lenguaje en que está escrito. Un CLI hecho en Go para desarrolladores Java va en `tools`; un plugin de Gradle va en `java`.
+3. Clasifícalo:
+   - **Tipo (`kind`), cómo se usa.** Es la navegación de arriba. Responde en orden y quédate con el primer sí:
+     1. ¿Se agrega como dependencia? `library` (paquetes, SDKs, módulos de Terraform, charts).
+     2. ¿Se instala dentro de otra herramienta? `plugin` (Gradle, Maven, IDE, ESLint, Backstage).
+     3. ¿Se copia o se genera para empezar un proyecto? `template` (arquetipos, starters, scaffolds).
+     4. ¿Se ejecuta? `tool` (CLIs, apps de escritorio, servicios internos, bots).
+     5. ¿Corre en el pipeline de CI/CD? `automation` (GitHub Actions, workflows reutilizables, políticas).
+   - **Disciplinas (`disciplines`), para qué trabajo sirve.** Al menos una de `backend`, `frontend`, `mobile`, `data`, `ai`, `quality`, `integration`, `cloudops`, `devsecops`, `dx`. La primera es la principal y decide el grupo en la barra lateral.
+   - **Lenguajes (`languages`)**, al menos uno, y **tecnologías (`technologies`)**, opcional: frameworks, plataformas y herramientas de build. Son filtros del catálogo.
 4. Elige el modo de documentación:
    - `indexed`: la documentación vive en el repo del artefacto y `docs.url` apunta a ella.
    - `hosted`: la documentación vive en el hub, en `src/content/docs/artifacts/<slug>/`. Copia la estructura de [`templates/docs-hosted/`](templates/docs-hosted/).
 5. Corre `pnpm build`. Si falla, el mensaje dice qué campo corregir.
 6. Abre el PR y completa el checklist.
 
-Si un ecosistema, área o registro que necesitas no existe, agrégalo en `src/content/artifact-schema.ts` (o en `src/content/taxonomy.mjs` para áreas y tipos) dentro del mismo PR y explica por qué.
+Si falta un lenguaje o una tecnología (por ejemplo `ruby` o `rails`), agrégalo en `src/content/taxonomy.mjs` dentro del mismo PR; la navegación no cambia. Un registro nuevo va en `REGISTRIES` de `src/content/artifact-schema.ts`. Los tipos y las disciplinas son la estructura del hub: para cambiarlos, abre primero un issue.
 
 ¿No tienes la ficha lista? Abre un issue con la plantilla **Proponer artefacto** y alguien te ayuda.
 

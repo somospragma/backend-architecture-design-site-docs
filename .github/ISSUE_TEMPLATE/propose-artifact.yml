@@ -29,11 +29,24 @@ body:
     validations:
       required: true
   - type: dropdown
-    id: area
+    id: kind
     attributes:
-      label: Área
-      description: Dónde lo busca quien lo va a usar.
-      options: [Java / JVM, Node / TS, Python, .NET, Mobile, Cloud, Herramientas, No estoy seguro]
+      label: Tipo
+      description: Cómo se usa.
+      options:
+        - Librería (se agrega como dependencia)
+        - Plugin (se instala dentro de otra herramienta)
+        - Plantilla (se copia o genera para empezar un proyecto)
+        - Herramienta (se ejecuta)
+        - Automatización (corre en el pipeline)
+        - No estoy seguro
+    validations:
+      required: true
+  - type: input
+    id: stack
+    attributes:
+      label: Lenguajes y tecnologías
+      placeholder: Java, Spring WebFlux, Gradle
     validations:
       required: true
   - type: dropdown

@@ -1,6 +1,6 @@
 ---
 name: add-artifact
-description: Agregar un artefacto al catálogo del Pragma Hub. Crea la ficha en src/content/artifacts/<slug>.md desde la plantilla, elige área, tipo y ecosistemas con las reglas del hub, verifica los criterios de entrada contra el repo del artefacto, valida el schema con pnpm build y arma el PR con su checklist. Úsala en el repo del hub cuando pidan agregar, registrar, catalogar o proponer una librería, plugin, SDK, plantilla, CLI, herramienta o action, o pasar un artefacto de comunidad a oficial.
+description: Agregar un artefacto al catálogo del Pragma Hub. Crea la ficha en src/content/artifacts/<slug>.md desde la plantilla, la clasifica por tipo (cómo se usa), disciplina, lenguajes y tecnologías con las reglas del hub, verifica los criterios de entrada contra el repo del artefacto, valida el schema con pnpm build y arma el PR con su checklist. Úsala en el repo del hub cuando pidan agregar, registrar, catalogar o proponer una librería, SDK, plugin, plantilla, arquetipo, CLI, herramienta, GitHub Action o workflow, o pasar un artefacto de comunidad a oficial.
 ---
 
 # Agregar un artefacto al hub
@@ -30,13 +30,17 @@ Si alguno falla, detente y dilo. No crees la ficha.
 Copia `templates/artifact.template.md` a `src/content/artifacts/<slug>.md`.
 
 - **slug:** minúsculas y guiones, sin prefijo de organización. Revisa que no exista ya otro archivo con ese nombre.
-- **area**, en este orden:
-  1. ¿Se importa o se usa desde un lenguaje? `java`, `node`, `python`, `dotnet` o `mobile`.
-  2. ¿Despliega o configura infraestructura? `cloud`.
-  3. ¿Se corre en la máquina del desarrollador? `tools`.
-  Es dónde lo busca quien lo usa, no el lenguaje en que está escrito.
-- **kind:** `library`, `plugin`, `sdk`, `template`, `cli`, `tool`, `action` u `other`.
-- **ecosystems:** de la lista cerrada del schema. Si falta uno, agrégalo a `ECOSYSTEMS` en el mismo PR. Áreas y tipos nuevos van en `src/content/taxonomy.mjs` y necesitan acuerdo del equipo: pregunta antes.
+- **kind**, cómo se usa. Es la navegación de arriba. Quédate con el primer sí:
+  1. ¿Se agrega como dependencia? `library` (paquetes, SDKs, módulos de Terraform, charts).
+  2. ¿Se instala dentro de otra herramienta? `plugin` (Gradle, Maven, IDE, ESLint, Backstage).
+  3. ¿Se copia o se genera para empezar un proyecto? `template` (arquetipos, starters, scaffolds).
+  4. ¿Se ejecuta? `tool` (CLIs, apps de escritorio, servicios internos, bots).
+  5. ¿Corre en el pipeline de CI/CD? `automation` (GitHub Actions, workflows reutilizables, políticas).
+  El lenguaje nunca decide el tipo.
+- **disciplines:** al menos una de `backend`, `frontend`, `mobile`, `data`, `ai`, `quality`, `integration`, `cloudops`, `devsecops`, `dx`. **La primera es la principal**: decide el grupo en la barra lateral, así que pon primero la del trabajo que más resuelve.
+- **languages:** al menos uno, el lenguaje desde el que lo usa quien lo consume (una action es `yaml`, un módulo de Terraform es `hcl`).
+- **technologies:** opcional. Frameworks, plataformas y herramientas de build: `spring-boot`, `spring-webflux`, `nestjs`, `aws`, `gradle`…
+- Lenguajes, tecnologías y registros son listas cerradas en `src/content/taxonomy.mjs` y `src/content/artifact-schema.ts`. Si falta uno (por ejemplo `ruby`), agrégalo en el mismo PR. **Tipos y disciplinas son la estructura del hub:** no los cambies; si ninguno encaja, dilo y sugiere abrir un issue.
 - **origin:** `official` si el repo es de una organización de Pragma; `community` si es de una cuenta personal.
 - **summary:** una frase en español y otra en inglés, de máximo 160 caracteres, que diga qué resuelve. Sin superlativos.
 - **status:** pregúntalo a los owners si no es obvio. Sin release publicado: `experimental`.
@@ -54,8 +58,8 @@ pnpm build
 Si falla, el mensaje dice qué campo corregir. Después revisa con `pnpm dev`:
 
 - la ficha en `/catalog/<slug>/`;
-- que aparece en `/areas/<area>/` y en el catálogo con los filtros;
-- que el área aparece en la barra superior (si es la primera ficha de esa área, aparece sola).
+- que aparece en `/types/<kind>/`, bajo su disciplina principal, y en el catálogo con los filtros de lenguaje y tecnología;
+- que el tipo aparece en la barra superior (si es la primera ficha de ese tipo, aparece sola).
 
 ## 5. Arma el PR
 

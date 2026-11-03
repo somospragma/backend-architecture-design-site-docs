@@ -16,7 +16,7 @@
 
 - [ ] Cumple los [criterios de entrada](https://github.com/somospragma/backend-architecture-design-site-docs/blob/main/CONTRIBUTING.md#criterios-de-entrada): repo accesible, README con instalación y ejemplo, licencia, owners reales.
 - [ ] No tiene secretos, URLs internas ni datos de clientes.
-- [ ] El `area` sigue la regla de CONTRIBUTING (dónde lo busca quien lo usa).
+- [ ] El `kind` sigue la regla de CONTRIBUTING (cómo se usa) y la primera disciplina es la principal.
 - [ ] `summary` está en español y en inglés.
 - [ ] `lastReviewed` tiene la fecha de hoy.
 - [ ] `pnpm build` pasa en local (valida el schema).

@@ -4,29 +4,28 @@ import type { Lang } from '../../i18n/catalog';
 export const home = {
 	es: {
 		title: 'Todo lo que construye Pragma',
-		lead: 'Librerías, plugins, CLIs y plantillas de Pragma y de sus pragmáticos. Cada uno con dueño, estado y documentación.',
+		lead: 'Librerías, plugins, plantillas, herramientas y automatizaciones de Pragma y de sus pragmáticos. Cada uno con dueño, estado y documentación.',
 		action: 'Ver el catálogo',
 		builder: {
 			title: 'Tu artefacto en el hub',
 			name: 'Nombre',
-			area: 'Área',
 			kind: 'Tipo',
+			discipline: 'Disciplina',
 			placeholder: 'Mi librería',
 			copy: 'Copiar ficha',
 			copied: 'Copiada',
 			summary: 'Una frase de qué resuelve.',
 		},
-		areas: {
-			heading: 'Búscalo por área',
+		types: {
+			heading: 'Búscalo por cómo lo usas',
 			empty: 'Aún sin artefactos. Puede ser el tuyo.',
+			stack: 'En cualquier lenguaje',
 			facts: {
-				java: 'Lo que importas desde Java, Kotlin, Spring, Quarkus o Gradle.',
-				node: 'Librerías, SDKs y plantillas para Node y TypeScript.',
-				python: 'Librerías y herramientas que se instalan con pip.',
-				dotnet: 'Paquetes NuGet y plantillas para .NET.',
-				mobile: 'Flutter y desarrollo nativo para iOS y Android.',
-				cloud: 'Lo que despliega o configura infraestructura: Terraform, CDK, Kubernetes, Actions.',
-				tools: 'Lo que corres en tu máquina: CLIs, terminal, extensiones y skills de IA.',
+				library: 'Lo agregas como dependencia: paquetes de Maven, npm, PyPI o NuGet, SDKs y módulos de Terraform.',
+				plugin: 'Lo instalas dentro de otra herramienta: Gradle, Maven, tu IDE, ESLint o Backstage.',
+				template: 'Lo copias o lo generas para empezar un proyecto: arquetipos, starters y scaffolds.',
+				tool: 'Lo ejecutas: CLIs, apps de escritorio, servicios internos y bots.',
+				automation: 'Corre en tu pipeline: GitHub Actions, workflows reutilizables y políticas.',
 			},
 		},
 		steps: {
@@ -35,7 +34,7 @@ export const home = {
 				'Primero abres un PR con su ficha.',
 				'Luego el build valida el schema.',
 				'Después los owners del hub lo aprueban.',
-				'Y queda publicado en su área.',
+				'Y queda publicado en su tipo.',
 			],
 			checks: 'Schema válido',
 			approved: 'Aprobado',
@@ -62,29 +61,28 @@ export const home = {
 	},
 	en: {
 		title: 'Everything Pragma builds',
-		lead: 'Libraries, plugins, CLIs and templates from Pragma and its people. Each with an owner, a status and docs.',
+		lead: 'Libraries, plugins, templates, tools and automations from Pragma and its people. Each with an owner, a status and docs.',
 		action: 'Browse the catalog',
 		builder: {
 			title: 'Your artifact on the hub',
 			name: 'Name',
-			area: 'Area',
-			kind: 'Kind',
+			kind: 'Type',
+			discipline: 'Discipline',
 			placeholder: 'My library',
 			copy: 'Copy entry',
 			copied: 'Copied',
 			summary: 'One sentence on what it solves.',
 		},
-		areas: {
-			heading: 'Find it by area',
+		types: {
+			heading: 'Find it by how you use it',
 			empty: 'No artifacts yet. Yours could be first.',
+			stack: 'In any language',
 			facts: {
-				java: 'What you import from Java, Kotlin, Spring, Quarkus or Gradle.',
-				node: 'Libraries, SDKs and templates for Node and TypeScript.',
-				python: 'Libraries and tools you install with pip.',
-				dotnet: 'NuGet packages and templates for .NET.',
-				mobile: 'Flutter and native development for iOS and Android.',
-				cloud: 'What deploys or configures infrastructure: Terraform, CDK, Kubernetes, Actions.',
-				tools: 'What runs on your machine: CLIs, terminal, extensions and AI skills.',
+				library: 'You add it as a dependency: Maven, npm, PyPI or NuGet packages, SDKs and Terraform modules.',
+				plugin: 'You install it inside another tool: Gradle, Maven, your IDE, ESLint or Backstage.',
+				template: 'You copy or generate it to start a project: archetypes, starters and scaffolds.',
+				tool: 'You run it: CLIs, desktop apps, internal services and bots.',
+				automation: 'It runs in your pipeline: GitHub Actions, reusable workflows and policies.',
 			},
 		},
 		steps: {
@@ -93,7 +91,7 @@ export const home = {
 				'First you open a PR with its entry.',
 				'Then the build checks the schema.',
 				'Then the hub owners approve it.',
-				'And it goes live in its area.',
+				'And it goes live under its type.',
 			],
 			checks: 'Schema valid',
 			approved: 'Approved',
@@ -120,12 +118,43 @@ export const home = {
 	},
 } satisfies Record<Lang, unknown>;
 
-/** Ejemplos de la barra lateral de cada área en la página inicial. Solo artefactos reales. */
-export const areaExamples: Record<string, { group: { es: string; en: string }; items: string[] }[]> = {
-	java: [
-		{ group: { es: 'Librerías', en: 'Libraries' }, items: ['Pragma Log'] },
-		{ group: { es: 'Plugins', en: 'Plugins' }, items: ['Clean Architecture Generator'] },
+/**
+ * Ejemplo de barra lateral de cada tipo en la página inicial: grupos por disciplina.
+ * Solo artefactos reales; los grupos vacíos muestran el texto de "aún sin artefactos".
+ */
+export const typeExamples: Record<string, { discipline: string; items: string[] }[]> = {
+	library: [
+		{ discipline: 'backend', items: ['Pragma Log'] },
+		{ discipline: 'frontend', items: [] },
+		{ discipline: 'mobile', items: [] },
 	],
+	plugin: [
+		{ discipline: 'backend', items: ['Clean Architecture Generator'] },
+		{ discipline: 'dx', items: [] },
+	],
+	template: [
+		{ discipline: 'backend', items: [] },
+		{ discipline: 'frontend', items: [] },
+		{ discipline: 'mobile', items: [] },
+	],
+	tool: [
+		{ discipline: 'dx', items: [] },
+		{ discipline: 'devsecops', items: [] },
+	],
+	automation: [
+		{ discipline: 'devsecops', items: [] },
+		{ discipline: 'cloudops', items: [] },
+		{ discipline: 'quality', items: [] },
+	],
+};
+
+/** Lenguajes y tecnologías de muestra en cada tipo: son filtros, no pestañas. */
+export const typeStacks: Record<string, string[]> = {
+	library: ['Java', 'TypeScript', 'Python', 'C#', 'Ruby'],
+	plugin: ['Gradle', 'Maven', 'ESLint', 'VS Code'],
+	template: ['Spring Boot', 'NestJS', 'React', 'Flutter'],
+	tool: ['Go', 'Rust', 'Node.js', 'Shell'],
+	automation: ['GitHub Actions', 'Terraform', 'Azure DevOps'],
 };
 
 export const REPO_URL = 'https://github.com/somospragma/backend-architecture-design-site-docs';

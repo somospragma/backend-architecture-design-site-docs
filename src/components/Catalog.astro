@@ -1,10 +1,12 @@
 ---
-// Lista de fichas del catálogo, con filtros por área, tipo, ecosistema, origen y estado.
+// Lista de fichas del catálogo, con filtros por tipo, disciplina, lenguaje, tecnología, origen y estado.
+// Los filtros de lenguaje y tecnología solo muestran valores que alguna ficha usa.
 // Se usa desde catalog.mdx en cada idioma: <Catalog lang="es" />.
 import { Aside } from '@astrojs/starlight/components';
 import ArtifactCard from './ArtifactCard.astro';
-import { AREAS, ECOSYSTEMS, KINDS, ORIGINS, STATUSES } from '../content/artifact-schema';
-import { areaLabels, kindLabels, originLabels, statusLabels, ui, type Lang } from '../i18n/catalog';
+import { KINDS, ORIGINS, STATUSES } from '../content/artifact-schema';
+import { DISCIPLINES, LANGUAGES, TECHNOLOGIES } from '../content/taxonomy.mjs';
+import { disciplineLabels, kindLabels, originLabels, statusLabels, ui, type Lang } from '../i18n/catalog';
 import { getVisibleArtifacts, sitePath } from '../lib/artifacts';
 
 interface Props {
@@ -15,10 +17,15 @@ const { lang } = Astro.props;
 const t = ui[lang];
 const artifacts = await getVisibleArtifacts();
 
+const used = (pick: (e: (typeof artifacts)[number]) => string[]) => new Set(artifacts.flatMap(pick));
+const usedLanguages = used((e) => e.data.languages);
+const usedTechnologies = used((e) => e.data.technologies);
+
 const filters = [
-	{ key: 'area', label: t.filterArea, options: AREAS.map((v) => [v, areaLabels[lang][v]]) },
 	{ key: 'kind', label: t.filterKind, options: KINDS.map((v) => [v, kindLabels[lang][v]]) },
-	{ key: 'ecosystem', label: t.filterEcosystem, options: ECOSYSTEMS.map((v) => [v, v]) },
+	{ key: 'discipline', label: t.filterDiscipline, options: Object.keys(DISCIPLINES).map((v) => [v, disciplineLabels[lang][v]]) },
+	{ key: 'language', label: t.filterLanguage, options: Object.entries(LANGUAGES).filter(([v]) => usedLanguages.has(v)) },
+	{ key: 'technology', label: t.filterTechnology, options: Object.entries(TECHNOLOGIES).filter(([v]) => usedTechnologies.has(v)) },
 	{ key: 'origin', label: t.filterOrigin, options: ORIGINS.map((v) => [v, originLabels[lang][v]]) },
 	{ key: 'status', label: t.filterStatus, options: STATUSES.map((v) => [v, statusLabels[lang][v]]) },
 ];
@@ -48,9 +55,10 @@ const filters = [
 			<ul class="grid not-content">
 				{artifacts.map((entry) => (
 					<li
-						data-area={entry.data.area}
 						data-kind={entry.data.kind}
-						data-ecosystem={entry.data.ecosystems.join(' ')}
+						data-discipline={entry.data.disciplines.join(' ')}
+						data-language={entry.data.languages.join(' ')}
+						data-technology={entry.data.technologies.join(' ')}
 						data-origin={entry.data.origin}
 						data-status={entry.data.status}
 					>

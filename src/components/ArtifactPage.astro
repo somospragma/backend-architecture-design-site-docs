@@ -2,7 +2,8 @@
 // Página de detalle de una ficha. La usan src/pages/catalog/[slug].astro y su versión en inglés.
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { Aside, Badge, LinkButton } from '@astrojs/starlight/components';
-import { areaLabels, kindLabels, originLabels, statusLabels, statusVariant, ui, type Lang } from '../i18n/catalog';
+import { LANGUAGES, TECHNOLOGIES } from '../content/taxonomy.mjs';
+import { disciplineLabels, kindLabels, originLabels, statusLabels, statusVariant, ui, type Lang } from '../i18n/catalog';
 import { artifactPath, docsHref, ownerHref, registryHref, sitePath, type ArtifactEntry } from '../lib/artifacts';
 
 interface Props {
@@ -49,9 +50,10 @@ const reviewed = data.lastReviewed.toLocaleDateString(lang, { year: 'numeric', m
 
 	<table>
 		<tbody>
-			<tr><th scope="row">{t.fieldArea}</th><td><a href={sitePath(lang, `areas/${data.area}/`)}>{areaLabels[lang][data.area]}</a></td></tr>
-			<tr><th scope="row">{t.fieldKind}</th><td>{kindLabels[lang][data.kind]}</td></tr>
-			<tr><th scope="row">{t.fieldEcosystems}</th><td>{data.ecosystems.join(', ')}</td></tr>
+			<tr><th scope="row">{t.fieldKind}</th><td><a href={sitePath(lang, `types/${data.kind}/`)}>{kindLabels[lang][data.kind]}</a></td></tr>
+			<tr><th scope="row">{t.fieldDisciplines}</th><td>{data.disciplines.map((d) => disciplineLabels[lang][d]).join(', ')}</td></tr>
+			<tr><th scope="row">{t.fieldLanguages}</th><td>{data.languages.map((l) => LANGUAGES[l]).join(', ')}</td></tr>
+			{data.technologies.length > 0 && <tr><th scope="row">{t.fieldTechnologies}</th><td>{data.technologies.map((x) => TECHNOLOGIES[x]).join(', ')}</td></tr>}
 			<tr><th scope="row">{t.fieldOrigin}</th><td>{originLabels[lang][data.origin]}</td></tr>
 			<tr>
 				<th scope="row">{t.fieldOwners}</th>

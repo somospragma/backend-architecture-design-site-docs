@@ -51,8 +51,10 @@ Cada artefacto es un archivo en `src/content/artifacts/<slug>.md(x)`, validado c
 name: Nombre visible
 slug: nombre-en-kebab
 summary: Una frase de qué resuelve.
-kind: library            # library | plugin | cli | template | tool | sdk | action | other
-ecosystems: [java]       # java | node | python | aws | gradle | spring | ...
+kind: library            # library | plugin | template | tool | automation
+disciplines: [backend]   # backend | frontend | mobile | data | ai | quality | integration | cloudops | devsecops | dx
+languages: [java]        # java | kotlin | typescript | python | ruby | ...
+technologies: [spring-webflux, gradle]  # opcional: frameworks, plataformas, build
 origin: official         # official | community
 owners: [github-user]    # quién responde por el artefacto
 repository: https://github.com/org/repo
@@ -82,7 +84,7 @@ Reglas del schema:
 - `license` debe ser un identificador SPDX válido. En las fichas de comunidad, además, debe estar aprobado por OSI. Las fichas oficiales pueden usar `UNLICENSED` para artefactos internos.
 - `docs.url` es obligatorio en `indexed`. En `hosted` no se usa, porque la ruta sale del slug.
 - `deprecationNote` es `{ es, en }`. `replacedBy` acepta el slug de otra ficha o una URL `https`.
-- `kind`, `ecosystems` y `registry.type` son listas cerradas. Para agregar un valor se edita la lista en el schema dentro del mismo PR de la ficha.
+- `kind`, `disciplines`, `languages`, `technologies` y `registry.type` son listas cerradas (las cuatro primeras en `src/content/taxonomy.mjs`). Para agregar un valor se edita la lista en el schema dentro del mismo PR de la ficha.
 - Las fichas con `draft: true` solo se ven con `pnpm dev`; el build de producción las excluye.
 - El aviso por `lastReviewed` vencido lo da `pnpm check:reviews`. En GitHub Actions emite anotaciones `::warning`.
 
@@ -189,19 +191,24 @@ En la otra sesión conviene usar:
 5. **Modo claro/oscuro:** se usa el selector de tema que trae Starlight. No se construye uno propio; solo se define la paleta de cada modo con los tokens.
 6. **Logos:** los SVG de Pragma que están en `static/img/` se pueden usar en el sitio.
 
-7. **Navegación por áreas** (2026-11-02). La barra superior tiene un tema "Hub" y un tema por cada área con al menos una ficha publicada. Las áreas son `java`, `node`, `python`, `dotnet`, `mobile`, `cloud` y `tools`, y están en `src/content/taxonomy.mjs`. Cada ficha tiene un `area` obligatorio: el lugar donde la busca quien la va a usar, no el lenguaje en que está escrita. `ecosystems` queda para filtrar. Dentro de cada área, la barra lateral se agrupa por tipo y en orden alfabético. Se implementa con `starlight-sidebar-topics` y con un `SiteTitle` propio que pone las áreas arriba en pantallas anchas; en celular quedan en el menú lateral.
-8. **Página inicial**. Se hace con componentes Astro, sin React, y conserva la barra superior y el buscador de Starlight. El motivo visual es el círculo del isotipo de Pragma. Incluye un armador de fichas en vivo, el selector de áreas, el flujo de aporte y un diálogo que abre el PR en GitHub con la ficha prellenada.
+7. **Navegación por áreas** (2026-11-02, reemplazada por la decisión 12). La barra superior tiene un tema "Hub" y un tema por cada área con al menos una ficha publicada. Las áreas son `java`, `node`, `python`, `dotnet`, `mobile`, `cloud` y `tools`, y están en `src/content/taxonomy.mjs`. Cada ficha tiene un `area` obligatorio: el lugar donde la busca quien la va a usar, no el lenguaje en que está escrita. `ecosystems` queda para filtrar. Dentro de cada área, la barra lateral se agrupa por tipo y en orden alfabético. Se implementa con `starlight-sidebar-topics` y con un `SiteTitle` propio que pone las áreas arriba en pantallas anchas; en celular quedan en el menú lateral.
+8. **Página inicial**. Se hace con componentes Astro, sin React, y conserva la barra superior y el buscador de Starlight. El motivo visual es el círculo del isotipo de Pragma. Incluye un armador de fichas en vivo, el selector de tipos, el flujo de aporte y un diálogo que abre el PR en GitHub con la ficha prellenada.
 
 9. **Paleta** (2026-11-02). Se aprueban los valores claro y oscuro de `src/styles/tokens.json`.
 10. **Reglas de aporte** (2026-11-03). Aprueba todo el equipo `@somospragma/backend-architecture`; CODEOWNERS separa fichas, docs `hosted` y marca para poder repartirlas después. Las vulnerabilidades se reportan por el reporte privado de GitHub (Security Advisories), sin correo. Los problemas de conducta se reportan por mensaje privado a alguien del equipo. Las docs `hosted` de una ficha en borrador solo se generan con `pnpm dev`.
 
 11. **Skills** (2026-11-03). Las cinco skills están en `.claude/skills/`. `pragma-brand` es la fuente de marca para fuera del hub; dentro del hub gana `tokens.json`. `document-project` es autocontenida para poder copiarla a cualquier repo de artefacto.
 
+12. **Navegación por tipo** (2026-11-03). El lenguaje no escala como navegación: el día que entra Ruby habría que crear una pestaña, y algo muy específico de Spring WebFlux quedaba al mismo nivel que un artefacto grande de Node. La barra superior tiene "Hub" y un tema por cada **tipo** con al menos una ficha publicada: `library` (se agrega como dependencia), `plugin` (se instala dentro de otra herramienta), `template` (se copia o genera para empezar), `tool` (se ejecuta) y `automation` (corre en el pipeline). Dentro de cada tipo, la barra lateral se agrupa por la **disciplina principal** (la primera de `disciplines`): backend, frontend, mobile, data, ai, quality, integration, cloudops, devsecops y dx. `languages` (obligatorio) y `technologies` (opcional) son filtros del catálogo; agregar uno no cambia la navegación. Se quitan `area` y `ecosystems`. Las páginas de cada tipo están en `/types/<kind>/`.
+
+13. **CI/CD** (2026-11-03). `ci.yml` y `security.yml` corren en cada PR y son reutilizables. `deploy.yml` tiene tres etapas: validar (los dos anteriores), aprobar (environment `production-approval` con revisores obligatorios) y desplegar (environment `github-pages`). El deploy queda apagado hasta crear la variable de repositorio `DEPLOY_ENABLED=true`. Gitleaks se instala desde su release con checksum porque la action oficial pide licencia en organizaciones.
+
 ## Decisiones pendientes
 
 1. Confirmar el slug del equipo que aprueba (`somospragma/backend-architecture`) y activar el reporte privado de vulnerabilidades en la configuración del repo.
-2. Al migrar el contenido legacy: revisar las ramas remotas `feature/backend-diseno-arquitectura-fnc-ts-archetype-node-hexagonal` y `feature/emvcode-package`, que no están en la historia de `legacy/docusaurus`.
-3. Más adelante: cómo traer las docs `hosted` que viven en otros repos (copiarlas, traerlas en el build o que cada repo las publique con una Action) y si habrá versionado de docs por artefacto.
+2. Para encender el deploy: crear el environment `production-approval` con revisores obligatorios, limitar `github-pages` a la rama `main`, poner Pages en modo "GitHub Actions" y crear la variable `DEPLOY_ENABLED=true`. Proteger `main` exigiendo los checks de CI y Security.
+3. Al migrar el contenido legacy: revisar las ramas remotas `feature/backend-diseno-arquitectura-fnc-ts-archetype-node-hexagonal` y `feature/emvcode-package`, que no están en la historia de `legacy/docusaurus`.
+4. Más adelante: cómo traer las docs `hosted` que viven en otros repos (copiarlas, traerlas en el build o que cada repo las publique con una Action) y si habrá versionado de docs por artefacto.
 
 ## Fuera de alcance de esta sesión
 

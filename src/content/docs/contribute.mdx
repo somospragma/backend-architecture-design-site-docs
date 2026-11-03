@@ -38,15 +38,30 @@ Un artefacto entra al hub con un pull request que agrega su ficha. Si la ficha n
 
 </Steps>
 
-## Cómo elegir el área
+## Cómo clasificar un artefacto
 
-El área es dónde busca el artefacto quien lo va a usar, no el lenguaje en que está escrito. Responde en orden:
+### Tipo: cómo se usa
 
-1. ¿Se importa o se usa desde un lenguaje? El área de ese lenguaje: `java`, `node`, `python`, `dotnet` o `mobile`.
-2. ¿Despliega o configura infraestructura? `cloud`.
-3. ¿Se corre en la máquina del desarrollador? `tools`.
+El tipo es la navegación de arriba y no depende del lenguaje. Responde en orden y quédate con la primera respuesta que sea sí:
 
-Un plugin de Gradle va en `java`. Un CLI escrito en Go que usan equipos Java va en `tools`.
+1. ¿Se agrega como dependencia? `library` (paquetes, SDKs, módulos de Terraform, charts).
+2. ¿Se instala dentro de otra herramienta? `plugin` (Gradle, Maven, IDE, ESLint, Backstage).
+3. ¿Se copia o se genera para empezar un proyecto? `template` (arquetipos, starters, scaffolds).
+4. ¿Se ejecuta? `tool` (CLIs, apps de escritorio, servicios internos, bots).
+5. ¿Corre en el pipeline de CI/CD? `automation` (GitHub Actions, workflows reutilizables, políticas).
+
+Un plugin de Gradle que genera código es `plugin`, no `template`. Un CLI que crea proyectos desde un arquetipo es `tool`; el arquetipo es `template`.
+
+### Disciplina: para qué trabajo sirve
+
+Al menos una: `backend`, `frontend`, `mobile`, `data`, `ai`, `quality`, `integration`, `cloudops`, `devsecops` o `dx`. **La primera es la principal** y decide el grupo en la barra lateral.
+
+### Lenguajes y tecnologías: filtros
+
+- `languages` (al menos uno): en qué lenguaje lo usa quien lo consume. Una action de YAML es `yaml`; una librería de Spring es `java` o `kotlin`.
+- `technologies` (opcional): frameworks, plataformas y herramientas de build, como `spring-webflux`, `nestjs`, `aws` o `gradle`.
+
+Si falta un lenguaje o una tecnología (por ejemplo `ruby`), agrégalo en `src/content/taxonomy.mjs` en el mismo PR. La navegación no cambia.
 
 ## Estados
 

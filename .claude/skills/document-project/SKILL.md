@@ -1,6 +1,6 @@
 ---
 name: document-project
-description: Documentar un proyecto de Pragma (librería, plugin, SDK, plantilla, CLI, herramienta o action) para que pueda entrar al Pragma Hub. Escribe o corrige el README con la plantilla oficial y, si hace falta, arma la estructura de documentación hosted (introducción, inicio rápido, guías, referencia, FAQ, changelog). Úsala dentro del repo del artefacto cuando pidan documentarlo, mejorar su README, prepararlo para el hub o revisar si su documentación cumple. Se puede copiar a cualquier repo.
+description: Documentar un proyecto de Pragma (librería, plugin, plantilla, herramienta o automatización, en cualquier lenguaje) para que pueda entrar al Pragma Hub. Escribe o corrige el README con la plantilla oficial y, si hace falta, arma la estructura de documentación hosted (introducción, inicio rápido, guías, referencia, FAQ, changelog). Úsala dentro del repo del artefacto cuando pidan documentarlo, mejorar su README, prepararlo para el hub o revisar si su documentación cumple. Se puede copiar a cualquier repo.
 ---
 
 # Documentar un proyecto para el Pragma Hub
@@ -66,5 +66,11 @@ Cada página lleva frontmatter con `title`, `description` y `sidebar.order`.
 - [ ] Los enlaces dicen a dónde llevan.
 
 ## 5. Siguiente paso
+
+Al terminar, di cómo se clasificaría en el hub para que la ficha salga rápido:
+
+- **Tipo**, cómo se usa: `library` (dependencia), `plugin` (dentro de otra herramienta), `template` (para empezar un proyecto), `tool` (se ejecuta) o `automation` (corre en el pipeline).
+- **Disciplina principal:** `backend`, `frontend`, `mobile`, `data`, `ai`, `quality`, `integration`, `cloudops`, `devsecops` o `dx`.
+- **Lenguajes y tecnologías** que encontraste en el manifiesto.
 
 Cuando el README esté listo, el artefacto puede entrar al hub con una ficha. En el repo del hub, la skill `add-artifact` la crea y arma el PR.

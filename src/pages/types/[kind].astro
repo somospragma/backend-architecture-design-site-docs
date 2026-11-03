@@ -1,0 +1,8 @@
+---
+import TypePage from '../../components/TypePage.astro';
+import { getTypePaths } from '../../lib/type-paths';
+
+export const getStaticPaths = getTypePaths;
+---
+
+<TypePage lang="es" kind={Astro.props.kind} entries={Astro.props.entries} />

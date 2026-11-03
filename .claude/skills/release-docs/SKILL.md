@@ -35,6 +35,7 @@ Abre `src/content/artifacts/<slug>.md`:
   Confírmalo con los owners; no lo cambies por tu cuenta.
 - [ ] **registry:** el `id` sigue siendo el mismo (a veces cambian el group o el nombre del paquete).
 - [ ] **summary/description:** siguen siendo ciertos.
+- [ ] **languages/technologies:** si la versión agrega soporte (por ejemplo, Spring WebFlux o un lenguaje nuevo), agrégalo; si lo quita, bórralo.
 - [ ] **lastReviewed:** la fecha de hoy.
 - [ ] Si es `hosted`: actualiza `changelog.md` y las páginas afectadas en `src/content/docs/artifacts/<slug>/` y su versión en inglés.
 

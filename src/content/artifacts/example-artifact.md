@@ -8,9 +8,10 @@ summary:
 description:
   es: Sirve para validar el schema y revisar el diseño de las fichas. No es un artefacto real.
   en: Used to validate the schema and review the entry design. It is not a real artifact.
-area: java
 kind: library
-ecosystems: [java, spring, gradle]
+disciplines: [backend, cloudops]
+languages: [java, kotlin]
+technologies: [spring-boot, spring-webflux, gradle]
 origin: official
 owners: [somospragma/backend-architecture]
 repository: https://github.com/somospragma/example-artifact

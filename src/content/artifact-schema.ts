@@ -1,37 +1,18 @@
 import { existsSync } from 'node:fs';
 import { z } from 'astro/zod';
 import spdx from 'spdx-license-list';
-import { AREA_IDS, KIND_IDS } from './taxonomy.mjs';
+import { DISCIPLINE_IDS, KIND_IDS, LANGUAGE_IDS, TECHNOLOGY_IDS } from './taxonomy.mjs';
 
 // Modelo de ficha de un artefacto del hub. Cada ficha es src/content/artifacts/<slug>.md
 // y el nombre del archivo es su slug. Si una ficha no cumple este schema, el build falla.
 //
-// Para agregar un valor a una lista (un ecosistema o un tipo de registro nuevo),
-// edita la lista correspondiente en este archivo dentro del mismo PR de la ficha.
-// Las áreas y los tipos viven en taxonomy.mjs porque también los usa la navegación.
+// Tipos, disciplinas, lenguajes y tecnologías viven en taxonomy.mjs porque también los usa la navegación.
+// Para agregar un lenguaje, una tecnología o un registro, edita su lista en el mismo PR de la ficha.
 
-export const AREAS = AREA_IDS;
 export const KINDS = KIND_IDS;
-export const ECOSYSTEMS = [
-	'java',
-	'kotlin',
-	'spring',
-	'quarkus',
-	'gradle',
-	'maven',
-	'node',
-	'typescript',
-	'python',
-	'dotnet',
-	'go',
-	'flutter',
-	'aws',
-	'azure',
-	'gcp',
-	'terraform',
-	'kubernetes',
-	'github-actions',
-] as const;
+export const DISCIPLINES = DISCIPLINE_IDS;
+export const LANGUAGES = LANGUAGE_IDS;
+export const TECHNOLOGIES = TECHNOLOGY_IDS;
 export const ORIGINS = ['official', 'community'] as const;
 export const STATUSES = ['experimental', 'beta', 'stable', 'deprecated'] as const;
 export const REGISTRIES = [
@@ -41,6 +22,10 @@ export const REGISTRIES = [
 	'pypi',
 	'nuget',
 	'pub-dev',
+	'rubygems',
+	'crates-io',
+	'artifact-hub',
+	'vscode-marketplace',
 	'github-packages',
 	'docker-hub',
 	'terraform-registry',
@@ -65,9 +50,11 @@ export const artifactSchema = z
 		name: z.string().trim().min(1).max(60),
 		summary: localized(160),
 		description: localized(600).optional(),
-		area: z.enum(AREAS),
 		kind: z.enum(KINDS),
-		ecosystems: z.array(z.enum(ECOSYSTEMS)).min(1),
+		// La primera disciplina es la principal: decide el grupo en la barra lateral del tipo.
+		disciplines: z.array(z.enum(DISCIPLINES)).min(1, 'Indica al menos una disciplina'),
+		languages: z.array(z.enum(LANGUAGES)).min(1, 'Indica al menos un lenguaje'),
+		technologies: z.array(z.enum(TECHNOLOGIES)).default([]),
 		origin: z.enum(ORIGINS),
 		owners: z
 			.array(z.string().regex(OWNER, 'Usa un usuario de GitHub (dev-user) o un equipo (org/team)'))

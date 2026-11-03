@@ -1,0 +1,3 @@
+# Falsos positivos revisados. Una línea por hallazgo, con su huella exacta (commit:archivo:regla:línea).
+# Valor de ejemplo en la doc legacy de Pragma Log (MaskType.HIDDEN), no es una llave real.
+b045fcac30f5ff0276263de596a14be2d932baef:docs/java/pragma-log/configuration/masking.md:generic-api-key:85
