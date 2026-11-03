@@ -19,6 +19,18 @@ function readArtifacts(includeDrafts) {
 		.filter((a) => a.area in AREAS && a.kind in KINDS && (includeDrafts || !a.draft));
 }
 
+/** Slugs de las fichas en borrador. Sus docs hosted no se publican en el build de producción. */
+export function draftArtifactSlugs() {
+	if (!existsSync(ARTIFACTS_DIR)) return [];
+	return readdirSync(ARTIFACTS_DIR)
+		.filter((file) => file.endsWith('.md'))
+		.filter((file) => {
+			const frontmatter = readFileSync(new URL(file, ARTIFACTS_DIR), 'utf8').match(/^---\n([\s\S]*?)\n---/)?.[1];
+			return parse(frontmatter ?? '')?.draft === true;
+		})
+		.map((file) => file.replace(/\.md$/, ''));
+}
+
 function artifactItem(artifact) {
 	if (artifact.docs?.mode === 'hosted') {
 		return {

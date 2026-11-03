@@ -28,15 +28,25 @@ An artifact joins the hub through a pull request that adds its entry. If the ent
 
 1. Get the artifact's README in shape following [how to document a project](../guides/documenting/).
 
-2. Create the entry at `src/content/artifacts/<slug>.md` from the `templates/artifact.template.md` template.
+2. Create the entry at `src/content/artifacts/<slug>.md` from the [`templates/artifact.template.md`](https://github.com/somospragma/backend-architecture-design-site-docs/blob/main/templates/artifact.template.md) template.
 
-3. If you choose `hosted` mode, add the docs under `src/content/docs/artifacts/<slug>/` using the `templates/docs-hosted/` structure.
+3. If you choose `hosted` mode, add the docs under `src/content/docs/artifacts/<slug>/` using the [`templates/docs-hosted/`](https://github.com/somospragma/backend-architecture-design-site-docs/tree/main/templates/docs-hosted) structure.
 
 4. Run `pnpm build` locally to validate the entry.
 
 5. Open the PR and complete the template checklist.
 
 </Steps>
+
+## Choosing the area
+
+The area is where the people who will use the artifact look for it, not the language it is written in. Answer in order:
+
+1. Is it imported or used from a language? That language's area: `java`, `node`, `python`, `dotnet` or `mobile`.
+2. Does it deploy or configure infrastructure? `cloud`.
+3. Does it run on the developer's machine? `tools`.
+
+A Gradle plugin goes in `java`. A CLI written in Go that Java teams use goes in `tools`.
 
 ## Statuses
 

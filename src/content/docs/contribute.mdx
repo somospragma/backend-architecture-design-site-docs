@@ -28,15 +28,25 @@ Un artefacto entra al hub con un pull request que agrega su ficha. Si la ficha n
 
 1. Deja el README del artefacto como pide la guía de [cómo documentar un proyecto](../guides/documenting/).
 
-2. Crea la ficha en `src/content/artifacts/<slug>.md` a partir de la plantilla `templates/artifact.template.md`.
+2. Crea la ficha en `src/content/artifacts/<slug>.md` a partir de la plantilla [`templates/artifact.template.md`](https://github.com/somospragma/backend-architecture-design-site-docs/blob/main/templates/artifact.template.md).
 
-3. Si eliges el modo `hosted`, agrega la documentación en `src/content/docs/artifacts/<slug>/` con la estructura de `templates/docs-hosted/`.
+3. Si eliges el modo `hosted`, agrega la documentación en `src/content/docs/artifacts/<slug>/` con la estructura de [`templates/docs-hosted/`](https://github.com/somospragma/backend-architecture-design-site-docs/tree/main/templates/docs-hosted).
 
 4. Corre `pnpm build` en local para validar la ficha.
 
 5. Abre el PR y completa el checklist de la plantilla.
 
 </Steps>
+
+## Cómo elegir el área
+
+El área es dónde busca el artefacto quien lo va a usar, no el lenguaje en que está escrito. Responde en orden:
+
+1. ¿Se importa o se usa desde un lenguaje? El área de ese lenguaje: `java`, `node`, `python`, `dotnet` o `mobile`.
+2. ¿Despliega o configura infraestructura? `cloud`.
+3. ¿Se corre en la máquina del desarrollador? `tools`.
+
+Un plugin de Gradle va en `java`. Un CLI escrito en Go que usan equipos Java va en `tools`.
 
 ## Estados
 

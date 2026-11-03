@@ -192,9 +192,12 @@ En la otra sesión conviene usar:
 7. **Navegación por áreas** (2026-11-02). La barra superior tiene un tema "Hub" y un tema por cada área con al menos una ficha publicada. Las áreas son `java`, `node`, `python`, `dotnet`, `mobile`, `cloud` y `tools`, y están en `src/content/taxonomy.mjs`. Cada ficha tiene un `area` obligatorio: el lugar donde la busca quien la va a usar, no el lenguaje en que está escrita. `ecosystems` queda para filtrar. Dentro de cada área, la barra lateral se agrupa por tipo y en orden alfabético. Se implementa con `starlight-sidebar-topics` y con un `SiteTitle` propio que pone las áreas arriba en pantallas anchas; en celular quedan en el menú lateral.
 8. **Página inicial**. Se hace con componentes Astro, sin React, y conserva la barra superior y el buscador de Starlight. El motivo visual es el círculo del isotipo de Pragma. Incluye un armador de fichas en vivo, el selector de áreas, el flujo de aporte y un diálogo que abre el PR en GitHub con la ficha prellenada.
 
+9. **Paleta** (2026-11-02). Se aprueban los valores claro y oscuro de `src/styles/tokens.json`.
+10. **Reglas de aporte** (2026-11-03). Aprueba todo el equipo `@somospragma/backend-architecture`; CODEOWNERS separa fichas, docs `hosted` y marca para poder repartirlas después. Las vulnerabilidades se reportan por el reporte privado de GitHub (Security Advisories), sin correo. Los problemas de conducta se reportan por mensaje privado a alguien del equipo. Las docs `hosted` de una ficha en borrador solo se generan con `pnpm dev`.
+
 ## Decisiones pendientes
 
-1. Aprobación de los valores de la paleta clara y oscura, sobre todo el fondo oscuro.
+1. Confirmar el slug del equipo que aprueba (`somospragma/backend-architecture`) y activar el reporte privado de vulnerabilidades en la configuración del repo.
 2. Al migrar el contenido legacy: revisar las ramas remotas `feature/backend-diseno-arquitectura-fnc-ts-archetype-node-hexagonal` y `feature/emvcode-package`, que no están en la historia de `legacy/docusaurus`.
 3. Más adelante: cómo traer las docs `hosted` que viven en otros repos (copiarlas, traerlas en el build o que cada repo las publique con una Action) y si habrá versionado de docs por artefacto.
 

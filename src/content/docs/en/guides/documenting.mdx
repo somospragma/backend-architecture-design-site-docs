@@ -12,7 +12,7 @@ Every artifact starts with a good README. That's enough to join the hub in `inde
 
 ## Minimum README
 
-Use the `templates/README.template.md` template. It must include, in this order:
+Use the [`templates/README.template.md`](https://github.com/somospragma/backend-architecture-design-site-docs/blob/main/templates/README.template.md) template. It must include, in this order:
 
 1. **What it is:** one sentence on what it solves and for whom.
 2. **Installation:** the exact command or dependency.
@@ -24,7 +24,7 @@ Use the `templates/README.template.md` template. It must include, in this order:
 
 ## `hosted` docs
 
-If the artifact needs guides and reference, its docs can live in the hub. Use the `templates/docs-hosted/` structure:
+If the artifact needs guides and reference, its docs can live in the hub. Use the [`templates/docs-hosted/`](https://github.com/somospragma/backend-architecture-design-site-docs/tree/main/templates/docs-hosted) structure:
 
 <FileTree>
 - src/content/docs/artifacts/my-artifact/
@@ -38,9 +38,7 @@ If the artifact needs guides and reference, its docs can live in the hub. Use th
 
 ## Style
 
-- Write short sentences, in active voice, addressing the reader as "you".
-- Name versions with semantic versioning: `1.4.0`, not "the latest".
-- Every code example must work as is and declare its language in the block.
+Follow the [style guide](../style/): tone, versions, code examples and what never gets published.
 
 <Aside type="danger" title="What never gets published">
 	Secrets, tokens, internal URLs, client names or client data. Use sample values such as `example.com` or `my-app`.

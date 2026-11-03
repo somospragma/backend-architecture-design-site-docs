@@ -1,0 +1,28 @@
+# Quién aprueba cada parte del hub. La última regla que coincide gana.
+# Hoy todo lo aprueba el mismo equipo; las secciones están separadas para poder repartirlas después.
+
+# Todo lo demás: configuración, componentes, CI.
+*                                   @somospragma/backend-architecture
+
+# Fichas del catálogo.
+/src/content/artifacts/             @somospragma/backend-architecture
+/src/content/artifact-schema.ts     @somospragma/backend-architecture
+/src/content/taxonomy.mjs           @somospragma/backend-architecture
+
+# Documentación hosted de cada artefacto.
+/src/content/docs/artifacts/        @somospragma/backend-architecture
+/src/content/docs/en/artifacts/     @somospragma/backend-architecture
+
+# Marca y tema: colores, logos y chequeo de contraste.
+/src/styles/                        @somospragma/backend-architecture
+/src/assets/brand/                  @somospragma/backend-architecture
+/public/favicon.svg                 @somospragma/backend-architecture
+/scripts/build-tokens.mjs           @somospragma/backend-architecture
+/scripts/check-contrast.mjs         @somospragma/backend-architecture
+/scripts/tokens-lib.mjs             @somospragma/backend-architecture
+
+# Reglas de aporte y CI.
+/.github/                           @somospragma/backend-architecture
+/CONTRIBUTING.md                    @somospragma/backend-architecture
+/CODE_OF_CONDUCT.md                 @somospragma/backend-architecture
+/SECURITY.md                        @somospragma/backend-architecture

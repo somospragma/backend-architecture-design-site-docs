@@ -1,0 +1,59 @@
+---
+title: Style guide
+description: How to write documentation for Pragma artifacts.
+sidebar:
+  label: Writing style
+  order: 3
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+People who read technical documentation want to solve something fast. Write for them.
+
+## Tone
+
+- Address the reader as "you" and use the imperative: "install", "configure", not "it should be installed".
+- Use active voice and short sentences, one idea each.
+- Get to the point. No "in this document we will see" or "as is well known".
+- Don't promise what the artifact doesn't do. "Cuts configuration" is fine; "the best library" is not.
+
+## Language
+
+- Hub pages go in Spanish and English, with the same file name.
+- Technical terms with no common translation stay in English and in code: `pull request`, `build`, `hosted`.
+- Option, command and file names always go in `code`, in their original language.
+- An artifact README may be in a single language. The entry always has `summary` in both.
+
+## Headings
+
+- One heading per idea, in sentence form: "How to configure the logger", not "Logger Configuration".
+- Capitalize only the first word, except proper names.
+- Don't skip levels: `###` comes after `##`.
+
+## Versions
+
+- Use full semantic versioning: `1.4.0`, not "the latest" or "v1.4".
+- Say since which version something exists: "Available since `1.3.0`".
+- Breaking changes are marked in the changelog with **Breaking** and say what to do.
+
+## Code examples
+
+- Every example must work when copied and pasted, imports included.
+- The block declares its language: ` ```java `, ` ```bash `, ` ```yaml `.
+- Show the minimum needed. If it's long, link to an example repository.
+- After the example, say what result the reader should see.
+- Don't start terminal commands with `$`.
+
+## Links
+
+- The link text says where it goes: "read the [configuration reference](#)", not "click [here](#)".
+- Inside the hub, use relative paths.
+
+<Aside type="danger" title="What never gets published">
+	- Secrets, tokens, passwords or keys, not even expired ones.
+	- Internal URLs, hosts or IPs of Pragma or its clients.
+	- Client names, logos or data, unless Pragma has permission to publish them.
+	- Real personal data in examples.
+
+	Use sample values: `example.com`, `my-app`, `dev-user`, `123456789012` for an AWS account.
+</Aside>
