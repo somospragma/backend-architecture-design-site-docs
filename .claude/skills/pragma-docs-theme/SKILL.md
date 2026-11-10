@@ -19,7 +19,7 @@ La marca está en la skill `pragma-brand`. Esta skill dice cómo se aplica en el
 | `src/styles/theme.css` | Ajustes de Starlight que no son color: pesos de títulos, tamaño del logo, tipos en el header. Usa solo `var(--sl-*)` o `var(--pragma-*)`. | Sí, sin colores literales. |
 | `src/styles/home.css` | Estilos de la página inicial, con prefijo `.ph-`. | Sí, sin colores literales. |
 | `src/components/SiteTitle.astro` | Override: logo más los tipos de artefacto en el header en pantallas anchas. | Con cuidado. |
-| `src/components/Hero.astro` | Override: el hero de la página inicial con el armador de fichas. | Con cuidado. |
+| `src/components/Hero.astro` | Override: el hero de la página inicial (título con la ventana del terminal y el círculo como horizonte). | Con cuidado. |
 
 ## Cómo mapea a Starlight
 
@@ -52,7 +52,7 @@ Por eso un cambio en `accent` puede romper los botones del modo oscuro sin tocar
 
 ## Reglas
 
-- Cero colores literales (`#hex`, `rgb()`) en CSS o componentes. Siempre `var(--sl-*)` o `var(--pragma-*)`. Los únicos permitidos son los discos de tipos en `HomeSections.astro`, que vienen de la paleta.
+- Cero colores literales (`#hex`, `rgb()`) en CSS o componentes. Siempre `var(--sl-*)` o `var(--pragma-*)`.
 - Usa el selector de tema de Starlight. No construyas uno propio.
 - No cambies `--sl-content-width` en la página inicial: rompe la grilla del header. Para ancho completo, usa `.sl-container { max-width: none }`.
 - Toda animación va dentro de `@media (prefers-reduced-motion: no-preference)`.

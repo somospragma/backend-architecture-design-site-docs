@@ -17,6 +17,9 @@ summary:
 #   es: ...
 #   en: ...
 
+# Opcional. Lo mínimo para empezar a usarlo: la línea de la dependencia, el plugin o el comando.
+# install: implementation("co.com.pragma:mi-libreria:1.0.0")
+
 # Tipo: cómo se usa. Quédate con el primer sí:
 # ¿Se agrega como dependencia?                → library
 # ¿Se instala dentro de otra herramienta?      → plugin

@@ -44,6 +44,8 @@ const reviewed = data.lastReviewed.toLocaleDateString(lang, { year: 'numeric', m
 
 	{data.description && <p>{data.description[lang]}</p>}
 
+	{data.install && <pre><code>{data.install}</code></pre>}
+
 	<LinkButton href={docsHref(lang, id, data)} icon="right-arrow">
 		{data.docs.mode === 'hosted' ? t.docsHosted : t.docsIndexed}
 	</LinkButton>

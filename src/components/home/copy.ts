@@ -1,160 +1,122 @@
 import type { Lang } from '../../i18n/catalog';
 
-// Textos de la página inicial. Todo texto nuevo va en los dos idiomas.
+// Textos de la página inicial. El home engancha a usar lo que ya existe;
+// lo de aportar vive en /contribute/ y aquí solo se invita al final. Todo texto va en los dos idiomas.
 export const home = {
 	es: {
-		title: 'Todo lo que construye Pragma',
-		lead: 'Librerías, plugins, plantillas, herramientas y automatizaciones de Pragma y de sus pragmáticos. Cada uno con dueño, estado y documentación.',
+		// El título se parte alrededor de la ventana del terminal: antes y después de ella.
+		title: ['No empieces', 'desde', 'cero.'],
+		lead: ['Librerías, plugins y herramientas de Pragma,', 'listas para usar en tu proyecto.'],
 		action: 'Ver el catálogo',
-		builder: {
-			title: 'Tu artefacto en el hub',
-			name: 'Nombre',
-			kind: 'Tipo',
-			discipline: 'Disciplina',
-			placeholder: 'Mi librería',
-			copy: 'Copiar ficha',
-			copied: 'Copiada',
-			summary: 'Una frase de qué resuelve.',
+		find: {
+			heading: '¿Qué vas a construir?',
+			label: 'Describe lo que necesitas',
+			value: 'enmascarar logs',
+			examples: ['arquitectura hexagonal', 'adaptador de Redis', 'logs en Quarkus'],
+			examplesLabel: 'Prueba con',
+			open: 'Ver la ficha',
+			empty: 'Todavía no hay nada para eso en el hub.',
+			catalog: 'Ver el catálogo completo',
+		},
+		proof: {
+			heading: 'Esto ya está hecho.',
+			open: 'Ver la ficha',
+			init: 'Un microservicio hexagonal con sus capas y sus pruebas de arquitectura, en un comando.',
+			adapter: 'Un adaptador de Redis con su mapper y su entidad, sin escribirlos a mano.',
+			log: 'Logs en JSON con la tarjeta y la contraseña enmascaradas, sin cambiar cómo logueas.',
 		},
 		types: {
-			heading: 'Búscalo por cómo lo usas',
-			empty: 'Aún sin artefactos. Puede ser el tuyo.',
-			stack: 'En cualquier lenguaje',
-			facts: {
-				library: 'Lo agregas como dependencia: paquetes de Maven, npm, PyPI o NuGet, SDKs y módulos de Terraform.',
-				plugin: 'Lo instalas dentro de otra herramienta: Gradle, Maven, tu IDE, ESLint o Backstage.',
-				template: 'Lo copias o lo generas para empezar un proyecto: arquetipos, starters y scaffolds.',
-				tool: 'Lo ejecutas: CLIs, apps de escritorio, servicios internos y bots.',
-				automation: 'Corre en tu pipeline: GitHub Actions, workflows reutilizables y políticas.',
-			},
+			heading: 'Todo, ordenado por cómo lo usas.',
+			label: 'Tipos',
+			soon: 'Pronto',
 		},
-		steps: {
-			heading: 'Cómo entra un artefacto',
-			items: [
-				'Primero abres un PR con su ficha.',
-				'Luego el build valida el schema.',
-				'Después los owners del hub lo aprueban.',
-				'Y queda publicado en su tipo.',
-			],
-			checks: 'Schema válido',
-			approved: 'Aprobado',
-			published: 'Publicado',
-		},
-		features: {
-			heading: 'Lo que trae cada ficha',
-			owners: ['Dueños reales', 'Siempre hay alguien que responde.'],
-			docs: ['Docs donde sirvan', 'En su repo, o completas en el hub.'],
-			search: ['Búsqueda en todo', 'Desde cualquier página del sitio.'],
-			status: ['Un estado claro', 'Experimental, beta, estable o en desuso.'],
-			langs: ['Español e inglés', 'Cada ficha se lee en los dos idiomas.'],
-		},
-		cta: {
-			heading: 'Súbelo al hub',
-			body: 'Escribe el nombre y abre el PR con la ficha lista para completar. Si falta algo, el build te lo dice.',
-			dialog: 'Propón un artefacto',
-			field: 'Nombre del artefacto',
-			official: 'Oficial',
-			community: 'Comunidad',
-			origin: 'Origen',
-			button: 'Abrir el PR en GitHub',
+		join: {
+			heading: ['¿Tu equipo ya', 'lo construyó?'],
+			add: 'Agrégalo al hub',
+			or: 'o',
+			propose: 'Propónlo en un issue',
+			after: 'Los owners del hub lo revisan y lo publican en su tipo.',
 		},
 	},
 	en: {
-		title: 'Everything Pragma builds',
-		lead: 'Libraries, plugins, templates, tools and automations from Pragma and its people. Each with an owner, a status and docs.',
+		title: ["Don't start", 'from', 'scratch.'],
+		lead: ['Libraries, plugins and tools from Pragma,', 'ready to use in your project.'],
 		action: 'Browse the catalog',
-		builder: {
-			title: 'Your artifact on the hub',
-			name: 'Name',
-			kind: 'Type',
-			discipline: 'Discipline',
-			placeholder: 'My library',
-			copy: 'Copy entry',
-			copied: 'Copied',
-			summary: 'One sentence on what it solves.',
+		find: {
+			heading: 'What are you building?',
+			label: 'Describe what you need',
+			value: 'mask logs',
+			examples: ['hexagonal architecture', 'Redis adapter', 'logs on Quarkus'],
+			examplesLabel: 'Try',
+			open: 'Open the entry',
+			empty: 'Nothing on the hub does that yet.',
+			catalog: 'Browse the whole catalog',
+		},
+		proof: {
+			heading: 'This already exists.',
+			open: 'Open the entry',
+			init: 'A hexagonal microservice with its layers and architecture tests, in one command.',
+			adapter: 'A Redis adapter with its mapper and entity, without writing them by hand.',
+			log: 'JSON logs with the card and the password masked, without changing how you log.',
 		},
 		types: {
-			heading: 'Find it by how you use it',
-			empty: 'No artifacts yet. Yours could be first.',
-			stack: 'In any language',
-			facts: {
-				library: 'You add it as a dependency: Maven, npm, PyPI or NuGet packages, SDKs and Terraform modules.',
-				plugin: 'You install it inside another tool: Gradle, Maven, your IDE, ESLint or Backstage.',
-				template: 'You copy or generate it to start a project: archetypes, starters and scaffolds.',
-				tool: 'You run it: CLIs, desktop apps, internal services and bots.',
-				automation: 'It runs in your pipeline: GitHub Actions, reusable workflows and policies.',
-			},
+			heading: 'Everything, sorted by how you use it.',
+			label: 'Types',
+			soon: 'Soon',
 		},
-		steps: {
-			heading: 'How an artifact gets in',
-			items: [
-				'First you open a PR with its entry.',
-				'Then the build checks the schema.',
-				'Then the hub owners approve it.',
-				'And it goes live under its type.',
-			],
-			checks: 'Schema valid',
-			approved: 'Approved',
-			published: 'Published',
-		},
-		features: {
-			heading: 'What every entry carries',
-			owners: ['Real owners', 'There is always someone accountable.'],
-			docs: ['Docs where they fit', 'In its repo, or in full on the hub.'],
-			search: ['Search everything', 'From any page on the site.'],
-			status: ['A clear status', 'Experimental, beta, stable or deprecated.'],
-			langs: ['Spanish and English', 'Every entry reads in both languages.'],
-		},
-		cta: {
-			heading: 'Put it on the hub',
-			body: 'Type the name and open the PR with the entry ready to fill in. If something is missing, the build tells you.',
-			dialog: 'Propose an artifact',
-			field: 'Artifact name',
-			official: 'Official',
-			community: 'Community',
-			origin: 'Origin',
-			button: 'Open the PR on GitHub',
+		join: {
+			heading: ['Has your team', 'already built it?'],
+			add: 'Add it to the hub',
+			or: 'or',
+			propose: 'Propose it in an issue',
+			after: 'The hub owners review it and publish it under its type.',
 		},
 	},
 } satisfies Record<Lang, unknown>;
 
-/**
- * Ejemplo de barra lateral de cada tipo en la página inicial: grupos por disciplina.
- * Solo artefactos reales; los grupos vacíos muestran el texto de "aún sin artefactos".
- */
-export const typeExamples: Record<string, { discipline: string; items: string[] }[]> = {
-	library: [
-		{ discipline: 'backend', items: ['Pragma Log'] },
-		{ discipline: 'frontend', items: [] },
-		{ discipline: 'mobile', items: [] },
-	],
-	plugin: [
-		{ discipline: 'backend', items: ['Clean Architecture Generator'] },
-		{ discipline: 'dx', items: [] },
-	],
-	template: [
-		{ discipline: 'backend', items: [] },
-		{ discipline: 'frontend', items: [] },
-		{ discipline: 'mobile', items: [] },
-	],
-	tool: [
-		{ discipline: 'dx', items: [] },
-		{ discipline: 'devsecops', items: [] },
-	],
-	automation: [
-		{ discipline: 'devsecops', items: [] },
-		{ discipline: 'cloudops', items: [] },
-		{ discipline: 'quality', items: [] },
-	],
-};
-
-/** Lenguajes y tecnologías de muestra en cada tipo: son filtros, no pestañas. */
-export const typeStacks: Record<string, string[]> = {
-	library: ['Java', 'TypeScript', 'Python', 'C#', 'Ruby'],
-	plugin: ['Gradle', 'Maven', 'ESLint', 'VS Code'],
-	template: ['Spring Boot', 'NestJS', 'React', 'Flutter'],
-	tool: ['Go', 'Rust', 'Node.js', 'Shell'],
-	automation: ['GitHub Actions', 'Terraform', 'Azure DevOps'],
-};
-
 export const REPO_URL = 'https://github.com/somospragma/backend-architecture-design-site-docs';
+
+/** Salida real de `initCleanArch` del Clean Architecture Generator (arquitectura hexagonal-single). */
+export const generatorRun = [
+	'$ ./gradlew initCleanArch',
+	'  architecture hexagonal-single',
+	'  framework    spring reactive',
+	'  create domain/model',
+	'  create domain/ports',
+	'  create domain/usecases',
+	'  create infrastructure/entry-points',
+	'  create infrastructure/driven-adapters',
+	'  create infrastructure/config',
+	'  create ArchitectureTest.java',
+	'  create DomainPurityTest.java',
+	'  create gradle/libs.versions.toml',
+	'BUILD SUCCESSFUL',
+];
+
+/** Salida de `generateOutputAdapter` (guía de inicio rápido del generador). */
+export const adapterRun = [
+	'$ ./gradlew generateOutputAdapter \\',
+	'    --name=UserRepository \\',
+	'    --entity=User --type=redis',
+	'',
+	'  create UserRepositoryAdapter.java',
+	'  create UserMapper.java',
+	'  create UserData.java',
+	'',
+	'BUILD SUCCESSFUL',
+];
+
+/** Ejemplo del README de Pragma Log: un objeto logueado y lo que sale. */
+export const logRun = [
+	'log.info("Customer registered: {}", customer);',
+	'',
+	'{',
+	'  "level": "INFO",',
+	'  "app": "orders",',
+	'  "message": "Customer registered:',
+	'    {\\"name\\":\\"Ana\\",',
+	'     \\"cardNumber\\":\\"4111********1111\\",',
+	'     \\"password\\":\\"******\\"}",',
+	'  "requestId": "req-7"',
+	'}',
+];

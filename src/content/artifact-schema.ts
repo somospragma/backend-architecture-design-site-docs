@@ -50,6 +50,8 @@ export const artifactSchema = z
 		name: z.string().trim().min(1).max(60),
 		summary: localized(160),
 		description: localized(600).optional(),
+		// Lo mínimo para empezar a usarlo: la dependencia, el plugin o el comando. Se muestra en la ficha y en el home.
+		install: z.string().trim().min(1).max(400).optional(),
 		kind: z.enum(KINDS),
 		// La primera disciplina es la principal: decide el grupo en la barra lateral del tipo.
 		disciplines: z.array(z.enum(DISCIPLINES)).min(1, 'Indica al menos una disciplina'),
