@@ -24,4 +24,10 @@ describe('buildTopics', () => {
 			.filter((slug) => !drafts.has(slug));
 		for (const slug of published) expect(links).toContain(`/catalog/${slug}/`);
 	});
+
+	it('nombra en los dos idiomas los grupos de las docs hosted, en vez de usar el nombre de la carpeta', () => {
+		const json = JSON.stringify(topics);
+		expect(json).not.toMatch(/"label":"(guides|reference)"/);
+		for (const match of json.matchAll(/"label":"(Guías|Referencia)"/g)) expect(match).toBeTruthy();
+	});
 });

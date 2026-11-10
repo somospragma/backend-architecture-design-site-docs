@@ -31,6 +31,45 @@ export function draftArtifactSlugs() {
 		.map((file) => file.replace(/\.md$/, ''));
 }
 
+const HOSTED_DOCS_DIR = new URL('./content/docs/artifacts/', import.meta.url);
+
+// Nombres de las carpetas de templates/docs-hosted/ en la barra lateral. Starlight usaría el nombre de la carpeta.
+const HOSTED_GROUPS = {
+	guides: { es: 'Guías', en: 'Guides' },
+	reference: { es: 'Referencia', en: 'Reference' },
+};
+
+/**
+ * Páginas de unas docs hosted: las de la raíz en el orden de `sidebar.order`, con las carpetas
+ * como grupos entre medio. Las páginas con orden 90 o más (FAQ, changelog) van al final.
+ */
+function hostedItems(slug) {
+	const dir = new URL(`${slug}/`, HOSTED_DOCS_DIR);
+	if (!existsSync(dir)) return [];
+	const entries = readdirSync(dir, { withFileTypes: true });
+	const pages = entries
+		.filter((e) => e.isFile() && /\.mdx?$/.test(e.name))
+		.map((e) => {
+			const frontmatter = readFileSync(new URL(e.name, dir), 'utf8').match(/^---\n([\s\S]*?)\n---/)?.[1];
+			const name = e.name.replace(/\.mdx?$/, '');
+			return {
+				order: parse(frontmatter ?? '')?.sidebar?.order ?? 50,
+				slug: name === 'index' ? `artifacts/${slug}` : `artifacts/${slug}/${name}`,
+			};
+		})
+		.sort((a, b) => a.order - b.order);
+	const groups = entries
+		.filter((e) => e.isDirectory())
+		.sort((a, b) => Object.keys(HOSTED_GROUPS).indexOf(a.name) - Object.keys(HOSTED_GROUPS).indexOf(b.name))
+		.map((e) => ({
+			label: HOSTED_GROUPS[e.name]?.es ?? e.name,
+			...(HOSTED_GROUPS[e.name] && { translations: { en: HOSTED_GROUPS[e.name].en } }),
+			items: [{ autogenerate: { directory: `artifacts/${slug}/${e.name}` } }],
+		}));
+	const page = ({ slug }) => ({ slug });
+	return [...pages.filter((p) => p.order < 90).map(page), ...groups, ...pages.filter((p) => p.order >= 90).map(page)];
+}
+
 function artifactItem(artifact) {
 	if (artifact.docs?.mode === 'hosted') {
 		return {
@@ -38,7 +77,7 @@ function artifactItem(artifact) {
 			collapsed: true,
 			items: [
 				{ link: `/catalog/${artifact.slug}/`, label: 'Ficha', translations: { en: 'Overview' } },
-				{ autogenerate: { directory: `artifacts/${artifact.slug}` } },
+				...hostedItems(artifact.slug),
 			],
 		};
 	}
