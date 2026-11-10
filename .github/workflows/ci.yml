@@ -35,7 +35,7 @@ jobs:
           persist-credentials: false
 
       - name: Preparar el entorno
-        uses: ./.github/actions/setup
+        uses: $/.github/actions/setup
 
       - name: ESLint
         run: pnpm lint
@@ -56,7 +56,7 @@ jobs:
           persist-credentials: false
 
       - name: Preparar el entorno
-        uses: ./.github/actions/setup
+        uses: $/.github/actions/setup
 
       - name: astro check
         run: pnpm typecheck
@@ -74,7 +74,7 @@ jobs:
           persist-credentials: false
 
       - name: Preparar el entorno
-        uses: ./.github/actions/setup
+        uses: $/.github/actions/setup
 
       - name: vitest
         run: pnpm test
@@ -92,7 +92,7 @@ jobs:
           persist-credentials: false
 
       - name: Preparar el entorno
-        uses: ./.github/actions/setup
+        uses: $/.github/actions/setup
 
       - name: knip
         run: pnpm knip
@@ -110,7 +110,7 @@ jobs:
           persist-credentials: false
 
       - name: Preparar el entorno
-        uses: ./.github/actions/setup
+        uses: $/.github/actions/setup
 
       - name: Contraste de la marca
         run: pnpm check:contrast
@@ -134,7 +134,7 @@ jobs:
 
       # Sin caché a propósito: este build es el que se publica y no debe depender de un caché que otro workflow pudo escribir.
       - name: Preparar el entorno
-        uses: ./.github/actions/setup
+        uses: $/.github/actions/setup
         with:
           cache: 'false'
 

@@ -25,7 +25,7 @@ jobs:
     if: vars.DEPLOY_ENABLED == 'true'
     permissions:
       contents: read
-    uses: ./.github/workflows/ci.yml
+    uses: $/.github/workflows/ci.yml
     with:
       publish: true
 
@@ -37,7 +37,7 @@ jobs:
       security-events: write
       actions: read
       pull-requests: write
-    uses: ./.github/workflows/security.yml
+    uses: $/.github/workflows/security.yml
 
   approve:
     name: Aprobación · Producción
