@@ -1,0 +1,278 @@
+---
+// Secciones de la página inicial, debajo del Hero. Se usa desde index.mdx de cada idioma.
+// 1. "¿Qué vas a construir?": escribes lo que necesitas y responde con fichas reales del catálogo.
+// 2. "Esto ya está hecho": la salida real de tres comandos de artefactos del catálogo.
+// 3. Los tipos, con su número de fichas.
+// 4. La invitación a aportar.
+import { KINDS, LANGUAGES, TECHNOLOGIES } from '../../content/taxonomy.mjs';
+import { kindLabels, statusLabels, type Lang } from '../../i18n/catalog';
+import { artifactPath, getVisibleArtifacts, sitePath } from '../../lib/artifacts';
+import { REPO_URL, adapterRun, generatorRun, home, logRun } from './copy';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = home[lang];
+const artifacts = await getVisibleArtifacts();
+
+// Lo que el buscador del home necesita de cada ficha; `text` es todo lo que se puede buscar.
+const index = artifacts.map(({ id, data }) => ({
+	name: data.name,
+	summary: data.summary[lang],
+	description: data.description?.[lang] ?? '',
+	meta: `${kindLabels[lang][data.kind]} · ${statusLabels[lang][data.status]}`,
+	install: data.install ?? '',
+	href: artifactPath(lang, id),
+	text: [
+		data.name,
+		data.summary.es,
+		data.summary.en,
+		data.description?.es,
+		data.description?.en,
+		KINDS[data.kind].es,
+		KINDS[data.kind].en,
+		...data.tags,
+		...data.languages.map((l) => LANGUAGES[l]),
+		...data.technologies.map((x) => TECHNOLOGIES[x]),
+	]
+		.filter(Boolean)
+		.join(' '),
+}));
+
+// Cada fragmento enlaza a la ficha de su artefacto solo si la ficha está publicada.
+const visible = new Set(artifacts.map((a) => a.id));
+const proofs = [
+	{
+		slug: 'clean-architecture-generator',
+		name: 'Clean Architecture Generator',
+		run: generatorRun.slice(0, 10).concat('  …', generatorRun.at(-1)!),
+		text: t.proof.init,
+	},
+	{
+		slug: 'clean-architecture-generator',
+		name: 'Clean Architecture Generator',
+		run: adapterRun,
+		text: t.proof.adapter,
+	},
+	{ slug: 'pragma-log', name: 'Pragma Log', run: logRun, text: t.proof.log },
+];
+
+const types = Object.keys(KINDS).map((kind) => ({
+	kind,
+	group: KINDS[kind].group[lang],
+	how: KINDS[kind].how[lang],
+	count: artifacts.filter((a) => a.data.kind === kind).length,
+}));
+---
+
+<div class="ph-sections not-content" data-lang={lang}>
+	<section class="ph-find" aria-labelledby="ph-find-h">
+		<h2 id="ph-find-h">{t.find.heading}</h2>
+		<pragma-find data-index={JSON.stringify(index)} data-empty={t.find.empty} data-open={t.find.open}>
+			<form class="ph-find__form" action={sitePath(lang, 'catalog/')} role="search" data-ui>
+				<label class="sr-only" for="ph-find-q">
+					{t.find.label}
+				</label>
+				<input id="ph-find-q" name="q" type="search" value={t.find.value} autocomplete="off" spellcheck="false" />
+			</form>
+			<div class="ph-find__body">
+				<ul class="ph-find__results" role="list" aria-live="polite" data-ui></ul>
+				<p class="ph-find__empty" hidden>
+					{t.find.empty} <a href={sitePath(lang, 'catalog/')}>{t.find.catalog}</a>
+				</p>
+				<div class="ph-find__examples">
+					<p>{t.find.examplesLabel}</p>
+					<ul role="list">
+						{t.find.examples.map((example) => (
+							<li>
+								<button type="button" data-example={example}>
+									{example}
+								</button>
+							</li>
+						))}
+					</ul>
+				</div>
+			</div>
+		</pragma-find>
+	</section>
+
+	<section class="ph-proof" aria-labelledby="ph-proof-h">
+		<h2 id="ph-proof-h">{t.proof.heading}</h2>
+		<ul class="ph-proof__fields" role="list">
+			{proofs.map((p, i) => (
+				<li class={`ph-proof__field ph-proof__field--${i + 1}`}>
+					<pre class="ph-run" data-ui><code>{p.run.join('\n')}</code></pre>
+					<div class="ph-proof__text">
+						<p class="ph-proof__name">{p.name}</p>
+						<p>{p.text}</p>
+						{visible.has(p.slug) && <a href={artifactPath(lang, p.slug)}>{t.proof.open} →</a>}
+					</div>
+				</li>
+			))}
+		</ul>
+	</section>
+
+	<section class="ph-types" aria-labelledby="ph-types-h">
+		<h2 id="ph-types-h">{t.types.heading}</h2>
+		<p class="ph-types__label">{t.types.label}</p>
+		<ul class="ph-types__rows" role="list">
+			{types.map((row) => (
+				<li>
+					{row.count > 0 ? (
+						<a href={sitePath(lang, `types/${row.kind}/`)}>
+							<span class="ph-types__group">{row.group}</span>
+							<span class="ph-types__how">{row.how}</span>
+							<span class="ph-types__count">{row.count} →</span>
+						</a>
+					) : (
+						<span class="ph-types__row is-empty">
+							<span class="ph-types__group">{row.group}</span>
+							<span class="ph-types__how">{row.how}</span>
+							<span class="ph-types__count">{t.types.soon}</span>
+						</span>
+					)}
+				</li>
+			))}
+		</ul>
+	</section>
+
+	<section class="ph-join" aria-labelledby="ph-join-h">
+		<h2 id="ph-join-h">
+			<span>{t.join.heading[0]}</span>
+			<span>{t.join.heading[1]}</span>
+		</h2>
+		<div class="ph-join__choice">
+			<div class="ph-join__buttons">
+				<a class="ph-btn ph-btn--paper" href={sitePath(lang, 'contribute/')}>
+					{t.join.add}
+				</a>
+				<span>{t.join.or}</span>
+				<a class="ph-btn ph-btn--line" href={`${REPO_URL}/issues/new?template=propose-artifact.yml`}>
+					{t.join.propose}
+				</a>
+			</div>
+			<p>{t.join.after}</p>
+		</div>
+	</section>
+</div>
+
+<script>
+	// Buscador del home (la búsqueda está en src/lib/find.ts). Sin script, el formulario lleva al catálogo.
+	import { search, words } from '../../lib/find';
+
+	type Item = {
+		name: string;
+		summary: string;
+		description: string;
+		meta: string;
+		install: string;
+		href: string;
+		text: string;
+	};
+
+	class PragmaFind extends HTMLElement {
+		connectedCallback() {
+			const items: Item[] = JSON.parse(this.dataset.index!);
+			const input = this.querySelector<HTMLInputElement>('input')!;
+			const list = this.querySelector<HTMLUListElement>('.ph-find__results')!;
+			const empty = this.querySelector<HTMLElement>('.ph-find__empty')!;
+
+			const render = () => {
+				const found = search(items, input.value);
+				list.replaceChildren(
+					...found.map((item, rank) => {
+						const li = document.createElement('li');
+						const a = document.createElement('a');
+						a.href = item.href;
+						const head = document.createElement('span');
+						head.className = 'ph-result__head';
+						const name = document.createElement('span');
+						name.className = 'ph-result__name';
+						name.textContent = item.name;
+						const meta = document.createElement('span');
+						meta.className = 'ph-result__meta';
+						meta.textContent = item.meta;
+						head.append(name, meta);
+						const summary = document.createElement('span');
+						summary.className = 'ph-result__summary';
+						summary.textContent = item.summary;
+						a.append(head, summary);
+						if (rank === 0 && item.description) {
+							const description = document.createElement('span');
+							description.className = 'ph-result__description';
+							description.textContent = item.description;
+							a.append(description);
+						}
+						if (item.install) {
+							const code = document.createElement('code');
+							code.textContent = item.install;
+							a.append(code);
+						}
+						const open = document.createElement('span');
+						open.className = 'ph-result__open';
+						open.textContent = `${this.dataset.open} →`;
+						a.append(open);
+						li.append(a);
+						return li;
+					}),
+				);
+				empty.hidden = found.length > 0 || words(input.value).length === 0;
+			};
+
+			input.addEventListener('input', render);
+			this.querySelector('form')!.addEventListener('submit', (event) => {
+				// Con resultados, Enter abre el primero; sin resultados, sigue al catálogo.
+				const first = list.querySelector('a');
+				if (first) {
+					event.preventDefault();
+					first.click();
+				}
+			});
+			for (const button of this.querySelectorAll<HTMLButtonElement>('[data-example]')) {
+				button.addEventListener('click', () => {
+					input.value = button.dataset.example!;
+					render();
+					input.focus();
+				});
+			}
+			render();
+		}
+	}
+	customElements.define('pragma-find', PragmaFind);
+
+	// Entradas al hacer scroll: título, cuerpo y fragmento de cada sección, escalonados.
+	const groups = [
+		'.ph-find h2, .ph-find__form, .ph-find__body',
+		'.ph-proof h2, .ph-proof__field',
+		'.ph-types h2, .ph-types__rows li',
+		'.ph-join h2 span, .ph-join__choice',
+	];
+	if ('IntersectionObserver' in window) {
+		document.documentElement.classList.add('ph-js');
+		const io = new IntersectionObserver(
+			(entries) => {
+				for (const entry of entries) {
+					if (entry.isIntersecting) {
+						entry.target.classList.add('is-in');
+						io.unobserve(entry.target);
+					}
+				}
+			},
+			{ rootMargin: '0px 0px -10% 0px' },
+		);
+		for (const selector of groups) {
+			document.querySelectorAll<HTMLElement>(selector).forEach((el, i) => {
+				el.dataset.reveal = '';
+				el.style.setProperty('--i', String(i));
+				io.observe(el);
+			});
+		}
+		// Respaldo: si el observador no llega a correr, nada se queda oculto.
+		setTimeout(() => {
+			document.querySelectorAll('[data-reveal]').forEach((el) => el.classList.add('is-in'));
+			io.disconnect();
+		}, 2500);
+	}
+</script>

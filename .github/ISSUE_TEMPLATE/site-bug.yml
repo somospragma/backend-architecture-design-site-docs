@@ -1,0 +1,29 @@
+name: Error en el sitio
+description: Algo del sitio no funciona o se ve mal.
+title: "[Sitio] "
+labels: [site-bug]
+body:
+  - type: input
+    id: url
+    attributes:
+      label: Página
+      placeholder: https://somospragma.github.io/backend-architecture-design-site-docs/catalog/
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: Qué pasa
+      description: Qué esperabas y qué viste. Una captura ayuda.
+    validations:
+      required: true
+  - type: dropdown
+    id: theme
+    attributes:
+      label: Modo
+      options: [Oscuro, Claro, Los dos]
+  - type: input
+    id: browser
+    attributes:
+      label: Navegador y dispositivo
+      placeholder: Chrome 131 en macOS, Safari en iPhone

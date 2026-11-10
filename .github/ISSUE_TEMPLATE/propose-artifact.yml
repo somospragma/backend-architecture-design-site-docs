@@ -1,0 +1,76 @@
+name: Proponer artefacto
+description: Sugiere un artefacto para el hub si todavía no tienes la ficha lista.
+title: "[Artefacto] "
+labels: [artifact-proposal]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Si ya tienes la ficha, abre directamente un PR. Este formulario es para proponer la idea y pedir ayuda.
+  - type: input
+    id: name
+    attributes:
+      label: Nombre
+      placeholder: Pragma Log
+    validations:
+      required: true
+  - type: input
+    id: repository
+    attributes:
+      label: Repositorio
+      placeholder: https://github.com/somospragma/pragma-log
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: Qué resuelve
+      description: Una o dos frases sobre qué hace y para quién.
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Tipo
+      description: Cómo se usa.
+      options:
+        - Librería (se agrega como dependencia)
+        - Plugin (se instala dentro de otra herramienta)
+        - Plantilla (se copia o genera para empezar un proyecto)
+        - Herramienta (se ejecuta)
+        - Automatización (corre en el pipeline)
+        - No estoy seguro
+    validations:
+      required: true
+  - type: input
+    id: stack
+    attributes:
+      label: Lenguajes y tecnologías
+      placeholder: Java, Spring WebFlux, Gradle
+    validations:
+      required: true
+  - type: dropdown
+    id: origin
+    attributes:
+      label: Origen
+      options:
+        - Oficial (vive en una organización de Pragma)
+        - Comunidad (vive en una cuenta personal y es open source)
+    validations:
+      required: true
+  - type: input
+    id: owners
+    attributes:
+      label: Owners
+      description: Usuarios de GitHub o equipo que responde por el artefacto.
+      placeholder: "@dev-user, @somospragma/backend-architecture"
+    validations:
+      required: true
+  - type: checkboxes
+    id: criteria
+    attributes:
+      label: Criterios de entrada
+      options:
+        - label: El README explica la instalación y trae al menos un ejemplo.
+        - label: Tiene licencia.
+        - label: No tiene secretos ni datos de clientes.

@@ -1,45 +1,53 @@
 {
-  "name": "clean-arch-generator-docs",
-  "version": "1.0.0",
+  "name": "pragma-docs-hub",
+  "type": "module",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
-    "docusaurus": "docusaurus",
-    "start": "docusaurus start",
-    "build": "docusaurus build",
-    "swizzle": "docusaurus swizzle",
-    "deploy": "docusaurus deploy",
-    "clear": "docusaurus clear",
-    "serve": "docusaurus serve",
-    "write-translations": "docusaurus write-translations",
-    "write-heading-ids": "docusaurus write-heading-ids"
-  },
-  "dependencies": {
-    "@docusaurus/core": "^3.1.0",
-    "@docusaurus/preset-classic": "^3.1.0",
-    "@docusaurus/theme-mermaid": "^3.9.2",
-    "@mdx-js/react": "^3.0.0",
-    "clsx": "^2.0.0",
-    "prism-react-renderer": "^2.3.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
-  },
-  "devDependencies": {
-    "@docusaurus/module-type-aliases": "^3.1.0",
-    "@docusaurus/types": "^3.1.0"
-  },
-  "browserslist": {
-    "production": [
-      ">0.5%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 3 chrome version",
-      "last 3 firefox version",
-      "last 5 safari version"
-    ]
+    "dev": "pnpm tokens && astro dev",
+    "build": "pnpm tokens && astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "tokens": "node scripts/build-tokens.mjs",
+    "check:contrast": "node scripts/check-contrast.mjs",
+    "check:reviews": "node scripts/check-review-dates.mjs",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "pnpm tokens && astro check",
+    "test": "vitest run",
+    "knip": "knip",
+    "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm knip && pnpm check:contrast && pnpm check:reviews"
   },
   "engines": {
-    "node": ">=18.0"
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@10.19.0",
+  "dependencies": {
+    "@astrojs/starlight": "0.42.8",
+    "@fontsource/poppins": "5.3.0",
+    "astro": "7.4.4",
+    "sharp": "0.35.5",
+    "spdx-license-list": "6.12.0",
+    "starlight-sidebar-topics": "0.9.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.12",
+    "@eslint/js": "10.0.1",
+    "eslint": "10.14.0",
+    "eslint-plugin-astro": "3.2.1",
+    "globals": "17.14.0",
+    "knip": "6.44.2",
+    "prettier": "3.9.10",
+    "prettier-plugin-astro": "1.1.2",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.2",
+    "vitest": "5.1.0",
+    "yaml": "2.9.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "minimatch@>=7.0.0 <11.0.1": "11.0.1"
+    }
   }
 }

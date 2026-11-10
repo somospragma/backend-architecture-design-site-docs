@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Reportar una vulnerabilidad
+    url: https://github.com/somospragma/backend-architecture-design-site-docs/security/advisories/new
+    about: Por el canal privado de GitHub. No abras un issue público.
+  - name: Cómo aportar
+    url: https://github.com/somospragma/backend-architecture-design-site-docs/blob/main/CONTRIBUTING.md
+    about: Criterios de entrada y pasos para agregar una ficha.

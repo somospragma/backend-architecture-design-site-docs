@@ -1,0 +1,63 @@
+---
+title: How to use the brand
+description: Pragma's palette, typography and logo, with contrast rules.
+sidebar:
+  label: Brand
+  order: 2
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Pragma's brand lives in a single file: `src/styles/tokens.json`. The site colors and the CI contrast check both come from it. If a color isn't in that file, don't use it.
+
+## Palette
+
+**Primary**
+
+| Color | Hex |
+|---|---|
+| Pragma Purple | `#6429CD` |
+| Deep Violet | `#531DBC` |
+| Midnight | `#330072` |
+| Lavender | `#E4A4FF` |
+| Black | `#1D1D1B` |
+
+**Secondary**, for charts and illustration: `#9610FF`, `#7500A0`, `#DD52DD`, `#B6B6FF` and `#D7E2FF`.
+
+## Contrast
+
+All text needs a contrast of at least 4.5:1 against its background (WCAG AA).
+
+| Color | On white | On `#1D1D1B` |
+|---|---|---|
+| `#6429CD` Pragma Purple | 7.66 ✅ | 2.20 ❌ |
+| `#330072` Midnight | 15.18 ✅ | 1.11 ❌ |
+| `#9610FF` | 5.50 ✅ | 3.07 ⚠️ large text only |
+| `#DD52DD` | 3.32 ⚠️ large text only | 5.09 ✅ |
+| `#E4A4FF` Lavender | 1.90 ❌ | 8.89 ✅ |
+| `#D7E2FF` Ice Blue | 1.30 ❌ | 13.03 ✅ |
+
+<Aside type="caution" title="Rules">
+	- Pragma Purple, Deep Violet, Midnight and `#7500A0` are never used as text in dark mode.
+	- Lavender, `#B6B6FF` and Ice Blue are never used as text in light mode.
+	- `#DD52DD` is decorative only, or large text in light mode.
+</Aside>
+
+## Typography
+
+**Poppins** only: Bold for headings, SemiBold or Medium for emphasis and Regular for body text.
+
+## Logo
+
+- The "pragma" wordmark has a purple "g". On dark backgrounds, use the white version.
+- The isotype is a white "g" in a `#6429CD` circle.
+- Leave clear space around it equal to the height of the "g".
+- Don't recolor it, distort it or add effects.
+
+Tagline: **Keep moving**.
+
+## Changing a site color
+
+1. Edit `src/styles/tokens.json`.
+2. Run `pnpm check:contrast`. If any pair drops below the minimum, the command fails.
+3. Check the site in light and dark mode with `pnpm dev`.

@@ -1,0 +1,49 @@
+---
+title: How to document a project
+description: The minimum documentation a Pragma artifact needs.
+sidebar:
+  label: Document a project
+  order: 1
+---
+
+import { Aside, FileTree } from '@astrojs/starlight/components';
+
+Every artifact starts with a good README. That's enough to join the hub in `indexed` mode.
+
+<Aside type="tip">
+	If you use an assistant with skills, copy the [`document-project`](https://github.com/somospragma/backend-architecture-design-site-docs/tree/main/.claude/skills/document-project) skill to your repo's `.claude/skills/`: it builds the README and the `hosted` structure following these rules.
+</Aside>
+
+## Minimum README
+
+Use the [`templates/README.template.md`](https://github.com/somospragma/backend-architecture-design-site-docs/blob/main/templates/README.template.md) template. It must include, in this order:
+
+1. **What it is:** one sentence on what it solves and for whom.
+2. **Installation:** the exact command or dependency.
+3. **Quick start:** an example that works when copied and pasted.
+4. **Configuration:** options and defaults.
+5. **Contributing:** how to propose changes.
+6. **License.**
+7. **Owners:** who is accountable for the artifact.
+
+## `hosted` docs
+
+If the artifact needs guides and reference, its docs can live in the hub. Use the [`templates/docs-hosted/`](https://github.com/somospragma/backend-architecture-design-site-docs/tree/main/templates/docs-hosted) structure:
+
+<FileTree>
+- src/content/docs/artifacts/my-artifact/
+  - index.md introduction
+  - quick-start.md
+  - guides/
+  - reference/
+  - faq.md
+  - changelog.md
+</FileTree>
+
+## Style
+
+Follow the [style guide](../style/): tone, versions, code examples and what never gets published.
+
+<Aside type="danger" title="What never gets published">
+	Secrets, tokens, internal URLs, client names or client data. Use sample values such as `example.com` or `my-app`.
+</Aside>

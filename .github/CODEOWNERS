@@ -1,0 +1,28 @@
+# Quién aprueba cada parte del hub. La última regla que coincide gana.
+# Hoy todo lo aprueba una persona, mientras se crea el equipo del hub; las secciones están separadas para poder repartirlas después.
+
+# Todo lo demás: configuración, componentes, CI.
+*                                   @dayepesb-pragma
+
+# Fichas del catálogo.
+/src/content/artifacts/             @dayepesb-pragma
+/src/content/artifact-schema.ts     @dayepesb-pragma
+/src/content/taxonomy.mjs           @dayepesb-pragma
+
+# Documentación hosted de cada artefacto.
+/src/content/docs/artifacts/        @dayepesb-pragma
+/src/content/docs/en/artifacts/     @dayepesb-pragma
+
+# Marca y tema: colores, logos y chequeo de contraste.
+/src/styles/                        @dayepesb-pragma
+/src/assets/brand/                  @dayepesb-pragma
+/public/favicon.svg                 @dayepesb-pragma
+/scripts/build-tokens.mjs           @dayepesb-pragma
+/scripts/check-contrast.mjs         @dayepesb-pragma
+/scripts/tokens-lib.mjs             @dayepesb-pragma
+
+# Reglas de aporte y CI.
+/.github/                           @dayepesb-pragma
+/CONTRIBUTING.md                    @dayepesb-pragma
+/CODE_OF_CONDUCT.md                 @dayepesb-pragma
+/SECURITY.md                        @dayepesb-pragma

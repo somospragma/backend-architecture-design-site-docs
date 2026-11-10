@@ -1,0 +1,59 @@
+---
+title: Guía de estilo
+description: Cómo escribir la documentación de los artefactos de Pragma.
+sidebar:
+  label: Estilo de escritura
+  order: 3
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Quien lee una documentación técnica quiere resolver algo rápido. Escribe para esa persona.
+
+## Tono
+
+- Háblale a quien lee en segunda persona: "instala", "configura", no "se debe instalar".
+- Usa voz activa y frases cortas, de una idea cada una.
+- Ve al grano. Nada de "en este documento veremos" ni "como es bien sabido".
+- No prometas lo que el artefacto no hace. "Reduce la configuración" vale; "la mejor librería" no.
+
+## Idioma
+
+- Las páginas del hub van en español y en inglés, con el mismo nombre de archivo.
+- Los términos técnicos que no tienen traducción común se dejan en inglés y en código: `pull request`, `build`, `hosted`.
+- Los nombres de opciones, comandos y archivos siempre van en `código`, en el idioma original.
+- Un README de artefacto puede estar en un solo idioma. La ficha siempre tiene `summary` en los dos.
+
+## Títulos
+
+- Un título por idea, en forma de frase: "Cómo configurar el logger", no "Configuración del Logger".
+- Solo la primera letra en mayúscula, salvo nombres propios.
+- No saltes niveles: después de `##` viene `###`.
+
+## Versiones
+
+- Usa versionado semántico completo: `1.4.0`, no "la última" ni "v1.4".
+- Di desde qué versión existe algo: "Disponible desde `1.3.0`".
+- Los cambios que rompen compatibilidad se marcan en el changelog con **Rompe compatibilidad** y dicen qué hay que hacer.
+
+## Ejemplos de código
+
+- Todo ejemplo debe funcionar al copiarlo y pegarlo, con sus imports.
+- El bloque declara su lenguaje: ` ```java `, ` ```bash `, ` ```yaml `.
+- Muestra lo mínimo que hace falta. Si es largo, enlaza a un repositorio de ejemplo.
+- Después del ejemplo, di qué resultado debe ver la persona.
+- En comandos de terminal no pongas `$` al inicio.
+
+## Enlaces
+
+- El texto del enlace dice a dónde lleva: "lee la [referencia de configuración](#)", no "haz clic [aquí](#)".
+- Dentro del hub, usa rutas relativas.
+
+<Aside type="danger" title="Qué no se publica">
+	- Secretos, tokens, contraseñas ni llaves, ni siquiera vencidos.
+	- URLs, hosts o IPs internos de Pragma o de clientes.
+	- Nombres, logos o datos de clientes, salvo que Pragma tenga permiso para publicarlos.
+	- Datos personales reales en los ejemplos.
+
+	Usa valores de ejemplo: `example.com`, `my-app`, `dev-user`, `123456789012` para una cuenta de AWS.
+</Aside>

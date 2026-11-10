@@ -1,0 +1,49 @@
+---
+title: Cómo documentar un proyecto
+description: Lo mínimo que necesita la documentación de un artefacto de Pragma.
+sidebar:
+  label: Documentar un proyecto
+  order: 1
+---
+
+import { Aside, FileTree } from '@astrojs/starlight/components';
+
+Todo artefacto empieza por un buen README. Con eso basta para entrar al hub en modo `indexed`.
+
+<Aside type="tip">
+	Si usas un asistente con skills, copia la skill [`document-project`](https://github.com/somospragma/backend-architecture-design-site-docs/tree/main/.claude/skills/document-project) a `.claude/skills/` de tu repo: arma el README y la estructura `hosted` con estas reglas.
+</Aside>
+
+## README mínimo
+
+Usa la plantilla [`templates/README.template.md`](https://github.com/somospragma/backend-architecture-design-site-docs/blob/main/templates/README.template.md). Debe tener, en este orden:
+
+1. **Qué es:** una frase sobre qué resuelve y para quién.
+2. **Instalación:** el comando o la dependencia exacta.
+3. **Uso rápido:** un ejemplo que funcione al copiarlo y pegarlo.
+4. **Configuración:** opciones y valores por defecto.
+5. **Contribución:** cómo proponer cambios.
+6. **Licencia.**
+7. **Owners:** quién responde por el artefacto.
+
+## Documentación `hosted`
+
+Si el artefacto necesita guías y referencia, su documentación puede vivir en el hub. Usa la estructura de [`templates/docs-hosted/`](https://github.com/somospragma/backend-architecture-design-site-docs/tree/main/templates/docs-hosted):
+
+<FileTree>
+- src/content/docs/artifacts/mi-artefacto/
+  - index.md introducción
+  - quick-start.md
+  - guides/
+  - reference/
+  - faq.md
+  - changelog.md
+</FileTree>
+
+## Estilo
+
+Sigue la [guía de estilo](../style/): tono, versiones, ejemplos de código y qué no se publica.
+
+<Aside type="danger" title="Qué no se publica">
+	Secretos, tokens, URLs internas, nombres o datos de clientes. Usa valores de ejemplo como `example.com` o `my-app`.
+</Aside>

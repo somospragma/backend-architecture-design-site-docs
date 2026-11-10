@@ -1,0 +1,146 @@
+---
+// Lista de fichas del catálogo, con filtros por tipo, disciplina, lenguaje, tecnología, origen y estado.
+// Los filtros de lenguaje y tecnología solo muestran valores que alguna ficha usa.
+// Se usa desde catalog.mdx en cada idioma: <Catalog lang="es" />.
+import { Aside } from '@astrojs/starlight/components';
+import ArtifactCard from './ArtifactCard.astro';
+import { KINDS, ORIGINS, STATUSES } from '../content/artifact-schema';
+import { DISCIPLINES, LANGUAGES, TECHNOLOGIES } from '../content/taxonomy.mjs';
+import { disciplineLabels, kindLabels, originLabels, statusLabels, ui, type Lang } from '../i18n/catalog';
+import { getVisibleArtifacts, sitePath } from '../lib/artifacts';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = ui[lang];
+const artifacts = await getVisibleArtifacts();
+
+const used = (pick: (e: (typeof artifacts)[number]) => string[]) => new Set(artifacts.flatMap(pick));
+const usedLanguages = used((e) => e.data.languages);
+const usedTechnologies = used((e) => e.data.technologies);
+
+const filters = [
+	{ key: 'kind', label: t.filterKind, options: KINDS.map((v) => [v, kindLabels[lang][v]]) },
+	{
+		key: 'discipline',
+		label: t.filterDiscipline,
+		options: Object.keys(DISCIPLINES).map((v) => [v, disciplineLabels[lang][v]]),
+	},
+	{
+		key: 'language',
+		label: t.filterLanguage,
+		options: Object.entries(LANGUAGES).filter(([v]) => usedLanguages.has(v)),
+	},
+	{
+		key: 'technology',
+		label: t.filterTechnology,
+		options: Object.entries(TECHNOLOGIES).filter(([v]) => usedTechnologies.has(v)),
+	},
+	{ key: 'origin', label: t.filterOrigin, options: ORIGINS.map((v) => [v, originLabels[lang][v]]) },
+	{ key: 'status', label: t.filterStatus, options: STATUSES.map((v) => [v, statusLabels[lang][v]]) },
+];
+---
+
+{artifacts.length === 0 ? (
+	<Aside type="note" title={t.emptyTitle}>
+		{t.emptyBody} <a href={sitePath(lang, 'contribute/')}>{t.emptyLink}</a>.
+	</Aside>
+) : (
+	<pragma-catalog data-count-one={t.count(1)} data-count-many={t.count(2).replace('2', '{n}')}>
+		<form class="filters not-content" aria-label={t.filtersLabel}>
+			{filters.map((f) => (
+				<label>
+					<span>{f.label}</span>
+					<select name={f.key}>
+						<option value="">{t.filterAll}</option>
+						{f.options.map(([value, label]) => (
+							<option value={value}>{label}</option>
+						))}
+					</select>
+				</label>
+			))}
+		</form>
+		<p class="count" aria-live="polite">
+			{t.count(artifacts.length)}
+		</p>
+		<ul class="grid not-content">
+			{artifacts.map((entry) => (
+				<li
+					data-kind={entry.data.kind}
+					data-discipline={entry.data.disciplines.join(' ')}
+					data-language={entry.data.languages.join(' ')}
+					data-technology={entry.data.technologies.join(' ')}
+					data-origin={entry.data.origin}
+					data-status={entry.data.status}
+				>
+					<ArtifactCard lang={lang} entry={entry} />
+				</li>
+			))}
+		</ul>
+		<p class="no-matches" hidden>
+			{t.noMatches}
+		</p>
+	</pragma-catalog>
+)}
+
+<script>
+	class PragmaCatalog extends HTMLElement {
+		connectedCallback() {
+			const form = this.querySelector('form')!;
+			const items = [...this.querySelectorAll<HTMLLIElement>('li[data-kind]')];
+			const count = this.querySelector('.count')!;
+			const empty = this.querySelector<HTMLElement>('.no-matches')!;
+			const { countOne, countMany } = this.dataset;
+
+			form.addEventListener('change', () => {
+				const active = [...new FormData(form)].filter(([, v]) => v !== '');
+				let visible = 0;
+				for (const item of items) {
+					const show = active.every(([key, value]) => item.dataset[key]!.split(' ').includes(String(value)));
+					item.hidden = !show;
+					if (show) visible++;
+				}
+				count.textContent = visible === 1 ? countOne! : countMany!.replace('{n}', String(visible));
+				empty.hidden = visible > 0;
+			});
+		}
+	}
+	customElements.define('pragma-catalog', PragmaCatalog);
+</script>
+
+<style>
+	.filters {
+		margin-top: 1.5rem;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+		gap: 0.75rem;
+	}
+	.filters label {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+		font-size: var(--sl-text-sm);
+		color: var(--sl-color-gray-2);
+	}
+	.filters select {
+		padding: 0.4rem 0.5rem;
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 0.375rem;
+		background: var(--sl-color-black);
+		color: var(--sl-color-white);
+		font: inherit;
+	}
+	.count {
+		font-size: var(--sl-text-sm);
+		color: var(--sl-color-gray-3);
+	}
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+		gap: 1rem;
+		padding: 0;
+		list-style: none;
+	}
+</style>

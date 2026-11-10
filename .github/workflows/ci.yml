@@ -1,0 +1,160 @@
+# Calidad y build del sitio, en dos etapas:
+#   1. Calidad: lint, tipos, pruebas, código muerto y marca, en jobs paralelos.
+#   2. Build: construye el sitio (valida el schema de las fichas) y revisa los enlaces internos.
+# Corre en cada PR y en main. deploy.yml lo reutiliza con `publish: true` para publicar ese mismo build.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_call:
+    inputs:
+      publish:
+        description: Subir el sitio construido como artefacto de GitHub Pages.
+        type: boolean
+        default: false
+
+permissions: {}
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  lint:
+    name: Calidad · Lint (ESLint y Prettier)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Preparar el entorno
+        uses: $/.github/actions/setup
+
+      - name: ESLint
+        run: pnpm lint
+
+      - name: Prettier
+        run: pnpm format:check
+
+  typecheck:
+    name: Calidad · Tipos (astro check)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Preparar el entorno
+        uses: $/.github/actions/setup
+
+      - name: astro check
+        run: pnpm typecheck
+
+  test:
+    name: Calidad · Pruebas (vitest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Preparar el entorno
+        uses: $/.github/actions/setup
+
+      - name: vitest
+        run: pnpm test
+
+  dead-code:
+    name: Calidad · Código muerto (knip)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Preparar el entorno
+        uses: $/.github/actions/setup
+
+      - name: knip
+        run: pnpm knip
+
+  brand:
+    name: Calidad · Marca y fichas
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Preparar el entorno
+        uses: $/.github/actions/setup
+
+      - name: Contraste de la marca
+        run: pnpm check:contrast
+
+      - name: Fichas sin revisar en 12 meses
+        run: pnpm check:reviews
+
+  build:
+    name: Build · Sitio y enlaces
+    needs: [lint, typecheck, test, dead-code, brand]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # lastUpdated de Starlight necesita la historia
+          persist-credentials: false
+
+      # Sin caché a propósito: este build es el que se publica y no debe depender de un caché que otro workflow pudo escribir.
+      - name: Preparar el entorno
+        uses: $/.github/actions/setup
+        with:
+          cache: 'false'
+
+      - name: Build (valida el schema de las fichas)
+        run: pnpm build
+
+      # Los enlaces del sitio llevan el base del repo; se monta dist/ debajo de él para resolverlos.
+      - name: Preparar el sitio para revisar enlaces
+        run: |
+          mkdir -p _site
+          cp -R dist "_site/${GITHUB_REPOSITORY#*/}"
+
+      - name: Enlaces internos rotos
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
+        with:
+          args: --offline --no-progress --root-dir ${{ github.workspace }}/_site '_site/**/*.html'
+          fail: true
+
+      - name: Subir el sitio para publicarlo
+        if: inputs.publish
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: dist

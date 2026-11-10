@@ -1,0 +1,28 @@
+name: Reportar ficha desactualizada
+description: Una ficha del catálogo dice algo que ya no es cierto.
+title: "[Ficha] "
+labels: [outdated-entry]
+body:
+  - type: input
+    id: entry
+    attributes:
+      label: Ficha
+      description: La URL de la ficha en el hub o su slug.
+      placeholder: https://somospragma.github.io/backend-architecture-design-site-docs/catalog/pragma-log/
+    validations:
+      required: true
+  - type: dropdown
+    id: what
+    attributes:
+      label: Qué está mal
+      multiple: true
+      options: [Estado, Versión o registro, Owners, Enlaces rotos, Descripción, Otro]
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Detalle
+      description: Qué dice hoy y qué debería decir. Enlaza la fuente si la tienes.
+    validations:
+      required: true

@@ -1,0 +1,11 @@
+# Prettier solo revisa código. La prosa (Markdown, MDX), los YAML y lo generado quedan fuera.
+dist/
+.astro/
+.taste-skill/
+.claude/
+pnpm-lock.yaml
+src/styles/tokens.css
+*.md
+*.mdx
+*.yml
+*.yaml

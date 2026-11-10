@@ -1,0 +1,11 @@
+---
+import ArtifactPage from '../../components/ArtifactPage.astro';
+import { getVisibleArtifacts } from '../../lib/artifacts';
+
+export async function getStaticPaths() {
+	const entries = await getVisibleArtifacts();
+	return entries.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+---
+
+<ArtifactPage lang="es" entry={Astro.props.entry} />

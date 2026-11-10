@@ -1,121 +1,75 @@
-# Pragma Libs Documentation
+# Pragma Hub
 
-Official documentation site for Pragma's enterprise libraries and tools.
+Sitio que reúne las librerías, plugins, plantillas y herramientas que construye Pragma y su comunidad. Está hecho con [Astro Starlight](https://starlight.astro.build/), en español (`/`) e inglés (`/en/`).
 
-## 🚀 Quick Start
+**Sitio:** https://somospragma.github.io/backend-architecture-design-site-docs/
+
+## Desarrollo
+
+Requiere Node 22 o superior y pnpm 10.
 
 ```bash
-# Install dependencies
 pnpm install
-
-# Start development server
-pnpm start
-
-# Build for production
-pnpm build
+pnpm dev              # servidor local en http://localhost:4321/backend-architecture-design-site-docs/
+pnpm build            # genera el sitio en dist/ (valida el schema de las fichas)
+pnpm check            # lo mismo que la etapa de calidad del CI: lint, formato, tipos, pruebas, código muerto y marca
+pnpm format           # aplica el formato de Prettier
 ```
 
-## 🎨 Branding
+Cada chequeo también corre por separado: `pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm test`, `pnpm knip`, `pnpm check:contrast` y `pnpm check:reviews`.
 
-### Colors (Pragma Brand)
-- **Primary Purple**: `#6429CD` (Pantone 2090 c)
-- **Black**: `#1D1D1B` (Pantone 419 c)
-- **White**: `#FFFFFF`
-- **Secondary Purples**:
-  - Dark: `#330072` (Pantone 2685 c)
-  - Medium: `#440099` (Pantone Violeta c)
-  - Light: `#531DBC` (Pantone 2098 c)
-
-### Assets
-- Logos: `static/img/pragma-logo.svg`, `pragma-logo-white.svg`
-- Icons: `static/img/pragma-icon.svg`, `pragma-icon-white.svg`, `pragma-icon-dark.svg`
-- Feature icons: `static/img/icons/`
-
-## 📚 Available Libraries
-
-### Clean Architecture Generator
-A Gradle plugin for generating clean architecture projects with support for:
-- Hexagonal and Onion architectures
-- Spring Boot and Quarkus frameworks
-- Reactive and Imperative paradigms
-
-[View Documentation →](docs/clean-arch/intro.md)
-
-## 🏗️ Project Structure
+## Estructura
 
 ```
-.
-├── docs/                          # Documentation content
-│   ├── intro.md                  # Main landing page
-│   └── clean-arch/               # Clean Architecture Generator docs
-│       ├── intro.md
-│       ├── getting-started/
-│       ├── guides/
-│       └── reference/
-├── src/
-│   ├── components/               # React components
-│   ├── css/                      # Custom styles
-│   └── pages/                    # Custom pages
-├── static/                       # Static assets
-│   └── img/                      # Images and icons
-├── docusaurus.config.js          # Docusaurus configuration
-└── sidebars.js                   # Sidebar configuration
+src/
+├── content/
+│   ├── artifacts/       # una ficha por artefacto: <slug>.md
+│   ├── artifact-schema.ts  # schema de las fichas (el build falla si no se cumple)
+│   ├── taxonomy.mjs     # tipos, disciplinas, lenguajes y tecnologías
+│   └── docs/            # páginas en español (raíz) y en/ para inglés
+├── styles/
+│   ├── tokens.json      # única fuente de la marca: colores, neutros, fuente y pares de contraste
+│   └── theme.css        # ajustes de Starlight que no son colores
+└── assets/brand/        # logos de Pragma
+scripts/
+├── build-tokens.mjs     # genera src/styles/tokens.css desde tokens.json
+└── check-contrast.mjs   # falla si un par texto/fondo baja de su mínimo
 ```
 
-## 🚀 Deployment
+## Aportar
 
-El sitio se despliega automáticamente a GitHub Pages cuando se hace push a `main`.
+Cada artefacto entra con una ficha en un PR. Lee [CONTRIBUTING.md](CONTRIBUTING.md); las plantillas están en [templates/](templates/).
 
-**URL de producción:** https://somospragma.github.io/backend-architecture-design-site-docs/
+## Skills
 
-### Despliegue Automático
+En [.claude/skills/](.claude/skills/) hay skills para que cualquier asistente haga las cosas igual:
 
-Cada push a `main` ejecuta el workflow de GitHub Actions que:
-1. Instala dependencias
-2. Ejecuta `pnpm build`
-3. Despliega a GitHub Pages
+| Skill | Para qué |
+|---|---|
+| `pragma-brand` | Paleta, contraste, tipografía, logo y voz de Pragma. |
+| `pragma-docs-theme` | Cambiar el tema de Starlight sin romper el contraste. |
+| `add-artifact` | Crear una ficha, validarla y armar el PR. |
+| `document-project` | Documentar un artefacto en su propio repo. Se puede copiar a cualquier proyecto. |
+| `release-docs` | Qué actualizar cuando un artefacto saca versión. |
 
-Ver [DEPLOYMENT.md](DEPLOYMENT.md) para más detalles.
+## CI y despliegue
 
-### Configuración Inicial
+| Workflow | Cuándo | Qué hace |
+|---|---|---|
+| `ci.yml` | Cada PR y `main` | **Calidad**, en jobs paralelos: ESLint y Prettier, tipos (`astro check`), pruebas (vitest), código muerto (knip), contraste de la marca y fichas sin revisar. Si todo pasa, **Build**: construye el sitio (valida el schema de las fichas) y revisa los enlaces internos. |
+| `security.yml` | Cada PR, `main` y los lunes | Secretos con gitleaks en toda la historia, CodeQL para TypeScript y para los workflows, zizmor, `pnpm audit` y revisión de dependencias nuevas en el PR. |
+| `deploy.yml` | `main` | Corre CI y seguridad en paralelo, **espera aprobación** en el environment `production` y publica en GitHub Pages el mismo build que validó el CI. Está apagado hasta que exista la variable `DEPLOY_ENABLED=true`. |
 
-1. Habilitar GitHub Pages en `Settings` → `Pages`
-2. Seleccionar "Source": `GitHub Actions`
-3. Verificar permisos en `Settings` → `Actions` → `General`
+La preparación del entorno (pnpm, Node y dependencias) está en `.github/actions/setup`. Las acciones están fijadas por SHA y Dependabot las mantiene al día. Los falsos positivos de gitleaks van en `.gitleaksignore` con su huella exacta.
 
-## 🛠️ Built With
+## Marca
 
-- [Docusaurus](https://docusaurus.io/) - Documentation framework
-- [React](https://reactjs.org/) - UI library
-- [pnpm](https://pnpm.io/) - Package manager
+Los colores no se escriben en el CSS. Se agregan o cambian en `src/styles/tokens.json` y se verifican con `pnpm check:contrast`. Las reglas están en la guía de marca del sitio (`/guides/brand/`).
 
-## 📝 Licencia
+## Historia
 
-Este proyecto está licenciado bajo la **Apache License 2.0** - ver el archivo [LICENSE](LICENSE) para más detalles.
+Hasta octubre de 2026 este repo era un sitio Docusaurus con la documentación del Clean Architecture Generator y de Pragma Log. Ese estado quedó en el tag `docusaurus-final` y en la rama `legacy/docusaurus`. Las dos documentaciones se van a migrar al hub como artefactos `hosted`.
 
-```
-Copyright 2025 Pragma S.A. and Contributors
+## Licencia
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-```
-
-### ¿Qué puedes hacer con este proyecto?
-
-- ✅ Usar en proyectos personales y comerciales
-- ✅ Modificar y crear obras derivadas
-- ✅ Distribuir copias originales o modificadas
-- ✅ Hacer fork y evolucionar el proyecto
-- ✅ Usar en tu empresa sin restricciones
-
-### ¿Qué debes hacer?
-
-- 📋 Mantener los avisos de copyright y licencia
-- 📋 Incluir el archivo [NOTICE](NOTICE) en distribuciones
-- 📋 Documentar cambios significativos realizados
-- 📋 Dar atribución al proyecto original
-
-Ver [NOTICE](NOTICE) para información de atribución.
+Apache License 2.0. Ver [LICENSE](LICENSE) y [NOTICE](NOTICE).
