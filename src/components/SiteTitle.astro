@@ -8,17 +8,15 @@ const topics = Astro.locals.starlightSidebarTopics?.topics ?? [];
 
 <div class="title-and-topics">
 	<Default />
-	{
-		topics.length > 1 && (
-			<nav class="topics" aria-label={Astro.currentLocale === 'en' ? 'Artifact types' : 'Tipos de artefacto'}>
-				{topics.map((topic) => (
-					<a href={topic.link} aria-current={topic.isCurrent ? 'page' : undefined}>
-						{topic.label}
-					</a>
-				))}
-			</nav>
-		)
-	}
+	{topics.length > 1 && (
+		<nav class="topics" aria-label={Astro.currentLocale === 'en' ? 'Artifact types' : 'Tipos de artefacto'}>
+			{topics.map((topic) => (
+				<a href={topic.link} aria-current={topic.isCurrent ? 'page' : undefined}>
+					{topic.label}
+				</a>
+			))}
+		</nav>
+	)}
 </div>
 
 <style>

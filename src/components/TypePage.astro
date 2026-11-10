@@ -15,29 +15,32 @@ interface Props {
 const { lang, kind, entries } = Astro.props;
 const t = ui[lang];
 const groups = Object.entries(DISCIPLINES)
-	.map(([discipline, label]) => ({ label: label[lang], items: entries.filter((e) => e.data.disciplines[0] === discipline) }))
+	.map(([discipline, label]) => ({
+		label: label[lang],
+		items: entries.filter((e) => e.data.disciplines[0] === discipline),
+	}))
 	.filter((g) => g.items.length > 0);
 ---
 
-<StarlightPage frontmatter={{ title: KINDS[kind].group[lang], description: KINDS[kind].how[lang], tableOfContents: false }}>
+<StarlightPage
+	frontmatter={{ title: KINDS[kind].group[lang], description: KINDS[kind].how[lang], tableOfContents: false }}
+>
 	<p>
 		<strong>{KINDS[kind].how[lang]}.</strong>
 		{t.typeIntro} <a href={sitePath(lang, 'catalog/')}>{t.catalogLink}</a>.
 	</p>
-	{
-		groups.map((group) => (
-			<section>
-				<h2>{group.label}</h2>
-				<ul class="grid not-content">
-					{group.items.map((entry) => (
-						<li>
-							<ArtifactCard lang={lang} entry={entry} />
-						</li>
-					))}
-				</ul>
-			</section>
-		))
-	}
+	{groups.map((group) => (
+		<section>
+			<h2>{group.label}</h2>
+			<ul class="grid not-content">
+				{group.items.map((entry) => (
+					<li>
+						<ArtifactCard lang={lang} entry={entry} />
+					</li>
+				))}
+			</ul>
+		</section>
+	))}
 </StarlightPage>
 
 <style>

@@ -3,7 +3,15 @@
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { Aside, Badge, LinkButton } from '@astrojs/starlight/components';
 import { LANGUAGES, TECHNOLOGIES } from '../content/taxonomy.mjs';
-import { disciplineLabels, kindLabels, originLabels, statusLabels, statusVariant, ui, type Lang } from '../i18n/catalog';
+import {
+	disciplineLabels,
+	kindLabels,
+	originLabels,
+	statusLabels,
+	statusVariant,
+	ui,
+	type Lang,
+} from '../i18n/catalog';
 import { artifactPath, docsHref, ownerHref, registryHref, sitePath, type ArtifactEntry } from '../lib/artifacts';
 
 interface Props {
@@ -15,8 +23,15 @@ const { lang, entry } = Astro.props;
 const { id, data } = entry;
 const t = ui[lang];
 const registryLink = data.registry && registryHref(data.registry);
-const replacedByHref = data.replacedBy?.startsWith('https://') ? data.replacedBy : data.replacedBy && artifactPath(lang, data.replacedBy);
-const reviewed = data.lastReviewed.toLocaleDateString(lang, { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+const replacedByHref = data.replacedBy?.startsWith('https://')
+	? data.replacedBy
+	: data.replacedBy && artifactPath(lang, data.replacedBy);
+const reviewed = data.lastReviewed.toLocaleDateString(lang, {
+	year: 'numeric',
+	month: 'long',
+	day: 'numeric',
+	timeZone: 'UTC',
+});
 ---
 
 <StarlightPage frontmatter={{ title: data.name, description: data.summary[lang] }}>
@@ -29,18 +44,16 @@ const reviewed = data.lastReviewed.toLocaleDateString(lang, { year: 'numeric', m
 		{data.draft && <Badge text={t.draft} variant="caution" />}
 	</p>
 
-	{
-		data.status === 'deprecated' && (
-			<Aside type="danger" title={t.deprecatedTitle}>
-				{data.deprecationNote && <p>{data.deprecationNote[lang]}</p>}
-				{replacedByHref && (
-					<p>
-						{t.replacedBy} <a href={replacedByHref}>{data.replacedBy}</a>
-					</p>
-				)}
-			</Aside>
-		)
-	}
+	{data.status === 'deprecated' && (
+		<Aside type="danger" title={t.deprecatedTitle}>
+			{data.deprecationNote && <p>{data.deprecationNote[lang]}</p>}
+			{replacedByHref && (
+				<p>
+					{t.replacedBy} <a href={replacedByHref}>{data.replacedBy}</a>
+				</p>
+			)}
+		</Aside>
+	)}
 
 	{data.description && <p>{data.description[lang]}</p>}
 
@@ -52,31 +65,84 @@ const reviewed = data.lastReviewed.toLocaleDateString(lang, { year: 'numeric', m
 
 	<table>
 		<tbody>
-			<tr><th scope="row">{t.fieldKind}</th><td><a href={sitePath(lang, `types/${data.kind}/`)}>{kindLabels[lang][data.kind]}</a></td></tr>
-			<tr><th scope="row">{t.fieldDisciplines}</th><td>{data.disciplines.map((d) => disciplineLabels[lang][d]).join(', ')}</td></tr>
-			<tr><th scope="row">{t.fieldLanguages}</th><td>{data.languages.map((l) => LANGUAGES[l]).join(', ')}</td></tr>
-			{data.technologies.length > 0 && <tr><th scope="row">{t.fieldTechnologies}</th><td>{data.technologies.map((x) => TECHNOLOGIES[x]).join(', ')}</td></tr>}
-			<tr><th scope="row">{t.fieldOrigin}</th><td>{originLabels[lang][data.origin]}</td></tr>
+			<tr>
+				<th scope="row">{t.fieldKind}</th>
+				<td>
+					<a href={sitePath(lang, `types/${data.kind}/`)}>{kindLabels[lang][data.kind]}</a>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row">{t.fieldDisciplines}</th>
+				<td>{data.disciplines.map((d) => disciplineLabels[lang][d]).join(', ')}</td>
+			</tr>
+			<tr>
+				<th scope="row">{t.fieldLanguages}</th>
+				<td>{data.languages.map((l) => LANGUAGES[l]).join(', ')}</td>
+			</tr>
+			{data.technologies.length > 0 && (
+				<tr>
+					<th scope="row">{t.fieldTechnologies}</th>
+					<td>{data.technologies.map((x) => TECHNOLOGIES[x]).join(', ')}</td>
+				</tr>
+			)}
+			<tr>
+				<th scope="row">{t.fieldOrigin}</th>
+				<td>{originLabels[lang][data.origin]}</td>
+			</tr>
 			<tr>
 				<th scope="row">{t.fieldOwners}</th>
-				<td>{data.owners.map((o, i) => <>{i > 0 && ', '}<a href={ownerHref(o)}>{o}</a></>)}</td>
+				<td>
+					{data.owners.map((o, i) => (
+						<>
+							{i > 0 && ', '}
+							<a href={ownerHref(o)}>{o}</a>
+						</>
+					))}
+				</td>
 			</tr>
-			<tr><th scope="row">{t.fieldRepository}</th><td><a href={data.repository}>{data.repository.replace('https://', '')}</a></td></tr>
-			{
-				data.registry && (
-					<tr>
-						<th scope="row">{t.fieldRegistry}</th>
-						<td>{registryLink ? <a href={registryLink}><code>{data.registry.id}</code></a> : <code>{data.registry.id}</code>} ({data.registry.type})</td>
-					</tr>
-				)
-			}
-			<tr><th scope="row">{t.fieldLicense}</th><td><code>{data.license}</code></td></tr>
-			{data.tags.length > 0 && <tr><th scope="row">{t.fieldTags}</th><td>{data.tags.join(', ')}</td></tr>}
-			<tr><th scope="row">{t.fieldLastReviewed}</th><td>{reviewed}</td></tr>
+			<tr>
+				<th scope="row">{t.fieldRepository}</th>
+				<td>
+					<a href={data.repository}>{data.repository.replace('https://', '')}</a>
+				</td>
+			</tr>
+			{data.registry && (
+				<tr>
+					<th scope="row">{t.fieldRegistry}</th>
+					<td>
+						{registryLink ? (
+							<a href={registryLink}>
+								<code>{data.registry.id}</code>
+							</a>
+						) : (
+							<code>{data.registry.id}</code>
+						)}{' '}
+						({data.registry.type})
+					</td>
+				</tr>
+			)}
+			<tr>
+				<th scope="row">{t.fieldLicense}</th>
+				<td>
+					<code>{data.license}</code>
+				</td>
+			</tr>
+			{data.tags.length > 0 && (
+				<tr>
+					<th scope="row">{t.fieldTags}</th>
+					<td>{data.tags.join(', ')}</td>
+				</tr>
+			)}
+			<tr>
+				<th scope="row">{t.fieldLastReviewed}</th>
+				<td>{reviewed}</td>
+			</tr>
 		</tbody>
 	</table>
 
-	<p><a href={sitePath(lang, 'catalog/')}>← {t.backToCatalog}</a></p>
+	<p>
+		<a href={sitePath(lang, 'catalog/')}>← {t.backToCatalog}</a>
+	</p>
 </StarlightPage>
 
 <style>

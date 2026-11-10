@@ -1,6 +1,7 @@
-# Publicación en GitHub Pages en tres etapas:
-#   1. Validar: CI y seguridad completos (los mismos workflows de cada PR).
-#   2. Aprobar: el environment `production-approval` pide aprobación manual.
+# Publicación en GitHub Pages, con las mismas etapas que el pipeline de Azure:
+#   1. Calidad y Build (ci.yml) en paralelo con Seguridad (security.yml).
+#      El sitio se construye una sola vez, en ci.yml, y ese mismo artefacto es el que se publica.
+#   2. Aprobar: el environment `production-approval` pide aprobación manual. No arranca si algo de la etapa 1 falló.
 #   3. Desplegar: el environment `github-pages` publica el sitio construido en la etapa 1.
 #
 # APAGADO hasta que exista la variable de repositorio DEPLOY_ENABLED=true
@@ -20,14 +21,16 @@ concurrency:
 
 jobs:
   ci:
-    name: Validar · CI
+    name: CI
     if: vars.DEPLOY_ENABLED == 'true'
     permissions:
       contents: read
     uses: ./.github/workflows/ci.yml
+    with:
+      publish: true
 
   security:
-    name: Validar · Seguridad
+    name: Seguridad
     if: vars.DEPLOY_ENABLED == 'true'
     permissions:
       contents: read
@@ -36,55 +39,21 @@ jobs:
       pull-requests: write
     uses: ./.github/workflows/security.yml
 
-  build:
-    name: Construir el sitio
-    needs: [ci, security]
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
-
-      # Sin caché a propósito: lo que se publica no debe depender de un caché que otro workflow pudo escribir.
-      - name: Setup Node.js
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: 22
-          package-manager-cache: false
-
-      - name: Instalar dependencias
-        run: pnpm install --frozen-lockfile
-
-      - name: Build
-        run: pnpm build
-
-      - name: Subir el sitio
-        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
-        with:
-          path: dist
-
   approve:
-    name: Aprobar la publicación
-    needs: build
+    name: Aprobación · Publicar en producción
+    needs: [ci, security]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions: {}
-    # Configura este environment con "Required reviewers" en Settings → Environments.
+    # Configura este environment con "Required reviewers" y "Prevent self-review" en Settings → Environments,
+    # y deja apagado "Allow administrators to bypass" para que nadie se salte la aprobación.
     environment: production-approval
     steps:
       - name: Aprobado
-        run: echo "Publicación aprobada por ${GITHUB_TRIGGERING_ACTOR} para ${GITHUB_SHA}."
+        run: echo "Publicación aprobada para ${GITHUB_SHA}."
 
   deploy:
-    name: Desplegar en GitHub Pages
+    name: Deploy · GitHub Pages
     needs: approve
     runs-on: ubuntu-latest
     timeout-minutes: 10

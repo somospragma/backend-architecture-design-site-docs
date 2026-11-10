@@ -23,55 +23,67 @@ const usedTechnologies = used((e) => e.data.technologies);
 
 const filters = [
 	{ key: 'kind', label: t.filterKind, options: KINDS.map((v) => [v, kindLabels[lang][v]]) },
-	{ key: 'discipline', label: t.filterDiscipline, options: Object.keys(DISCIPLINES).map((v) => [v, disciplineLabels[lang][v]]) },
-	{ key: 'language', label: t.filterLanguage, options: Object.entries(LANGUAGES).filter(([v]) => usedLanguages.has(v)) },
-	{ key: 'technology', label: t.filterTechnology, options: Object.entries(TECHNOLOGIES).filter(([v]) => usedTechnologies.has(v)) },
+	{
+		key: 'discipline',
+		label: t.filterDiscipline,
+		options: Object.keys(DISCIPLINES).map((v) => [v, disciplineLabels[lang][v]]),
+	},
+	{
+		key: 'language',
+		label: t.filterLanguage,
+		options: Object.entries(LANGUAGES).filter(([v]) => usedLanguages.has(v)),
+	},
+	{
+		key: 'technology',
+		label: t.filterTechnology,
+		options: Object.entries(TECHNOLOGIES).filter(([v]) => usedTechnologies.has(v)),
+	},
 	{ key: 'origin', label: t.filterOrigin, options: ORIGINS.map((v) => [v, originLabels[lang][v]]) },
 	{ key: 'status', label: t.filterStatus, options: STATUSES.map((v) => [v, statusLabels[lang][v]]) },
 ];
 ---
 
-{
-	artifacts.length === 0 ? (
-		<Aside type="note" title={t.emptyTitle}>
-			{t.emptyBody} <a href={sitePath(lang, 'contribute/')}>{t.emptyLink}</a>.
-		</Aside>
-	) : (
-		<pragma-catalog data-count-one={t.count(1)} data-count-many={t.count(2).replace('2', '{n}')}>
-			<form class="filters not-content" aria-label={t.filtersLabel}>
-				{filters.map((f) => (
-					<label>
-						<span>{f.label}</span>
-						<select name={f.key}>
-							<option value="">{t.filterAll}</option>
-							{f.options.map(([value, label]) => (
-								<option value={value}>{label}</option>
-							))}
-						</select>
-					</label>
-				))}
-			</form>
-			<p class="count" aria-live="polite">{t.count(artifacts.length)}</p>
-			<ul class="grid not-content">
-				{artifacts.map((entry) => (
-					<li
-						data-kind={entry.data.kind}
-						data-discipline={entry.data.disciplines.join(' ')}
-						data-language={entry.data.languages.join(' ')}
-						data-technology={entry.data.technologies.join(' ')}
-						data-origin={entry.data.origin}
-						data-status={entry.data.status}
-					>
-						<ArtifactCard lang={lang} entry={entry} />
-					</li>
-				))}
-			</ul>
-			<p class="no-matches" hidden>
-				{t.noMatches}
-			</p>
-		</pragma-catalog>
-	)
-}
+{artifacts.length === 0 ? (
+	<Aside type="note" title={t.emptyTitle}>
+		{t.emptyBody} <a href={sitePath(lang, 'contribute/')}>{t.emptyLink}</a>.
+	</Aside>
+) : (
+	<pragma-catalog data-count-one={t.count(1)} data-count-many={t.count(2).replace('2', '{n}')}>
+		<form class="filters not-content" aria-label={t.filtersLabel}>
+			{filters.map((f) => (
+				<label>
+					<span>{f.label}</span>
+					<select name={f.key}>
+						<option value="">{t.filterAll}</option>
+						{f.options.map(([value, label]) => (
+							<option value={value}>{label}</option>
+						))}
+					</select>
+				</label>
+			))}
+		</form>
+		<p class="count" aria-live="polite">
+			{t.count(artifacts.length)}
+		</p>
+		<ul class="grid not-content">
+			{artifacts.map((entry) => (
+				<li
+					data-kind={entry.data.kind}
+					data-discipline={entry.data.disciplines.join(' ')}
+					data-language={entry.data.languages.join(' ')}
+					data-technology={entry.data.technologies.join(' ')}
+					data-origin={entry.data.origin}
+					data-status={entry.data.status}
+				>
+					<ArtifactCard lang={lang} entry={entry} />
+				</li>
+			))}
+		</ul>
+		<p class="no-matches" hidden>
+			{t.noMatches}
+		</p>
+	</pragma-catalog>
+)}
 
 <script>
 	class PragmaCatalog extends HTMLElement {

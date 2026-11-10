@@ -23,11 +23,12 @@ const PAGE_TITLE_ID = '_top';
 		</span>
 	</h1>
 	<p class="ph-horizon">
-		<span>{t.lead[0]}</span>{' '}
-		<span>{t.lead[1]}</span>
+		<span>{t.lead[0]}</span> <span>{t.lead[1]}</span>
 	</p>
 	<div class="ph-hero__action">
-		<a class="ph-btn ph-btn--paper" href={sitePath(lang, 'catalog/')}>{t.action}</a>
+		<a class="ph-btn ph-btn--paper" href={sitePath(lang, 'catalog/')}>
+			{t.action}
+		</a>
 	</div>
 	<div class="ph-sun ph-shutter" aria-hidden="true"></div>
 </section>

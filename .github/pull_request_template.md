@@ -31,3 +31,7 @@
 
 - [ ] La página existe en español y en inglés.
 - [ ] Sigue la [guía de estilo](https://somospragma.github.io/backend-architecture-design-site-docs/guides/style/).
+
+### Si toca código del sitio (componentes, scripts, configuración)
+
+- [ ] `pnpm check` pasa en local (lint, formato, tipos, pruebas, código muerto y marca).

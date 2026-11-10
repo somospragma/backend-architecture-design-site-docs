@@ -10,12 +10,12 @@ import { DISCIPLINE_IDS, KIND_IDS, LANGUAGE_IDS, TECHNOLOGY_IDS } from './taxono
 // Para agregar un lenguaje, una tecnología o un registro, edita su lista en el mismo PR de la ficha.
 
 export const KINDS = KIND_IDS;
-export const DISCIPLINES = DISCIPLINE_IDS;
-export const LANGUAGES = LANGUAGE_IDS;
-export const TECHNOLOGIES = TECHNOLOGY_IDS;
+const DISCIPLINES = DISCIPLINE_IDS;
+const LANGUAGES = LANGUAGE_IDS;
+const TECHNOLOGIES = TECHNOLOGY_IDS;
 export const ORIGINS = ['official', 'community'] as const;
 export const STATUSES = ['experimental', 'beta', 'stable', 'deprecated'] as const;
-export const REGISTRIES = [
+const REGISTRIES = [
 	'maven-central',
 	'gradle-plugin-portal',
 	'npm',
@@ -31,7 +31,7 @@ export const REGISTRIES = [
 	'terraform-registry',
 	'github-marketplace',
 ] as const;
-export const DOCS_MODES = ['indexed', 'hosted'] as const;
+const DOCS_MODES = ['indexed', 'hosted'] as const;
 
 /** Las fichas oficiales pueden usar UNLICENSED para artefactos internos sin licencia pública. */
 const INTERNAL_LICENSE = 'UNLICENSED';
@@ -119,7 +119,7 @@ export const artifactSchema = z
 export type Artifact = z.infer<typeof artifactSchema>;
 
 /** Carpeta donde viven las docs de un artefacto hosted, relativa a la raíz del repo. */
-export const hostedDocsDir = (slug: string) => `src/content/docs/artifacts/${slug}`;
+const hostedDocsDir = (slug: string) => `src/content/docs/artifacts/${slug}`;
 
 /**
  * El schema no conoce el nombre del archivo, así que la regla de hosted se valida

@@ -44,8 +44,18 @@ const index = artifacts.map(({ id, data }) => ({
 // Cada fragmento enlaza a la ficha de su artefacto solo si la ficha está publicada.
 const visible = new Set(artifacts.map((a) => a.id));
 const proofs = [
-	{ slug: 'clean-architecture-generator', name: 'Clean Architecture Generator', run: generatorRun.slice(0, 10).concat('  …', generatorRun.at(-1)!), text: t.proof.init },
-	{ slug: 'clean-architecture-generator', name: 'Clean Architecture Generator', run: adapterRun, text: t.proof.adapter },
+	{
+		slug: 'clean-architecture-generator',
+		name: 'Clean Architecture Generator',
+		run: generatorRun.slice(0, 10).concat('  …', generatorRun.at(-1)!),
+		text: t.proof.init,
+	},
+	{
+		slug: 'clean-architecture-generator',
+		name: 'Clean Architecture Generator',
+		run: adapterRun,
+		text: t.proof.adapter,
+	},
 	{ slug: 'pragma-log', name: 'Pragma Log', run: logRun, text: t.proof.log },
 ];
 
@@ -62,7 +72,9 @@ const types = Object.keys(KINDS).map((kind) => ({
 		<h2 id="ph-find-h">{t.find.heading}</h2>
 		<pragma-find data-index={JSON.stringify(index)} data-empty={t.find.empty} data-open={t.find.open}>
 			<form class="ph-find__form" action={sitePath(lang, 'catalog/')} role="search" data-ui>
-				<label class="sr-only" for="ph-find-q">{t.find.label}</label>
+				<label class="sr-only" for="ph-find-q">
+					{t.find.label}
+				</label>
 				<input id="ph-find-q" name="q" type="search" value={t.find.value} autocomplete="off" spellcheck="false" />
 			</form>
 			<div class="ph-find__body">
@@ -73,15 +85,13 @@ const types = Object.keys(KINDS).map((kind) => ({
 				<div class="ph-find__examples">
 					<p>{t.find.examplesLabel}</p>
 					<ul role="list">
-						{
-							t.find.examples.map((example) => (
-								<li>
-									<button type="button" data-example={example}>
-										{example}
-									</button>
-								</li>
-							))
-						}
+						{t.find.examples.map((example) => (
+							<li>
+								<button type="button" data-example={example}>
+									{example}
+								</button>
+							</li>
+						))}
 					</ul>
 				</div>
 			</div>
@@ -91,20 +101,16 @@ const types = Object.keys(KINDS).map((kind) => ({
 	<section class="ph-proof" aria-labelledby="ph-proof-h">
 		<h2 id="ph-proof-h">{t.proof.heading}</h2>
 		<ul class="ph-proof__fields" role="list">
-			{
-				proofs.map((p, i) => (
-					<li class={`ph-proof__field ph-proof__field--${i + 1}`}>
-						<pre class="ph-run" data-ui><code>{p.run.join('\n')}</code></pre>
-						<div class="ph-proof__text">
-							<p class="ph-proof__name">{p.name}</p>
-							<p>{p.text}</p>
-							{visible.has(p.slug) && (
-								<a href={artifactPath(lang, p.slug)}>{t.proof.open} →</a>
-							)}
-						</div>
-					</li>
-				))
-			}
+			{proofs.map((p, i) => (
+				<li class={`ph-proof__field ph-proof__field--${i + 1}`}>
+					<pre class="ph-run" data-ui><code>{p.run.join('\n')}</code></pre>
+					<div class="ph-proof__text">
+						<p class="ph-proof__name">{p.name}</p>
+						<p>{p.text}</p>
+						{visible.has(p.slug) && <a href={artifactPath(lang, p.slug)}>{t.proof.open} →</a>}
+					</div>
+				</li>
+			))}
 		</ul>
 	</section>
 
@@ -112,25 +118,23 @@ const types = Object.keys(KINDS).map((kind) => ({
 		<h2 id="ph-types-h">{t.types.heading}</h2>
 		<p class="ph-types__label">{t.types.label}</p>
 		<ul class="ph-types__rows" role="list">
-			{
-				types.map((row) => (
-					<li>
-						{row.count > 0 ? (
-							<a href={sitePath(lang, `types/${row.kind}/`)}>
-								<span class="ph-types__group">{row.group}</span>
-								<span class="ph-types__how">{row.how}</span>
-								<span class="ph-types__count">{row.count} →</span>
-							</a>
-						) : (
-							<span class="ph-types__row is-empty">
-								<span class="ph-types__group">{row.group}</span>
-								<span class="ph-types__how">{row.how}</span>
-								<span class="ph-types__count">{t.types.soon}</span>
-							</span>
-						)}
-					</li>
-				))
-			}
+			{types.map((row) => (
+				<li>
+					{row.count > 0 ? (
+						<a href={sitePath(lang, `types/${row.kind}/`)}>
+							<span class="ph-types__group">{row.group}</span>
+							<span class="ph-types__how">{row.how}</span>
+							<span class="ph-types__count">{row.count} →</span>
+						</a>
+					) : (
+						<span class="ph-types__row is-empty">
+							<span class="ph-types__group">{row.group}</span>
+							<span class="ph-types__how">{row.how}</span>
+							<span class="ph-types__count">{t.types.soon}</span>
+						</span>
+					)}
+				</li>
+			))}
 		</ul>
 	</section>
 
@@ -141,9 +145,13 @@ const types = Object.keys(KINDS).map((kind) => ({
 		</h2>
 		<div class="ph-join__choice">
 			<div class="ph-join__buttons">
-				<a class="ph-btn ph-btn--paper" href={sitePath(lang, 'contribute/')}>{t.join.add}</a>
+				<a class="ph-btn ph-btn--paper" href={sitePath(lang, 'contribute/')}>
+					{t.join.add}
+				</a>
 				<span>{t.join.or}</span>
-				<a class="ph-btn ph-btn--line" href={`${REPO_URL}/issues/new?template=propose-artifact.yml`}>{t.join.propose}</a>
+				<a class="ph-btn ph-btn--line" href={`${REPO_URL}/issues/new?template=propose-artifact.yml`}>
+					{t.join.propose}
+				</a>
 			</div>
 			<p>{t.join.after}</p>
 		</div>
@@ -151,38 +159,30 @@ const types = Object.keys(KINDS).map((kind) => ({
 </div>
 
 <script>
-	// Buscador del home: compara las palabras de la consulta con las fichas, sin acentos y por prefijo
-	// ("enmascarar" encuentra "enmascaramiento"). Sin script, el formulario lleva al catálogo.
-	type Item = { name: string; summary: string; description: string; meta: string; install: string; href: string; text: string };
+	// Buscador del home (la búsqueda está en src/lib/find.ts). Sin script, el formulario lleva al catálogo.
+	import { search, words } from '../../lib/find';
 
-	const STOP = new Set(['para', 'con', 'sin', 'los', 'las', 'del', 'una', 'uno', 'que', 'mis', 'the', 'for', 'and', 'with', 'from', 'your']);
-	const normalize = (s: string) =>
-		s
-			.normalize('NFD')
-			.replace(/[̀-ͯ]/g, '')
-			.toLowerCase();
-	const words = (s: string) => normalize(s).split(/[^a-z0-9#.+]+/).filter((w) => w.length >= 3 && !STOP.has(w));
+	type Item = {
+		name: string;
+		summary: string;
+		description: string;
+		meta: string;
+		install: string;
+		href: string;
+		text: string;
+	};
 
 	class PragmaFind extends HTMLElement {
 		connectedCallback() {
-			const items: (Item & { words: string[] })[] = JSON.parse(this.dataset.index!).map((item: Item) => ({
-				...item,
-				words: words(item.text),
-			}));
+			const items: Item[] = JSON.parse(this.dataset.index!);
 			const input = this.querySelector<HTMLInputElement>('input')!;
 			const list = this.querySelector<HTMLUListElement>('.ph-find__results')!;
 			const empty = this.querySelector<HTMLElement>('.ph-find__empty')!;
 
-			const matches = (q: string, w: string) => w.startsWith(q.slice(0, 6)) || (w.length >= 4 && q.startsWith(w));
 			const render = () => {
-				const query = words(input.value);
-				const found = items
-					.map((item) => ({ item, score: query.filter((q) => item.words.some((w) => matches(q, w))).length }))
-					.filter((r) => r.score > 0)
-					.sort((a, b) => b.score - a.score)
-					.slice(0, 3);
+				const found = search(items, input.value);
 				list.replaceChildren(
-					...found.map(({ item }, rank) => {
+					...found.map((item, rank) => {
 						const li = document.createElement('li');
 						const a = document.createElement('a');
 						a.href = item.href;
@@ -218,7 +218,7 @@ const types = Object.keys(KINDS).map((kind) => ({
 						return li;
 					}),
 				);
-				empty.hidden = found.length > 0 || query.length === 0;
+				empty.hidden = found.length > 0 || words(input.value).length === 0;
 			};
 
 			input.addEventListener('input', render);
@@ -243,8 +243,12 @@ const types = Object.keys(KINDS).map((kind) => ({
 	customElements.define('pragma-find', PragmaFind);
 
 	// Entradas al hacer scroll: título, cuerpo y fragmento de cada sección, escalonados.
-	const groups = ['.ph-find h2, .ph-find__form, .ph-find__body', '.ph-proof h2, .ph-proof__field',
-		'.ph-types h2, .ph-types__rows li', '.ph-join h2 span, .ph-join__choice'];
+	const groups = [
+		'.ph-find h2, .ph-find__form, .ph-find__body',
+		'.ph-proof h2, .ph-proof__field',
+		'.ph-types h2, .ph-types__rows li',
+		'.ph-join h2 span, .ph-join__choice',
+	];
 	if ('IntersectionObserver' in window) {
 		document.documentElement.classList.add('ph-js');
 		const io = new IntersectionObserver(

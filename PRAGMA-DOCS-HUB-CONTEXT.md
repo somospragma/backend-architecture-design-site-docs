@@ -203,10 +203,12 @@ En la otra sesión conviene usar:
 
 13. **CI/CD** (2026-11-03). `ci.yml` y `security.yml` corren en cada PR y son reutilizables. `deploy.yml` tiene tres etapas: validar (los dos anteriores), aprobar (environment `production-approval` con revisores obligatorios) y desplegar (environment `github-pages`). El deploy queda apagado hasta crear la variable de repositorio `DEPLOY_ENABLED=true`. Gitleaks se instala desde su release con checksum porque la action oficial pide licencia en organizaciones.
 
+14. **Pipeline por etapas, como el de Azure** (2026-11-09). `ci.yml` se parte en **Calidad**, con jobs paralelos (ESLint y Prettier, `astro check`, vitest, knip, y marca y fichas), y **Build**, que espera a todos, construye el sitio sin caché y revisa los enlaces. El sitio se construye una sola vez: `deploy.yml` llama a `ci.yml` con `publish: true` y publica ese mismo artefacto. Seguridad corre en paralelo con CI, no después, y la aprobación espera a los dos. La preparación del entorno está en la action compuesta `.github/actions/setup`. TypeScript queda en 6.x porque `@astrojs/check` y typescript-eslint todavía no soportan la 7. Prettier solo revisa código; Markdown, MDX y YAML quedan fuera para no reformatear la prosa. La lógica del buscador del home vive en `src/lib/find.ts` para poder probarla.
+
 ## Decisiones pendientes
 
 1. Confirmar el slug del equipo que aprueba (`somospragma/backend-architecture`) y activar el reporte privado de vulnerabilidades en la configuración del repo.
-2. Para encender el deploy: crear el environment `production-approval` con revisores obligatorios, limitar `github-pages` a la rama `main`, poner Pages en modo "GitHub Actions" y crear la variable `DEPLOY_ENABLED=true`. Proteger `main` exigiendo los checks de CI y Security.
+2. Para encender el deploy: crear el environment `production-approval` con revisores obligatorios, "Prevent self-review" y sin "Allow administrators to bypass"; limitar `github-pages` a la rama `main`, poner Pages en modo "GitHub Actions" y crear la variable `DEPLOY_ENABLED=true`. Proteger `main` exigiendo los checks `Build · Sitio y enlaces` (que solo corre si pasa toda la etapa de Calidad), `Secretos (gitleaks)`, `Vulnerabilidades de dependencias` y `Seguridad de los workflows (zizmor)`.
 3. Al migrar el contenido legacy: revisar las ramas remotas `feature/backend-diseno-arquitectura-fnc-ts-archetype-node-hexagonal` y `feature/emvcode-package`, que no están en la historia de `legacy/docusaurus`.
 4. Más adelante: cómo traer las docs `hosted` que viven en otros repos (copiarlas, traerlas en el build o que cada repo las publique con una Action) y si habrá versionado de docs por artefacto.
 
