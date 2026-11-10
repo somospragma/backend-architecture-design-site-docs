@@ -114,9 +114,9 @@ export const logRun = [
 	'  "level": "INFO",',
 	'  "app": "orders",',
 	'  "message": "Customer registered:',
-	'    {\\"name\\":\\"Ana\\",',
-	'     \\"cardNumber\\":\\"4111********1111\\",',
-	'     \\"password\\":\\"******\\"}",',
+	String.raw`    {\"name\":\"Ana\",`,
+	String.raw`     \"cardNumber\":\"4111********1111\",`,
+	String.raw`     \"password\":\"******\"}",`,
 	'  "requestId": "req-7"',
 	'}',
 ];

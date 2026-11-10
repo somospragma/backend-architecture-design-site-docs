@@ -13,8 +13,7 @@ for (const [key, entry] of Object.entries(tokens.brand)) {
 for (const [key, value] of Object.entries(tokens.neutral)) {
 	lines.push(`\t--pragma-neutral-${key}: ${value};`);
 }
-lines.push(`\t--sl-font: ${tokens.font.family};`);
-lines.push('}', '');
+lines.push(`\t--sl-font: ${tokens.font.family};`, '}', '');
 
 const selectors = {
 	dark: ':root',
