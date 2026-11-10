@@ -1,7 +1,7 @@
 # Publicación en GitHub Pages, con las mismas etapas que el pipeline de Azure:
 #   1. Calidad y Build (ci.yml) en paralelo con Seguridad (security.yml).
 #      El sitio se construye una sola vez, en ci.yml, y ese mismo artefacto es el que se publica.
-#   2. Aprobar: el environment `production-approval` pide aprobación manual. No arranca si algo de la etapa 1 falló.
+#   2. Aprobar: el environment `production` pide aprobación manual a sus revisores. No arranca si algo de la etapa 1 falló.
 #   3. Desplegar: el environment `github-pages` publica el sitio construido en la etapa 1.
 #
 # APAGADO hasta que exista la variable de repositorio DEPLOY_ENABLED=true
@@ -40,14 +40,14 @@ jobs:
     uses: ./.github/workflows/security.yml
 
   approve:
-    name: Aprobación · Publicar en producción
+    name: Aprobación · Producción
     needs: [ci, security]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions: {}
-    # Configura este environment con "Required reviewers" y "Prevent self-review" en Settings → Environments,
-    # y deja apagado "Allow administrators to bypass" para que nadie se salte la aprobación.
-    environment: production-approval
+    # Los revisores del environment `production` (Settings → Environments) son quienes pueden aprobar.
+    # "Allow administrators to bypass" está apagado para que nadie se salte la aprobación.
+    environment: production
     steps:
       - name: Aprobado
         run: echo "Publicación aprobada para ${GITHUB_SHA}."

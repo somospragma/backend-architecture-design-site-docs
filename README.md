@@ -58,7 +58,7 @@ En [.claude/skills/](.claude/skills/) hay skills para que cualquier asistente ha
 |---|---|---|
 | `ci.yml` | Cada PR y `main` | **Calidad**, en jobs paralelos: ESLint y Prettier, tipos (`astro check`), pruebas (vitest), código muerto (knip), contraste de la marca y fichas sin revisar. Si todo pasa, **Build**: construye el sitio (valida el schema de las fichas) y revisa los enlaces internos. |
 | `security.yml` | Cada PR, `main` y los lunes | Secretos con gitleaks en toda la historia, CodeQL para TypeScript y para los workflows, zizmor, `pnpm audit` y revisión de dependencias nuevas en el PR. |
-| `deploy.yml` | `main` | Corre CI y seguridad en paralelo, **espera aprobación** en el environment `production-approval` y publica en GitHub Pages el mismo build que validó el CI. Está apagado hasta que exista la variable `DEPLOY_ENABLED=true`. |
+| `deploy.yml` | `main` | Corre CI y seguridad en paralelo, **espera aprobación** en el environment `production` y publica en GitHub Pages el mismo build que validó el CI. Está apagado hasta que exista la variable `DEPLOY_ENABLED=true`. |
 
 La preparación del entorno (pnpm, Node y dependencias) está en `.github/actions/setup`. Las acciones están fijadas por SHA y Dependabot las mantiene al día. Los falsos positivos de gitleaks van en `.gitleaksignore` con su huella exacta.
 
