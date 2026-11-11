@@ -1,0 +1,159 @@
+---
+title: How to use it in Spring Boot
+description: Installation, configuration and behavior of pragma-log in Spring Boot 3.5 and 4.x, with MVC and WebFlux.
+sidebar:
+  order: 10
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+The starter configures Spring Boot logging for you: you don't need `logback-spring.xml`. It works with Spring Boot 3.5 and 4.x, in Spring MVC and in Spring WebFlux, and it's tested against both versions in every build.
+
+## Install the starter
+
+```kotlin
+dependencies {
+    implementation("co.com.pragma.logging:pragma-log-spring-boot-starter:1.0.0")
+}
+```
+
+```xml
+<dependency>
+  <groupId>co.com.pragma.logging</groupId>
+  <artifactId>pragma-log-spring-boot-starter</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
+
+From the moment the app starts, the console and the log file (if you configured `logging.file.name`) write JSON. All the configuration goes in `application.yml` under `pragma.log`, and your IDE autocompletes it.
+
+## What you get without configuring anything
+
+| Field | Where it comes from |
+|---|---|
+| `app` | `spring.application.name`. Change it with `pragma.log.app-name`. |
+| `version` | `spring.application.version`. Change it with `pragma.log.version`. If neither is set, it doesn't appear. |
+| `host` | The `HOSTNAME` variable (in Kubernetes, the pod name) or the machine name. |
+| `requestId` | The `X-Request-Id` header. If it's missing, or isn't a safe value, one is generated and returned in the response. |
+| `http.method`, `http.path` | The current request, in every log written while it's being handled. |
+| `traceId`, `spanId` | Micrometer Tracing (Brave or OpenTelemetry), if the app has it. |
+
+When each request ends, a log with the status and the duration is written:
+
+```json
+{"timestamp":"2026-11-11T10:15:30.123-05:00","level":"INFO","logger":"co.com.pragma.logging.http","thread":"http-nio-8080-exec-1","message":"HTTP GET /orders/7 200 in 12 ms","requestId":"req-7","http.method":"GET","http.path":"/orders/7","http.status":200,"http.durationMs":12,"app":"orders-service"}
+```
+
+Unhandled exceptions are logged with `500`, and Spring exceptions with their status (`404`, `400`…). The `/actuator/**` paths don't write that log. To change this, read [How to capture the HTTP context](../http-context/).
+
+## Configure with `application.yml`
+
+An example with the most used options:
+
+```yaml
+pragma:
+  log:
+    fields:
+      env: prod                       # fixed field in every log
+    hide-fields: [thread]
+    rename-fields:
+      level: severity
+    masking:
+      patterns: [CARD, JWT]           # masks cards and tokens inside the text
+    http:
+      headers: [X-Client-Id]
+    timestamp:
+      zone: America/Bogota
+```
+
+Each option is explained in its guide, and all of them are in the [Configuration](../../reference/configuration/) reference.
+
+<Aside type="caution" title="An invalid configuration stops startup">
+A masking type that doesn't exist, a class that can't be loaded or a badly written regex pattern stop the app from starting, with a message that says which property to fix. This way a configuration error doesn't silently let sensitive data through.
+</Aside>
+
+## Use different formats per environment
+
+Use Spring profiles. For example, readable text locally and JSON in the other environments:
+
+```yaml
+# src/main/resources/application-local.yml
+pragma:
+  log:
+    format: plain
+```
+
+Start with `--spring.profiles.active=local` or with the variable `SPRING_PROFILES_ACTIVE=local`.
+
+## Use your own context in WebFlux
+
+In WebFlux the code switches threads (`publishOn`, `delayElement`, non-blocking clients), so the MDC doesn't work to pass data. The starter turns on Reactor context propagation (equivalent to `spring.reactor.context-propagation=auto`), and the request context shows up in the logs without `block()` or manual ThreadLocals.
+
+For your own values, declare the keys in `context-keys` and put them in the Reactor Context as usual:
+
+```yaml
+pragma:
+  log:
+    context-keys: [userId, tenantId]
+```
+
+```java
+import reactor.core.publisher.Mono;
+import reactor.util.context.Context;
+
+return userService.find(id)
+        .doOnNext(user -> log.info("User loaded"))
+        .contextWrite(Context.of("userId", "u-7", "tenantId", 42));
+```
+
+The log comes out with `"userId":"u-7"` and `"tenantId":"42"`, next to the rest of the fields.
+
+- It works in any reactive flow, also outside an HTTP request, such as a queue consumer.
+- Values don't mix between requests and don't stay attached to the thread afterwards.
+- They're masked by name like the rest: a `token` key comes out masked.
+
+In Spring MVC you don't need it: use `MDC.put("userId", id)`.
+
+## Register extensions as beans
+
+In Spring Boot, any bean of these types registers itself:
+
+| Type | What for | Guide |
+|---|---|---|
+| `LogEnricher` | Add fields to every log. | [How to enrich logs](../enrichment/) |
+| `LogAlertListener` | Receive the size, masking and missing-field alerts. | [How to control log size and get alerts](../alerts/) |
+
+```java
+import co.com.pragma.logging.core.enrich.LogEnricher;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+class LoggingConfig {
+
+    @Bean
+    LogEnricher regionEnricher() {
+        return event -> event.put("region", System.getenv().getOrDefault("REGION", "local"));
+    }
+}
+```
+
+`@LogEnrichment` and `@LogField` work in any Spring bean. They only need spring-aop, which already comes with Spring Boot; you don't need AspectJ.
+
+## Change the configuration without restarting
+
+Changes to `pragma.log.*` apply on their own when Spring Cloud publishes an `EnvironmentChangeEvent` (the `refresh` endpoint, Kubernetes ConfigMaps, Config Server). Read [How to change configuration at runtime](../hot-reload/).
+
+## Turn off the library
+
+```yaml
+pragma:
+  log:
+    enabled: false
+```
+
+Spring Boot goes back to its default logging, without JSON or masking.
+
+<Aside type="note" title="Spring Boot 3.5 and 4.x">
+The starter detects the Spring Boot version and adapts. If you upgrade from 3.5 to 4.x you don't have to change anything in pragma-log.
+</Aside>

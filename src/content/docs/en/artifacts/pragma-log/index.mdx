@@ -1,0 +1,63 @@
+---
+title: Introduction
+description: What pragma-log is, which module to use in each framework, when to use it and when not to.
+sidebar:
+  order: 1
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+pragma-log turns the logs of a Java service into structured JSON, with the same schema in every service and with sensitive data masked. You keep writing with SLF4J (`log.info(...)`); the library takes care of the format, the masking and the context. This documentation covers version `1.0.0`.
+
+```java
+log.info("Customer registered: {}", customer);
+```
+
+```json
+{"timestamp":"2026-11-11T10:15:30.123-05:00","level":"INFO","logger":"com.acme.Customers","thread":"http-nio-8080-exec-1","message":"Customer registered: {\"name\":\"Ana\",\"cardNumber\":\"4111********1111\",\"password\":\"********\"}","app":"customers-service","host":"customers-7d9f-x2k","requestId":"req-7","http.method":"POST","http.path":"/customers"}
+```
+
+## What it solves
+
+- **A single schema.** Every service writes the same fields (`timestamp`, `level`, `message`, `app`, `requestId`…), so searches and dashboards work for all of them.
+- **Sensitive data out of the logs.** Passwords, tokens, cards and whatever you mark with `@MaskedLogField` come out masked, in the message, in the MDC, in the key-values, in the headers and in the bodies.
+- **Context without code.** Every log of a request carries `requestId`, method and path; if you use Micrometer Tracing, also `traceId` and `spanId`. In WebFlux and Mutiny the context follows the flow even when it changes threads.
+- **Configuration in one place.** `application.yml` in Spring Boot, `application.properties` in Quarkus or `logback.xml` in plain Java, with the same options.
+
+## Which module to use
+
+Add **only one** module, the one for your framework. The others come as dependencies.
+
+| Your application | Module | Guide |
+|---|---|---|
+| Spring Boot 3.5 or 4.x, MVC or WebFlux | `pragma-log-spring-boot-starter` | [Spring Boot](./guides/spring-boot/) |
+| Quarkus 3.33 or later, JVM or native | `pragma-log-quarkus` | [Quarkus](./guides/quarkus/) |
+| Java without a framework, with Logback | `pragma-log-logback` | [Java with Logback](./guides/plain-java/) |
+
+You don't add the other four published artifacts by hand:
+
+| Artifact | What it is |
+|---|---|
+| `pragma-log-bom` | Aligns the versions of all modules. Use it if you add more than one. |
+| `pragma-log-core` | Field schema, masking and formats. The three modules above bring it. |
+| `pragma-log-quarkus-deployment` | Build part of the Quarkus extension. Quarkus resolves it on its own. |
+| `pragma-log-quarkus-slf4j` | SLF4J binding of the extension. It comes with `pragma-log-quarkus`. |
+
+All of them are published to Maven Central with the group `co.com.pragma.logging`, under the Apache 2.0 license, and require Java 17 or later.
+
+## When to use it
+
+- Your logs go to a collector (Elastic, Datadog, OpenTelemetry, CloudWatch) and you want to search them by field.
+- You log domain objects and don't want a password or a card number to end up in the log.
+- You have several services and want all of them to write the same schema.
+- You need the request context in reactive code without passing the `requestId` by hand.
+
+## When not to
+
+- Your app uses Log4j 2 as its logging backend: pragma-log works on top of Logback (Spring Boot and plain Java) and on top of JBoss LogManager (Quarkus).
+- You use Micronaut, Vert.x without Quarkus or Spring without Spring Boot: there is no integration for those frameworks. You can use `pragma-log-logback` with a `logback.xml`, but without automatic HTTP context.
+- You only need plain text in a console app: Logback already does that. pragma-log also has [readable text](./guides/formats/#plain-text-for-local-development), but its value is in structured logs.
+
+<Aside type="tip" title="Where to go next">
+If it's your first time, follow the [quick start](./quick-start/). If you already have it running, the [configuration reference](./reference/configuration/) has every option with its default value.
+</Aside>

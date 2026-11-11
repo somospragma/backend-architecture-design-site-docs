@@ -1,0 +1,214 @@
+---
+title: How to organize fields
+description: Add fixed fields; hide, rename, nest and order fields; define required ones; group into extra; and change the timestamp.
+sidebar:
+  order: 21
+---
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+Each log has standard fields (`timestamp`, `level`, `logger`, `thread`, `message`, `app`, `host`…), the MDC fields, the key-values and the enricher fields. This guide shows how to change which ones appear, with what name and in what order. Everything on this page applies the same way to JSON, XML, CSV and custom formats.
+
+The full output schema is in the [Output fields](../../reference/output-fields/) reference.
+
+## Identify the app
+
+| Option | Default | Field |
+|---|---|---|
+| `app-name` | `spring.application.name` or `quarkus.application.name` | `app` |
+| `version` | `spring.application.version` or `quarkus.application.version`; if there's none, it doesn't appear | `version` |
+| `include-host` | `true` | `host`: the `HOSTNAME` variable (in Kubernetes, the pod name) or the machine name |
+| `include-pid` | `false` | `pid`: the process id |
+
+In `logback.xml` they're `<appName>`, `<appVersion>`, `<includeHost>` and `<includePid>`.
+
+## Add fixed fields
+
+A fixed field appears in every log with the same value. Use it for the environment, the region or the owning team:
+
+<Tabs syncKey="framework">
+<TabItem label="Spring Boot">
+```yaml
+pragma:
+  log:
+    fields:
+      env: prod
+      team: payments
+```
+</TabItem>
+<TabItem label="Quarkus">
+```properties
+pragma.log.fields.env=prod
+pragma.log.fields.team=payments
+```
+</TabItem>
+<TabItem label="Java with Logback">
+```xml
+<field>env=prod</field>
+<field>team=payments</field>
+```
+</TabItem>
+</Tabs>
+
+Use an environment variable so the same artifact works in every environment: `env: ${ENVIRONMENT:local}` in Spring or `pragma.log.fields.env=${ENVIRONMENT:local}` in Quarkus.
+
+## Hide fields
+
+`hide-fields` removes standard, fixed, MDC or key-value fields:
+
+<Tabs syncKey="framework">
+<TabItem label="Spring Boot">
+```yaml
+pragma:
+  log:
+    hide-fields: [thread, logger]
+```
+</TabItem>
+<TabItem label="Quarkus">
+```properties
+pragma.log.hide-fields=thread,logger
+```
+</TabItem>
+<TabItem label="Java with Logback">
+```xml
+<hideFields>thread,logger</hideFields>
+```
+</TabItem>
+</Tabs>
+
+## Rename fields
+
+So your logs use the names your platform expects (`severity` instead of `level`, `@timestamp` instead of `timestamp`):
+
+<Tabs syncKey="framework">
+<TabItem label="Spring Boot">
+```yaml
+pragma:
+  log:
+    rename-fields:
+      level: severity
+      timestamp: "@timestamp"
+```
+</TabItem>
+<TabItem label="Quarkus">
+```properties
+pragma.log.rename-fields.level=severity
+pragma.log.rename-fields.timestamp=@timestamp
+```
+</TabItem>
+<TabItem label="Java with Logback">
+```xml
+<renameField>level=severity</renameField>
+<renameField>timestamp=@timestamp</renameField>
+```
+</TabItem>
+</Tabs>
+
+It applies to any field: standard, fixed, MDC or key-value. Names with dots work as they are, without brackets: `http.method: http.request.method`.
+
+For Elastic, Datadog and OpenTelemetry there are ready-made configurations in [How to send logs to Elastic, Datadog or OpenTelemetry](../observability/).
+
+## Nest fields in objects
+
+A new name that starts with `$.` puts the field inside objects:
+
+```yaml
+pragma:
+  log:
+    rename-fields:
+      requestId: $.http.request.id
+      stacktrace: $.error.stack_trace
+```
+
+```json
+{"level":"INFO","message":"Order paid","http":{"request":{"id":"req-7"}},"error":{"type":"java.lang.IllegalStateException","message":"Gateway timeout","stack_trace":"java.lang.IllegalStateException: ..."}}
+```
+
+If the object already exists, such as `error`, the field is added inside it. Without `$.`, `http.request.id` is a single field with dots in its name; for Elasticsearch and Datadog both forms are equivalent.
+
+## Order the fields
+
+`field-order` puts those fields first, in that order. The rest keep their natural order. You can use the original name or the new one:
+
+```yaml
+pragma:
+  log:
+    field-order: [timestamp, level, message, requestId]
+```
+
+In `logback.xml`: `<fieldOrder>timestamp,level,message,requestId</fieldOrder>`.
+
+## Require fields
+
+`required-fields` lists the fields every log must have. If a log is missing one, it comes out with the value of `required-placeholder` (`unknown` by default) and the [alert listeners](../alerts/) are notified with `onMissingFields`. The log is never lost.
+
+```yaml
+pragma:
+  log:
+    required-fields: [requestId, userId]
+    required-placeholder: none
+```
+
+```json
+{"level":"INFO","message":"Scheduled job ran","requestId":"none","userId":"none"}
+```
+
+In `logback.xml`: `<requiredFields>requestId,userId</requiredFields>` and `<requiredPlaceholder>none</requiredPlaceholder>`.
+
+## Group the context in an `extra` object
+
+With `extra-field`, the MDC and the key-values go inside an object, and the standard and fixed fields stay at the root:
+
+```yaml
+pragma:
+  log:
+    extra-field: extra
+```
+
+```json
+{"timestamp":"…","level":"INFO","message":"Order paid","app":"orders-service","extra":{"orderId":"o-1","amount":10}}
+```
+
+- The fields you name in `field-order`, `rename-fields` or `required-fields` stay at the root.
+- It accepts a nested name: `extra-field: $.context.extra`.
+
+In `logback.xml`: `<extraField>extra</extraField>`.
+
+## Change the timestamp format
+
+| Option | Default | Example |
+|---|---|---|
+| `timestamp.pattern` | `[ISO_OFFSET_DATE_TIME]` in JSON; `yyyy-MM-dd HH:mm:ss.SSS` in text | `[ISO_INSTANT]`, `yyyy-MM-dd HH:mm:ss.SSS` |
+| `timestamp.zone` | The system zone | `UTC`, `America/Bogota` |
+
+The pattern is a `DateTimeFormatter` pattern, or the name of one of its constants in brackets. For example, for UTC with `Z`, as Elastic recommends:
+
+```yaml
+pragma:
+  log:
+    timestamp:
+      pattern: "[ISO_INSTANT]"
+      zone: UTC
+```
+
+```json
+{"timestamp":"2026-11-11T15:15:30.123Z", "level":"INFO"}
+```
+
+In `logback.xml`: `<timestampPattern>[ISO_INSTANT]</timestampPattern>` and `<timeZone>UTC</timeZone>`.
+
+## Cut long texts
+
+`max-field-length` cuts the message and every text value that goes over that number of characters. The rest is replaced with `...[truncated N chars]`:
+
+```yaml
+pragma:
+  log:
+    max-field-length: 4000
+```
+
+Masking happens first and cutting after, so no piece of a secret stays visible. `0` (the default) doesn't cut. The stack trace has its own limit: read [How to log exceptions](../exceptions/).
+
+<Aside type="tip" title="Combinations that warn">
+Some combinations don't do what they seem to: a required field that's also hidden, two fields renamed to the same name or an `extra-field` with the name of another field. pragma-log detects them at startup and warns once. Read [Configuration warnings](../hot-reload/#configuration-warnings).
+</Aside>

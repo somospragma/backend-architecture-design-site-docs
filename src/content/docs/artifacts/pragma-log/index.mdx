@@ -1,0 +1,63 @@
+---
+title: Introducción
+description: Qué es pragma-log, qué módulo usar en cada framework, cuándo usarla y cuándo no.
+sidebar:
+  order: 1
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+pragma-log convierte los logs de un servicio Java en JSON estructurado, con el mismo esquema en todos los servicios y con los datos sensibles enmascarados. Sigues escribiendo con SLF4J (`log.info(...)`); la librería se encarga del formato, del masking y del contexto. Esta documentación corresponde a la versión `1.0.0`.
+
+```java
+log.info("Customer registered: {}", customer);
+```
+
+```json
+{"timestamp":"2026-11-11T10:15:30.123-05:00","level":"INFO","logger":"com.acme.Customers","thread":"http-nio-8080-exec-1","message":"Customer registered: {\"name\":\"Ana\",\"cardNumber\":\"4111********1111\",\"password\":\"********\"}","app":"customers-service","host":"customers-7d9f-x2k","requestId":"req-7","http.method":"POST","http.path":"/customers"}
+```
+
+## Qué resuelve
+
+- **Un solo esquema.** Todos los servicios escriben los mismos campos (`timestamp`, `level`, `message`, `app`, `requestId`…), así las búsquedas y los dashboards sirven para todos.
+- **Datos sensibles fuera de los logs.** Contraseñas, tokens, tarjetas y lo que marques con `@MaskedLogField` salen enmascarados, en el mensaje, en el MDC, en los key-values, en los headers y en los bodies.
+- **Contexto sin código.** Cada log de un request lleva `requestId`, método y path; si usas Micrometer Tracing, también `traceId` y `spanId`. En WebFlux y Mutiny el contexto sigue al flujo aunque cambie de hilo.
+- **Configuración en un solo lugar.** `application.yml` en Spring Boot, `application.properties` en Quarkus o `logback.xml` en Java puro, con las mismas opciones.
+
+## Qué módulo usar
+
+Agrega **un solo** módulo, el de tu framework. Los demás llegan como dependencias.
+
+| Tu aplicación | Módulo | Guía |
+|---|---|---|
+| Spring Boot 3.5 o 4.x, MVC o WebFlux | `pragma-log-spring-boot-starter` | [Spring Boot](./guides/spring-boot/) |
+| Quarkus 3.33 o superior, JVM o nativo | `pragma-log-quarkus` | [Quarkus](./guides/quarkus/) |
+| Java sin framework, con Logback | `pragma-log-logback` | [Java con Logback](./guides/plain-java/) |
+
+Los otros cuatro artefactos publicados no se agregan a mano:
+
+| Artefacto | Qué es |
+|---|---|
+| `pragma-log-bom` | Alinea las versiones de todos los módulos. Úsalo si agregas más de uno. |
+| `pragma-log-core` | Esquema de campos, masking y formatos. Lo traen los tres módulos de arriba. |
+| `pragma-log-quarkus-deployment` | Parte de build de la extensión de Quarkus. Quarkus la resuelve solo. |
+| `pragma-log-quarkus-slf4j` | Binding de SLF4J de la extensión. Llega con `pragma-log-quarkus`. |
+
+Todos se publican en Maven Central con el group `co.com.pragma.logging`, bajo licencia Apache 2.0, y requieren Java 17 o superior.
+
+## Cuándo usarla
+
+- Tus logs van a un recolector (Elastic, Datadog, OpenTelemetry, CloudWatch) y quieres buscarlos por campo.
+- Logueas objetos de dominio y no quieres que una contraseña o un número de tarjeta termine en el log.
+- Tienes varios servicios y quieres que todos escriban el mismo esquema.
+- Necesitas el contexto del request en código reactivo sin pasar el `requestId` a mano.
+
+## Cuándo no
+
+- Tu app usa Log4j 2 como backend de logging: pragma-log funciona sobre Logback (Spring Boot y Java puro) y sobre JBoss LogManager (Quarkus).
+- Usas Micronaut, Vert.x sin Quarkus o Spring sin Spring Boot: no hay integración para esos frameworks. Puedes usar `pragma-log-logback` con un `logback.xml`, pero sin contexto HTTP automático.
+- Solo necesitas texto plano en una app de consola: Logback ya lo hace. pragma-log también tiene [texto legible](./guides/formats/#texto-plano-para-desarrollo-local), pero su valor está en los logs estructurados.
+
+<Aside type="tip" title="Por dónde seguir">
+Si es tu primera vez, sigue el [inicio rápido](./quick-start/). Si ya lo tienes andando, la [referencia de configuración](./reference/configuration/) tiene todas las opciones con sus valores por defecto.
+</Aside>

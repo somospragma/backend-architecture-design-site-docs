@@ -1,0 +1,146 @@
+---
+title: How to enrich logs
+description: Add fields with the MDC, key-values, LogEnricher, @LogEnrichment, @LogField and the Reactor Context.
+sidebar:
+  order: 31
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+There are several ways to add your own fields to logs. Choose based on the scope you need:
+
+| Way | Scope | When to use it |
+|---|---|---|
+| [Key-values](#add-fields-to-one-log) | One log. | Data that only matters in that log, like the `orderId`. |
+| [MDC](#add-fields-to-a-block-of-code) | Everything logged on that thread until you remove it. | Data for a process in imperative code. |
+| [`@LogEnrichment` and `@LogField`](#add-fields-to-a-method) | Everything logged while a method runs, also in `Mono`, `Flux` and `Uni`. | Data for a business operation, without touching the method's code. |
+| [`LogEnricher`](#add-fields-to-every-log) | Every log in the app. | App or environment data: region, tenant, model version. |
+| [`context-keys`](#use-the-reactor-context-in-webflux) | A whole reactive flow. | Spring WebFlux. |
+
+Every field goes through masking by name and through the patterns, like the rest of the log.
+
+## Add fields to one log
+
+Use the SLF4J 2 fluent API:
+
+```java
+log.atInfo()
+        .addKeyValue("orderId", order.id())
+        .addKeyValue("amount", order.amount())
+        .log("Order placed");
+```
+
+```json
+{"level":"INFO","message":"Order placed","orderId":"ORD-9","amount":120.5}
+```
+
+A value can be an object: it comes out as masked JSON.
+
+## Add fields to a block of code
+
+```java
+import org.slf4j.MDC;
+
+try (MDC.MDCCloseable ignored = MDC.putCloseable("batchId", batch.id())) {
+    log.info("Batch started");
+    processor.run(batch);           // processor's logs also carry batchId
+}
+```
+
+In reactive code the MDC doesn't work, because the flow switches threads. Use `@LogEnrichment` or the [Reactor Context](#use-the-reactor-context-in-webflux).
+
+## Add fields to a method
+
+`@LogEnrichment` adds fixed fields and `@LogField` adds the value of a parameter. They apply to every log written while the method runs, including those of the classes it calls:
+
+```java
+import co.com.pragma.logging.core.enrich.LogEnrichment;
+import co.com.pragma.logging.core.enrich.LogField;
+
+@Service
+@LogEnrichment("domain=payments")               // on the class: applies to all its methods
+public class PaymentService {
+
+    @LogEnrichment({"operation=refund", "channel=api"})
+    public Mono<Refund> refund(@LogField("paymentId") String id, @LogField("request") RefundRequest request) {
+        log.info("Refund requested");           // carries domain, operation, channel, paymentId and request
+        return gateway.refund(id, request);
+    }
+}
+```
+
+- It works in Spring and CDI (Quarkus) beans. In Spring it only needs spring-aop, which comes with Spring Boot.
+- Simple values are written as they are. Objects come out as masked JSON, with their `@MaskedLogField`.
+- With `Mono`, `Flux` or `Uni`, the fields travel with the flow until it ends, on any thread.
+- When the method ends, the previous MDC values are restored, so they don't stay stuck to the thread.
+- Subclasses inherit the class annotation.
+
+In Spring it uses proxies: it applies when the method is called from another bean, not from the same class (`this.refund(...)`).
+
+## Add fields to every log
+
+Implement `LogEnricher`. It's called once for each log:
+
+```java
+package com.acme.logging;
+
+import co.com.pragma.logging.core.enrich.LogEnricher;
+
+public class TenantEnricher implements LogEnricher {
+
+    @Override
+    public void enrich(EnrichedEvent event) {
+        event.put("tenantId", TenantContext.current());
+        if ("ERROR".equals(event.level())) {
+            event.put("oncall", "payments-team");
+        }
+    }
+}
+```
+
+`event.logger()` and `event.level()` let you decide what to add based on the log. Register it in one of these ways:
+
+<Tabs syncKey="framework">
+<TabItem label="Spring Boot">
+As a bean (`@Component` or `@Bean`), or by class name:
+```yaml
+pragma:
+  log:
+    enrichers: [com.acme.logging.TenantEnricher]
+```
+</TabItem>
+<TabItem label="Quarkus">
+As a CDI bean (`@ApplicationScoped`), or by class name:
+```properties
+pragma.log.enrichers=com.acme.logging.TenantEnricher
+```
+</TabItem>
+<TabItem label="Java with Logback">
+In the encoder, or in code with `LogEnrichers.register(new TenantEnricher())`:
+```xml
+<enricher>com.acme.logging.TenantEnricher</enricher>
+```
+</TabItem>
+</Tabs>
+
+- If an MDC field or a key-value has the same name, the MDC field or the key-value wins.
+- An enricher that throws an exception doesn't break the log: the log is written without the fields it didn't manage to add. That's why there's no warning; test it like any other class.
+- Keep the enricher fast: it runs on every log. With asynchronous logging in Quarkus it runs on the thread that writes, so read the request data from the MDC.
+
+## Use the Reactor Context in WebFlux
+
+Declare the keys and put them in the Reactor Context. They show up in every log of the flow:
+
+```yaml
+pragma:
+  log:
+    context-keys: [userId, tenantId]
+```
+
+```java
+return userService.find(id)
+        .doOnNext(user -> log.info("User loaded"))
+        .contextWrite(Context.of("userId", "u-7", "tenantId", 42));
+```
+
+It works in any reactive flow, also outside an HTTP request, and doesn't mix between flows. It only exists in Spring Boot.

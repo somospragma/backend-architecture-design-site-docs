@@ -1,0 +1,73 @@
+---
+title: Cómo escribir los logs de forma asíncrona
+description: Logging asíncrono que no pierde logs, en Spring Boot, Quarkus y Java con Logback.
+sidebar:
+  order: 33
+---
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+Con logging asíncrono, `log.info(...)` vuelve de inmediato y otro hilo enmascara, formatea y escribe el log. Sirve cuando el logging aparece en tus perfiles de rendimiento, por ejemplo con muchos logs por request o con una salida lenta.
+
+<Tabs syncKey="framework">
+<TabItem label="Spring Boot">
+```yaml
+pragma:
+  log:
+    async:
+      enabled: true
+```
+Envuelve los appenders de consola y de archivo de Spring Boot.
+
+| Opción | Por defecto | Qué hace |
+|---|---|---|
+| `async.enabled` | `false` | Activa el logging asíncrono. |
+| `async.queue-size` | `8192` | Logs que pueden esperar a ser escritos. |
+| `async.never-block` | `false` | `true` descarta logs cuando la cola está llena, en vez de hacer esperar a quien loguea. |
+| `async.max-flush-time` | `5s` | Tiempo máximo para escribir los logs pendientes al apagar la app. |
+</TabItem>
+<TabItem label="Quarkus">
+Usa el async propio de Quarkus. El formato de pragma-log se aplica igual:
+```properties
+quarkus.log.console.async=true
+quarkus.log.file.async=true
+```
+</TabItem>
+<TabItem label="Java con Logback">
+Envuelve el appender real con `PragmaAsyncAppender`:
+```xml
+<configuration>
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="co.com.pragma.logging.logback.PragmaStructuredEncoder"/>
+  </appender>
+
+  <appender name="ASYNC" class="co.com.pragma.logging.logback.PragmaAsyncAppender">
+    <queueSize>8192</queueSize>
+    <appender-ref ref="CONSOLE"/>
+  </appender>
+
+  <root level="INFO">
+    <appender-ref ref="ASYNC"/>
+  </root>
+</configuration>
+```
+Acepta las propiedades del `AsyncAppender` de Logback, como `queueSize`, `neverBlock` y `maxFlushTime`, con los mismos valores por defecto que Spring Boot.
+</TabItem>
+</Tabs>
+
+## No se pierde ningún log
+
+El `AsyncAppender` por defecto de Logback descarta los logs `INFO`, `DEBUG` y `TRACE` cuando la cola se llena al 80 %. pragma-log no descarta nada:
+
+- Cuando la cola está llena, quien loguea espera a que haya espacio. Con `never-block: true` prefieres descartar a esperar.
+- Al apagar la app se escriben los logs pendientes, hasta `max-flush-time`.
+
+## El contexto es el del hilo que loguea
+
+El MDC y los campos de los enrichers se toman en el hilo que llamó a `log.info(...)`, no en el que escribe. Tus logs llevan el `requestId` correcto aunque se escriban después, en otro hilo.
+
+En Quarkus, el async de Quarkus llama a los enrichers en el hilo que escribe. Para datos del request, usa el MDC.
+
+<Aside type="caution" title="No modifiques un objeto después de loguearlo">
+Los objetos se enmascaran y se convierten a JSON en el hilo que escribe. Si cambias un objeto justo después de loguearlo, el log puede mostrar el valor nuevo. Loguea objetos inmutables, como records, o copias.
+</Aside>

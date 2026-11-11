@@ -1,0 +1,144 @@
+---
+title: How to use it in Quarkus
+description: Installation, configuration and behavior of the pragma-log extension in Quarkus 3.33 or later, on the JVM and in native mode.
+sidebar:
+  order: 11
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+`pragma-log-quarkus` is a Quarkus extension. It replaces the console and file log format with the pragma-log one, with the same schema, the same masking and the same options as in Spring Boot. It works with Quarkus 3.33 or later, on the JVM, in the production jar, in dev mode and in native mode.
+
+## Install the extension
+
+```kotlin
+dependencies {
+    implementation("co.com.pragma.logging:pragma-log-quarkus:1.0.0")
+}
+```
+
+```xml
+<dependency>
+  <groupId>co.com.pragma.logging</groupId>
+  <artifactId>pragma-log-quarkus</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
+
+Don't add `pragma-log-quarkus-deployment` or `pragma-log-quarkus-slf4j`: Quarkus resolves them on its own.
+
+## What you get without configuring anything
+
+- `app` and `version` come from `quarkus.application.name` and `quarkus.application.version`.
+- Each request adds `requestId`, `http.method` and `http.path`, also in worker threads and in reactive code with Mutiny.
+- When each request ends, a log with `http.status` and `http.durationMs` is written. The `/q/**` paths (health, metrics, dev UI) don't write it.
+- If you use `quarkus-opentelemetry`, Quarkus puts `traceId` and `spanId` in the MDC and they appear in every log.
+
+## Use SLF4J or JBoss Logging
+
+Both APIs go through the same masking:
+
+```java
+import io.quarkus.logging.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+private static final Logger log = LoggerFactory.getLogger(CustomerResource.class);
+
+log.info("Customer found: {}", customer);                   // SLF4J
+log.atInfo().addKeyValue("customerId", id).log("Found");    // SLF4J with key-values
+Log.infof("Audit %s (attempt %d)", customer, 1);            // JBoss Logging
+```
+
+The extension replaces the Quarkus SLF4J binding. The original one turned objects into text before they could be masked; the pragma-log one keeps the arguments so it can mask them.
+
+## Configure with `application.properties`
+
+The options are the same as in Spring Boot, with the `pragma.log` prefix:
+
+```properties
+pragma.log.fields.env=prod
+pragma.log.rename-fields.level=severity
+pragma.log.masking.patterns=CARD,JWT
+pragma.log.http.headers=X-Client-Id
+pragma.log.http.request-log.exclude-paths=/q/**,/health
+pragma.log.timestamp.zone=America/Bogota
+```
+
+- Lists are comma-separated.
+- Maps put the key at the end: `pragma.log.fields.env=prod`, `pragma.log.rename-fields.level=severity`.
+- Sizes use the Quarkus format: `64K`, `1M`.
+
+All the options are in the [Configuration](../../reference/configuration/) reference. The only Spring Boot ones that don't exist in Quarkus are `async.*` (use the Quarkus async, further down) and `context-keys` (it's for the WebFlux Reactor Context).
+
+<Aside type="caution" title="An invalid configuration stops startup">
+A masking type that doesn't exist, a class that can't be loaded or a badly written regex stop the app from starting, with a message that says which property to fix.
+</Aside>
+
+## Use readable text in dev mode
+
+With a Quarkus profile, `quarkus dev` writes text and the other environments write JSON:
+
+```properties
+%dev.pragma.log.format=plain
+```
+
+Masking is the same in both formats. Read [Plain text for local development](../formats/#plain-text-for-local-development).
+
+## Register extensions as CDI beans
+
+Any CDI bean that implements `LogEnricher` or `LogAlertListener` is registered at startup:
+
+```java
+import co.com.pragma.logging.core.enrich.LogEnricher;
+import jakarta.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped
+public class RegionEnricher implements LogEnricher {
+
+    @Override
+    public void enrich(EnrichedEvent event) {
+        event.put("region", "co-bog");
+    }
+}
+```
+
+`@LogEnrichment` and `@LogField` work in any CDI bean, also with methods that return `Uni`. Read [How to enrich logs](../enrichment/).
+
+## Write logs asynchronously
+
+Use Quarkus's own async. The pragma-log format applies the same way:
+
+```properties
+quarkus.log.console.async=true
+quarkus.log.file.async=true
+```
+
+With async, enrichers run in the thread that writes the log, not in the one that called it. For request data, use the MDC.
+
+## Compile in native mode
+
+The extension works in native mode (GraalVM or Mandrel); a CI job compiles a sample app to native and runs its tests in every build.
+
+- Classes with `@MaskedLogField`, and the `LogAlertListener`, `MaskingStrategy`, `LogEventFormatter` and `LogEnricher` classes you configure, are registered for reflection on their own.
+- Other classes you log as objects need `@RegisterForReflection`. Without it, in native mode they come out as `<ClassName>`: the log is written, but without their fields.
+
+```java
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
+@RegisterForReflection
+public record Address(String city, String street) {}
+```
+
+## What Quarkus doesn't have
+
+- **Runtime changes:** Quarkus doesn't reread its configuration while it runs. To change an option, restart the app.
+- **`context-keys`:** it's for the Spring WebFlux Reactor Context. In Quarkus use the MDC; the context travels with Mutiny.
+
+## Turn off the extension
+
+```properties
+pragma.log.enabled=false
+```
+
+Quarkus goes back to its default log format.

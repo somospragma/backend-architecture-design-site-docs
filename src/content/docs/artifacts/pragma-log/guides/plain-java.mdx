@@ -1,0 +1,157 @@
+---
+title: Cómo usarla en Java con Logback
+description: Configura pragma-log en una aplicación Java sin framework con logback.xml.
+sidebar:
+  order: 12
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Sin Spring Boot ni Quarkus, pragma-log se usa como un encoder de Logback. La configuración va en `logback.xml` y cada opción es un elemento dentro del encoder.
+
+## Instala el módulo
+
+```kotlin
+dependencies {
+    implementation("co.com.pragma.logging:pragma-log-logback:1.0.0")
+}
+```
+
+```xml
+<dependency>
+  <groupId>co.com.pragma.logging</groupId>
+  <artifactId>pragma-log-logback</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
+
+Trae Logback y SLF4J como dependencias.
+
+## Configura `logback.xml`
+
+```xml
+<!-- src/main/resources/logback.xml -->
+<configuration>
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="co.com.pragma.logging.logback.PragmaStructuredEncoder">
+      <appName>orders-service</appName>
+      <appVersion>1.4.2</appVersion>
+      <field>env=prod</field>
+      <maskPattern>CARD</maskPattern>
+    </encoder>
+  </appender>
+  <root level="INFO">
+    <appender-ref ref="STDOUT"/>
+  </root>
+</configuration>
+```
+
+- Las opciones de un valor van una vez: `<appName>`, `<format>`, `<hideFields>`.
+- Las que aceptan varios valores se repiten: `<field>`, `<renameField>`, `<maskPattern>`, `<maskStrategy>`, `<alertListener>`, `<enricher>`.
+- Las listas en un solo elemento van separadas por coma: `<hideFields>thread,internalId</hideFields>`.
+
+Todas las propiedades del encoder están en la [referencia de Logback](../../reference/logback/).
+
+## Loguea con SLF4J
+
+```java
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+
+public class Orders {
+
+    private static final Logger log = LoggerFactory.getLogger(Orders.class);
+
+    public void place() {
+        MDC.put("requestId", "req-123");
+        try {
+            log.atInfo().addKeyValue("orderId", "ORD-9").log("Order placed");
+        } finally {
+            MDC.remove("requestId");
+        }
+    }
+}
+```
+
+```json
+{"timestamp":"2026-11-11T10:15:30.123-05:00","level":"INFO","logger":"com.acme.Orders","thread":"main","message":"Order placed","requestId":"req-123","orderId":"ORD-9","app":"orders-service","version":"1.4.2","host":"orders-7d9f-x2k","env":"prod"}
+```
+
+Sin un framework web no hay contexto HTTP automático: pon en el MDC lo que quieras ver en cada log, como el `requestId`.
+
+## Escribe texto legible en local
+
+Cambia el encoder por `PragmaTextEncoder`. Acepta las mismas opciones de masking:
+
+```xml
+<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+  <encoder class="co.com.pragma.logging.logback.PragmaTextEncoder">
+    <levelColor>INFO=blue</levelColor>
+  </encoder>
+</appender>
+```
+
+```text
+2026-11-11 10:15:30.123  INFO [main] com.acme.Orders : Order placed requestId=req-123 orderId=ORD-9
+```
+
+En un appender de archivo pon `<color>NEVER</color>`. Lee [Texto plano para desarrollo local](../formats/#texto-plano-para-desarrollo-local).
+
+## Escribe los logs de forma asíncrona
+
+Envuelve el appender real con `PragmaAsyncAppender`:
+
+```xml
+<configuration>
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="co.com.pragma.logging.logback.PragmaStructuredEncoder"/>
+  </appender>
+
+  <appender name="ASYNC" class="co.com.pragma.logging.logback.PragmaAsyncAppender">
+    <appender-ref ref="CONSOLE"/>
+  </appender>
+
+  <root level="INFO">
+    <appender-ref ref="ASYNC"/>
+  </root>
+</configuration>
+```
+
+A diferencia del `AsyncAppender` de Logback, no descarta logs cuando la cola se llena. Lee [Cómo escribir los logs de forma asíncrona](../async/).
+
+## Recarga la configuración sin reiniciar
+
+Con `scan`, Logback relee el archivo cuando cambia y crea encoders nuevos con la configuración nueva:
+
+```xml
+<configuration scan="true" scanPeriod="30 seconds">
+  ...
+</configuration>
+```
+
+## Registra extensiones
+
+Sin un contenedor de beans, registra las extensiones en `logback.xml` con el nombre de la clase (necesitan un constructor público sin argumentos):
+
+```xml
+<encoder class="co.com.pragma.logging.logback.PragmaStructuredEncoder">
+  <enricher>com.acme.logging.TenantEnricher</enricher>
+  <alertListener>com.acme.logging.AlertsToMetrics</alertListener>
+  <maskStrategy>iban=com.acme.logging.IbanMasking</maskStrategy>
+</encoder>
+```
+
+O en código, al arrancar la app:
+
+```java
+import co.com.pragma.logging.core.alert.LogAlerts;
+import co.com.pragma.logging.core.enrich.LogEnrichers;
+
+LogEnrichers.register(new TenantEnricher());
+LogAlerts.register(new AlertsToMetrics());
+```
+
+<Aside type="note" title="Errores de configuración">
+En `logback.xml` una configuración inválida no detiene la app: Logback la reporta en su estado (lo ves con `<configuration debug="true">`) y el encoder usa los valores seguros por defecto. Si el masking de un evento falla, el log se escribe igual, sin los argumentos y con el campo `pragmaLogError`.
+</Aside>

@@ -1,0 +1,186 @@
+---
+title: How to capture the HTTP context
+description: requestId, traces, headers, query params, request start and end logs, and body capture in Spring Boot and Quarkus.
+sidebar:
+  order: 30
+---
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+In Spring Boot and Quarkus, every log written while a request is being handled carries that request's context. You don't have to pass anything by hand: it works in your classes, in the libraries you call and in reactive code, even when it switches threads.
+
+In plain Java there is no automatic HTTP context: put the data in the MDC.
+
+## What goes in each request log
+
+| Field | What it is |
+|---|---|
+| `requestId` | The value of the `X-Request-Id` header, or a generated one. |
+| `http.method` | `GET`, `POST`… |
+| `http.path` | The path, without the query string. |
+| `traceId`, `spanId` | The ones from Micrometer Tracing in Spring Boot or from OpenTelemetry in Quarkus, if the app has them. |
+| `http.header.<name>` | The headers you ask for, with the name in lowercase. |
+| `http.query.<name>` | The query params you ask for. |
+
+## The `requestId`
+
+pragma-log reads the `X-Request-Id` header. If it's missing, or if it isn't a safe value, it generates a UUID. In both cases it returns it in the same response header, so the caller can report it.
+
+A value is safe if it has between 1 and 128 characters and only letters, numbers, `.`, `_`, `:` or `-`. That way nobody can inject line breaks or fake text into your logs through that header.
+
+To use another header:
+
+<Tabs syncKey="framework">
+<TabItem label="Spring Boot">
+```yaml
+pragma:
+  log:
+    http:
+      request-id-header: X-Correlation-Id
+```
+</TabItem>
+<TabItem label="Quarkus">
+```properties
+pragma.log.http.request-id-header=X-Correlation-Id
+```
+</TabItem>
+</Tabs>
+
+## The request end log
+
+When each request finishes, a log with the status and the duration comes out, from the `co.com.pragma.logging.http` logger:
+
+```json
+{"level":"INFO","logger":"co.com.pragma.logging.http","message":"HTTP GET /orders/7 200 in 12 ms","requestId":"req-7","http.method":"GET","http.path":"/orders/7","http.status":200,"http.durationMs":12}
+```
+
+- Unhandled exceptions come out with `500` and Spring's with their status (`404`, `400`…).
+- If the client cancels the request (for example, in WebFlux), the message is `HTTP GET /orders/7 cancelled after 12 ms`.
+- It doesn't come out for the routes in `request-log.exclude-paths`: `/actuator/**` in Spring Boot and `/q/**` in Quarkus. The patterns are Ant-style (`*` one segment, `**` several).
+
+Also, `request-log.entry: true` writes a log when each request starts, with the same context: `HTTP POST /orders started`.
+
+<Tabs syncKey="framework">
+<TabItem label="Spring Boot">
+```yaml
+pragma:
+  log:
+    http:
+      request-log:
+        entry: true
+        exclude-paths: [/actuator/**, /health, /swagger-ui/**]
+```
+</TabItem>
+<TabItem label="Quarkus">
+```properties
+pragma.log.http.request-log.entry=true
+pragma.log.http.request-log.exclude-paths=/q/**,/health,/swagger-ui/**
+```
+</TabItem>
+</Tabs>
+
+To turn off both logs, use `request-log.enabled: false`. The context still shows up in your logs.
+
+## Add headers
+
+`http.headers` is a list of the headers you want to see:
+
+<Tabs syncKey="framework">
+<TabItem label="Spring Boot">
+```yaml
+pragma:
+  log:
+    http:
+      headers: [X-Client-Id, User-Agent]
+```
+</TabItem>
+<TabItem label="Quarkus">
+```properties
+pragma.log.http.headers=X-Client-Id,User-Agent
+```
+</TabItem>
+</Tabs>
+
+```json
+{"message":"Order created","http.header.x-client-id":"mobile","http.header.user-agent":"okhttp/4.12.0"}
+```
+
+With `"*"`, every header goes in except the ones in `http.exclude-headers`. By default that list has `Authorization`, `Proxy-Authorization`, `Cookie` and `Set-Cookie`, so credentials don't reach the logs.
+
+```yaml
+pragma:
+  log:
+    http:
+      headers: ["*"]
+      exclude-headers: [Authorization, Proxy-Authorization, Cookie, Set-Cookie, X-Internal-Signature]
+```
+
+- A header you name in `headers` always goes in, even if it's in `exclude-headers`.
+- A header with a sensitive name comes out masked: `X-Api-Key` is masked like `apiKey`. Read [Mask by field name](../masking/#mask-by-field-name).
+
+## Add query params
+
+`http.query-params` works the same as headers, with `"*"` for all of them:
+
+```yaml
+pragma:
+  log:
+    http:
+      query-params: [page, channel]
+```
+
+A request to `/orders?page=2&channel=web` comes out with `"http.query.page":"2"` and `"http.query.channel":"web"`. The body of a form is never read to get them, so it doesn't affect the request.
+
+## Capture the bodies
+
+With `http.body.enabled: true`, the request end log carries the request body and the response body, masked:
+
+<Tabs syncKey="framework">
+<TabItem label="Spring Boot">
+```yaml
+pragma:
+  log:
+    http:
+      body:
+        enabled: true
+        max-size: 4KB
+```
+</TabItem>
+<TabItem label="Quarkus">
+```properties
+pragma.log.http.body.enabled=true
+pragma.log.http.body.max-size=4K
+```
+</TabItem>
+</Tabs>
+
+```json
+{"message":"HTTP POST /orders 200 in 35 ms","http.request.body":{"amount":10,"password":"****"},"http.response.body":{"status":"created","token":"*****"}}
+```
+
+| Option | Default | What it does |
+|---|---|---|
+| `http.body.enabled` | `false` | Turns on the capture. |
+| `http.body.request` | `true` | Captures the request body. |
+| `http.body.response` | `true` | Captures the response body. |
+| `http.body.max-size` | `4KB` | Bytes kept from each body; the rest is cut with `...[truncated N bytes]`. |
+| `http.body.content-types` | JSON, `application/*+json`, forms, XML and `text/*` | Types that are captured. Binary ones never are. |
+
+- JSON and form bodies are turned into objects and masked like any object: by field name at any depth and by patterns. The rest of the text (XML, plain text) only goes through the patterns.
+- In Quarkus, the response body is the object the endpoint returns, so its `@MaskedLogField` annotations apply too. This applies to Quarkus REST endpoints.
+- Bodies are copied as they pass through, without reading them ahead of time or keeping them whole in memory.
+
+<Aside type="caution" title="Turn on bodies with care">
+Bodies are the most common source of personal data in logs, and they make each log bigger. Turn them on only in the services that need them, check that your list of [sensitive names](../masking/#mask-by-field-name) covers your payloads and consider [`alerts.max-log-size`](../alerts/) to detect logs that are too big.
+</Aside>
+
+## Turn off the HTTP context
+
+```yaml
+pragma:
+  log:
+    http:
+      enabled: false
+```
+
+No HTTP field is added and the request start and end logs aren't written.

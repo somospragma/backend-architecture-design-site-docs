@@ -1,0 +1,147 @@
+---
+title: Inicio rápido
+description: De cero a logs JSON enmascarados en Spring Boot, Quarkus o Java puro en menos de 10 minutos.
+sidebar:
+  order: 2
+---
+
+import { Tabs, TabItem, Steps } from '@astrojs/starlight/components';
+
+Al terminar esta página tu servicio escribe cada log en JSON, con los datos sensibles enmascarados y, en Spring Boot y Quarkus, con el contexto de cada request.
+
+Necesitas Java 17 o superior y una app con SLF4J. Elige tu framework; la selección se mantiene en todas las páginas.
+
+<Steps>
+
+1. Agrega la dependencia.
+
+   <Tabs syncKey="framework">
+   <TabItem label="Spring Boot">
+   ```kotlin
+   // build.gradle.kts
+   dependencies {
+       implementation("co.com.pragma.logging:pragma-log-spring-boot-starter:1.0.0")
+   }
+   ```
+   ```xml
+   <!-- pom.xml -->
+   <dependency>
+     <groupId>co.com.pragma.logging</groupId>
+     <artifactId>pragma-log-spring-boot-starter</artifactId>
+     <version>1.0.0</version>
+   </dependency>
+   ```
+   Funciona con Spring Boot 3.5 y 4.x, en MVC y en WebFlux.
+   </TabItem>
+   <TabItem label="Quarkus">
+   ```kotlin
+   // build.gradle.kts
+   dependencies {
+       implementation("co.com.pragma.logging:pragma-log-quarkus:1.0.0")
+   }
+   ```
+   ```xml
+   <!-- pom.xml -->
+   <dependency>
+     <groupId>co.com.pragma.logging</groupId>
+     <artifactId>pragma-log-quarkus</artifactId>
+     <version>1.0.0</version>
+   </dependency>
+   ```
+   Funciona con Quarkus 3.33 o superior, en JVM y en modo nativo.
+   </TabItem>
+   <TabItem label="Java con Logback">
+   ```kotlin
+   // build.gradle.kts
+   dependencies {
+       implementation("co.com.pragma.logging:pragma-log-logback:1.0.0")
+   }
+   ```
+   ```xml
+   <!-- pom.xml -->
+   <dependency>
+     <groupId>co.com.pragma.logging</groupId>
+     <artifactId>pragma-log-logback</artifactId>
+     <version>1.0.0</version>
+   </dependency>
+   ```
+   </TabItem>
+   </Tabs>
+
+2. Configura el nombre de la app.
+
+   <Tabs syncKey="framework">
+   <TabItem label="Spring Boot">
+   No hace falta `logback-spring.xml`. El campo `app` sale de `spring.application.name`:
+   ```yaml
+   # src/main/resources/application.yml
+   spring:
+     application:
+       name: orders-service
+   ```
+   </TabItem>
+   <TabItem label="Quarkus">
+   El campo `app` sale de `quarkus.application.name`, que por defecto es el nombre del proyecto:
+   ```properties
+   # src/main/resources/application.properties
+   quarkus.application.name=orders-service
+   ```
+   </TabItem>
+   <TabItem label="Java con Logback">
+   Crea `src/main/resources/logback.xml` con el encoder de pragma-log:
+   ```xml
+   <configuration>
+     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+       <encoder class="co.com.pragma.logging.logback.PragmaStructuredEncoder">
+         <appName>orders-service</appName>
+       </encoder>
+     </appender>
+     <root level="INFO">
+       <appender-ref ref="STDOUT"/>
+     </root>
+   </configuration>
+   ```
+   </TabItem>
+   </Tabs>
+
+3. Marca los datos sensibles de un objeto y loguéalo.
+
+   ```java
+   import co.com.pragma.logging.core.masking.MaskType;
+   import co.com.pragma.logging.core.masking.MaskedLogField;
+   import org.slf4j.Logger;
+   import org.slf4j.LoggerFactory;
+
+   public class Orders {
+
+       private static final Logger log = LoggerFactory.getLogger(Orders.class);
+
+       record Payment(String holder,
+                      @MaskedLogField(type = MaskType.MIDDLE, length = 4) String cardNumber,
+                      @MaskedLogField(type = MaskType.HIDDEN) String cvv) {}
+
+       public void pay() {
+           Payment payment = new Payment("Ana", "4111111111111111", "123");
+           log.atInfo().addKeyValue("orderId", "ORD-9").log("Payment received: {}", payment);
+       }
+   }
+   ```
+
+4. Arranca la app y mira la consola.
+
+   ```json
+   {"timestamp":"2026-11-11T10:15:30.123-05:00","level":"INFO","logger":"com.acme.Orders","thread":"main","message":"Payment received: {\"holder\":\"Ana\",\"cardNumber\":\"4111********1111\"}","orderId":"ORD-9","app":"orders-service","host":"orders-7d9f-x2k"}
+   ```
+
+   - `cardNumber` sale con el centro enmascarado y `cvv` no aparece.
+   - `orderId` es un campo propio del log, buscable en tu recolector.
+   - En Spring Boot y Quarkus, si el log ocurre dentro de un request, también salen `requestId`, `http.method` y `http.path`, y al terminar el request sale un log con `http.status` y `http.durationMs`.
+
+</Steps>
+
+## Siguientes pasos
+
+- Para leer los logs en local en vez de JSON, usa el [formato de texto plano](../guides/formats/#texto-plano-para-desarrollo-local).
+- Para enmascarar más campos o usar patrones, lee [Cómo enmascarar datos sensibles](../guides/masking/).
+- Para agregar `env`, cambiar nombres de campos o adaptarte a Elastic o Datadog, lee [Cómo organizar los campos](../guides/fields/).
+- Para los detalles de tu framework, lee la guía de [Spring Boot](../guides/spring-boot/), [Quarkus](../guides/quarkus/) o [Java con Logback](../guides/plain-java/).
