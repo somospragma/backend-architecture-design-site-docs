@@ -1,5 +1,5 @@
 # Calidad y build del sitio, en dos etapas:
-#   1. Calidad: lint, tipos, pruebas, código muerto y marca, en jobs paralelos.
+#   1. Calidad: lint, tipos, pruebas, código muerto, marca y SonarCloud, en jobs paralelos.
 #   2. Build: construye el sitio (valida el schema de las fichas) y revisa los enlaces internos.
 # Corre en cada PR y en main. deploy.yml lo reutiliza con `publish: true` para publicar ese mismo build.
 name: CI
@@ -78,6 +78,33 @@ jobs:
 
       - name: vitest
         run: pnpm test
+
+  # Análisis de SonarCloud con la cobertura de vitest. No lo corre deploy.yml (publish) ni un PR desde un fork,
+  # porque ahí no hay SONAR_TOKEN. El build no depende de este job: si SonarCloud falla, no frena el despliegue.
+  sonar:
+    name: Calidad · SonarCloud
+    if: ${{ !inputs.publish && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # SonarCloud usa la historia para saber qué código es nuevo
+          persist-credentials: false
+
+      - name: Preparar el entorno
+        uses: $/.github/actions/setup
+
+      - name: vitest con cobertura
+        run: pnpm test:coverage
+
+      - name: Análisis de SonarCloud
+        uses: SonarSource/sonarqube-scan-action@4d1dc0c91ee400dcf8a6dddf2f705ac36542e304 # v8.4.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   dead-code:
     name: Calidad · Código muerto (knip)
