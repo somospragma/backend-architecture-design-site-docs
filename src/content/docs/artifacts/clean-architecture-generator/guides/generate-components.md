@@ -53,7 +53,7 @@ Qué genera:
 ./gradlew generateOutputAdapter --name=Customer --entity=Customer --type=postgresql
 ```
 
-- `--type` es uno de los [adaptadores de salida](../../reference/driven-adapters/). Por defecto, `redis`.
+- `--type` es uno de los [adaptadores de salida](../../driven-adapters/overview/). Por defecto, `redis`.
 - `--entity` es la entidad que guarda o consulta.
 - Si no existe, crea el gateway `I<Entidad>Gateway` en el paquete de puertos, que el adaptador implementa y el caso de uso usa.
 - Crea una entidad de persistencia y un mapper MapStruct entre ella y la del dominio, para que el dominio no tenga anotaciones de base de datos.
@@ -93,7 +93,7 @@ Los demás tipos no necesitan `--endpoints`, pero sí `--useCase`, que es el cas
 | Clases secundarias | `--name` + nombre de la plantilla | `CustomerRepository`, `CustomerR2dbcConfig` |
 | Módulo (solo `hexagonal-multi-granular`) | `--name` en minúsculas | `:customer` |
 
-El sufijo de cada adaptador está en las tablas de [adaptadores de entrada](../../reference/entry-points/) y [de salida](../../reference/driven-adapters/).
+Las clases que genera cada adaptador están en su página, desde los [adaptadores de entrada](../../entry-points/overview/) y [de salida](../../driven-adapters/overview/).
 
 ## Qué toca cada adaptador fuera de su carpeta
 
@@ -105,7 +105,7 @@ Antes de escribir, el plugin respalda `application.yml` y `build.gradle.kts` en 
 
 ## Si algo falla
 
-- **`Adapter metadata not found for: X`**: ese tipo de adaptador no existe. Usa uno de las tablas de [adaptadores de entrada](../../reference/entry-points/) o [de salida](../../reference/driven-adapters/).
+- **`Adapter metadata not found for: X`**: ese tipo de adaptador no existe. Usa uno de las tablas de [adaptadores de entrada](../../entry-points/overview/) o [de salida](../../driven-adapters/overview/).
 - **`The following has evaluated to null or missing: useCaseType`**: falta `--useCase`. Los adaptadores de entrada lo necesitan para saber qué caso de uso llamar.
 - **`Endpoints are required`**: un adaptador `rest` necesita `--endpoints`.
 - **El build falla en las pruebas de `architecture`**: alguna clase rompe una regla de la arquitectura. El mensaje de ArchUnit dice qué clase y qué regla; lee [qué verifican](../../reference/generated-project/#pruebas-de-arquitectura).

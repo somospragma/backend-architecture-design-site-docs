@@ -95,4 +95,4 @@ Para ver todo lo que generaste:
 
 - [Elige la arquitectura](../guides/architectures/) que mejor encaja con tu servicio.
 - Mira todas las opciones de cada comando en la [referencia de tareas](../reference/tasks/).
-- Revisa los [adaptadores de entrada](../reference/entry-points/) y [de salida](../reference/driven-adapters/) disponibles.
+- Revisa los [adaptadores de entrada](../entry-points/overview/) y [de salida](../driven-adapters/overview/) disponibles.

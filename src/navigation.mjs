@@ -36,6 +36,8 @@ const HOSTED_DOCS_DIR = new URL('./content/docs/artifacts/', import.meta.url);
 // Nombres de las carpetas de templates/docs-hosted/ en la barra lateral. Starlight usaría el nombre de la carpeta.
 const HOSTED_GROUPS = {
 	guides: { es: 'Guías', en: 'Guides' },
+	'entry-points': { es: 'Adaptadores de entrada', en: 'Entry points' },
+	'driven-adapters': { es: 'Adaptadores de salida', en: 'Driven adapters' },
 	reference: { es: 'Referencia', en: 'Reference' },
 };
 

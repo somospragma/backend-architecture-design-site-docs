@@ -53,7 +53,7 @@ What it generates:
 ./gradlew generateOutputAdapter --name=Customer --entity=Customer --type=postgresql
 ```
 
-- `--type` is one of the [output adapters](../../reference/driven-adapters/). By default, `redis`.
+- `--type` is one of the [output adapters](../../driven-adapters/overview/). By default, `redis`.
 - `--entity` is the entity it stores or queries.
 - If it doesn't exist, it creates the `I<Entity>Gateway` gateway in the ports package, which the adapter implements and the use case uses.
 - It creates a persistence entity and a MapStruct mapper between it and the domain entity, so the domain has no database annotations.
@@ -93,7 +93,7 @@ The other types don't need `--endpoints`, but they do need `--useCase`, the use 
 | Secondary classes | `--name` + template name | `CustomerRepository`, `CustomerR2dbcConfig` |
 | Module (only `hexagonal-multi-granular`) | `--name` in lowercase | `:customer` |
 
-Each adapter's suffix is in the [input adapters](../../reference/entry-points/) and [output adapters](../../reference/driven-adapters/) tables.
+The classes each adapter generates are on its page, linked from the [entry points](../../entry-points/overview/) and [driven adapters](../../driven-adapters/overview/) overviews.
 
 ## What each adapter touches outside its folder
 
@@ -105,7 +105,7 @@ Before writing, the plugin backs up `application.yml` and `build.gradle.kts` to 
 
 ## If something fails
 
-- **`Adapter metadata not found for: X`**: that adapter type doesn't exist. Use one from the [input adapters](../../reference/entry-points/) or [output adapters](../../reference/driven-adapters/) tables.
+- **`Adapter metadata not found for: X`**: that adapter type doesn't exist. Use one from the [input adapters](../../entry-points/overview/) or [output adapters](../../driven-adapters/overview/) tables.
 - **`The following has evaluated to null or missing: useCaseType`**: `--useCase` is missing. Input adapters need it to know which use case to call.
 - **`Endpoints are required`**: a `rest` adapter needs `--endpoints`.
 - **The build fails in the `architecture` tests**: some class breaks an architecture rule. The ArchUnit message says which class and which rule; read [what they check](../../reference/generated-project/#architecture-tests).
