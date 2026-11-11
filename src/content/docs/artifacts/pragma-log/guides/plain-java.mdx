@@ -13,7 +13,7 @@ Sin Spring Boot ni Quarkus, pragma-log se usa como un encoder de Logback. La con
 
 ```kotlin
 dependencies {
-    implementation("co.com.pragma.logging:pragma-log-logback:1.0.0")
+    implementation("co.com.pragma.logging:pragma-log-logback:1.0.1")
 }
 ```
 
@@ -21,7 +21,7 @@ dependencies {
 <dependency>
   <groupId>co.com.pragma.logging</groupId>
   <artifactId>pragma-log-logback</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
 </dependency>
 ```
 
@@ -130,6 +130,8 @@ Con `scan`, Logback relee el archivo cuando cambia y crea encoders nuevos con la
   ...
 </configuration>
 ```
+
+`scan` solo funciona con un `logback.xml` en disco, por ejemplo con `-Dlogback.configurationFile=/ruta/logback.xml`. Si el archivo va dentro del jar (`src/main/resources`), Logback no puede vigilarlo: lo avisa al arrancar e imprime todo su estado interno.
 
 ## Registra extensiones
 

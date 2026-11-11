@@ -7,6 +7,21 @@ sidebar:
 
 pragma-log sigue [versionado semántico](https://semver.org/lang/es/). El detalle completo está en el [CHANGELOG del repositorio](https://github.com/somospragma/pragma-log-lib/blob/main/CHANGELOG.md).
 
+## 1.0.1 — 2026-11-11
+
+Corrige los problemas que salieron al probar la 1.0.0 desde Maven Central en proyectos reales. No cambia la configuración.
+
+### Cambiado
+
+- **Spring Boot (MVC y WebFlux):** el body de la respuesta en el log de fin de request es el objeto que retorna el `@RestController`, así que aplican sus `@MaskedLogField`, como en Quarkus. Antes solo se enmascaraba por nombre de campo y por patrones. Lee [Captura los bodies](../guides/http-context/#captura-los-bodies).
+- **Spring Boot (MVC y WebFlux):** si un request termina en `500` o más por una excepción no manejada, el log de fin de request sale en `ERROR` con la excepción, así el stack trace lleva el `requestId`.
+
+### Corregido
+
+- El patrón `EMAIL` tardaba un tiempo cuadrático en textos largos sin `@`: un log de 100 KB tomaba más de un minuto y frenaba el logging asíncrono.
+- Spring Boot: los objetos de `@LogField` ignoraban `masking.strategies`; un campo `CUSTOM` salía enmascarado completo.
+- Documentación: en el `application.properties` de Quarkus una regex de `masking.patterns` necesita `\\\\` por cada `\`, y `scan` de Logback solo funciona con el archivo en disco.
+
 ## 1.0.0 — 2026-11-11
 
 Primera versión publicada en Maven Central, con el group `co.com.pragma.logging` y licencia Apache 2.0. Es una reescritura completa de la librería interna anterior.

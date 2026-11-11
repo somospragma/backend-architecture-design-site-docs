@@ -7,9 +7,11 @@ sidebar:
 
 This `logback.xml` has every property of the pragma-log encoder, grouped and commented, with asynchronous logging. It's the same configuration as the [Spring Boot](../example-spring-boot/) one. It was tested with a Java app without a framework: it writes every log, including the pending ones when the app ends.
 
+`scan` only works if the file is on disk (`-Dlogback.configurationFile=/path/logback.xml`). If you keep it in `src/main/resources`, remove `scan` and `scanPeriod`: inside the jar Logback can't watch it and warns at startup.
+
 ```xml
 <!-- src/main/resources/logback.xml -->
-<configuration scan="true" scanPeriod="30 seconds">  <!-- scan: applies changes without restarting -->
+<configuration scan="true" scanPeriod="30 seconds">  <!-- scan: applies changes without restarting; only with the file on disk -->
 
   <!-- When the app shuts down, writes the pending logs of the async appender -->
   <shutdownHook/>

@@ -47,6 +47,8 @@ Usa el `scan` de Logback. Relee `logback.xml` cuando cambia y crea encoders nuev
   ...
 </configuration>
 ```
+
+`scan` solo funciona con un `logback.xml` en disco, por ejemplo con `-Dlogback.configurationFile=/ruta/logback.xml`. Si el archivo va dentro del jar (`src/main/resources`), Logback no puede vigilarlo: lo avisa al arrancar e imprime todo su estado interno.
 </TabItem>
 </Tabs>
 
