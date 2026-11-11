@@ -104,6 +104,7 @@ Envuelve el appender real con `PragmaAsyncAppender`:
 
 ```xml
 <configuration>
+  <shutdownHook/>  <!-- al apagar la app escribe los logs pendientes -->
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
     <encoder class="co.com.pragma.logging.logback.PragmaStructuredEncoder"/>
   </appender>
@@ -118,7 +119,7 @@ Envuelve el appender real con `PragmaAsyncAppender`:
 </configuration>
 ```
 
-A diferencia del `AsyncAppender` de Logback, no descarta logs cuando la cola se llena. Lee [Cómo escribir los logs de forma asíncrona](../async/).
+A diferencia del `AsyncAppender` de Logback, no descarta logs cuando la cola se llena. No quites `<shutdownHook/>`: sin él, los logs pendientes se pierden cuando la app termina. Lee [Cómo escribir los logs de forma asíncrona](../async/).
 
 ## Recarga la configuración sin reiniciar
 

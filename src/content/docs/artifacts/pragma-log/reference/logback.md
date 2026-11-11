@@ -114,3 +114,5 @@ Escribe los logs en otro hilo sin descartar ninguno. Hereda las propiedades del 
 | `neverBlock` | `false` | `true` descarta en vez de hacer esperar a quien loguea. |
 | `maxFlushTime` | `5000` | Milisegundos para escribir los pendientes al apagar. |
 | `appender-ref` | — | El appender real. Obligatorio. |
+
+Agrega `<shutdownHook/>` dentro de `<configuration>`: sin él, los logs pendientes se pierden cuando la app termina.

@@ -114,3 +114,5 @@ Writes the logs on another thread without discarding any. It inherits the proper
 | `neverBlock` | `false` | `true` discards instead of making the caller wait. |
 | `maxFlushTime` | `5000` | Milliseconds to write pending logs at shutdown. |
 | `appender-ref` | — | The real appender. Required. |
+
+Add `<shutdownHook/>` inside `<configuration>`: without it, pending logs are lost when the app ends.
