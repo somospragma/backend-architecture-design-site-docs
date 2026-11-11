@@ -6,7 +6,7 @@ summary:
 description:
   es: Sigues usando SLF4J y cada log sale en JSON con el mismo esquema. Enmascara contraseñas, tarjetas y tokens, agrega requestId, traceId y el contexto HTTP, y funciona en Spring Boot (MVC y WebFlux), Quarkus y Java puro con Logback.
   en: You keep using SLF4J and every log comes out as JSON with the same schema. It masks passwords, cards and tokens, adds requestId, traceId and the HTTP context, and works on Spring Boot (MVC and WebFlux), Quarkus and plain Java with Logback.
-install: implementation("co.com.pragma.logging:pragma-log-spring-boot-starter:1.0.0")
+install: implementation("co.com.pragma.logging:pragma-log-spring-boot-starter:1.0.1")
 kind: library
 disciplines: [backend, cloudops]
 languages: [java]
