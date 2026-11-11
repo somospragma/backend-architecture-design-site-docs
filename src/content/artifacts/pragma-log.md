@@ -12,7 +12,7 @@ disciplines: [backend, cloudops]
 languages: [java]
 technologies: [spring-boot, spring-webflux, quarkus, gradle, opentelemetry]
 origin: official
-owners: [somospragma/backend-architecture]
+owners: [somospragma/backend-chapter]
 repository: https://github.com/somospragma/pragma-log-lib
 status: experimental
 license: UNLICENSED

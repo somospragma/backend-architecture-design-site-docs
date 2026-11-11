@@ -44,8 +44,8 @@ technologies: []
 # official: vive en una organización de Pragma. community: cuenta personal y open source.
 origin: official
 
-# Usuarios de GitHub (dev-user) o equipos (somospragma/backend-architecture).
-owners: [somospragma/backend-architecture]
+# Usuarios de GitHub (dev-user) o equipos (somospragma/backend-chapter).
+owners: [somospragma/backend-chapter]
 
 repository: https://github.com/somospragma/mi-artefacto
 

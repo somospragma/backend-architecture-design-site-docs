@@ -8,7 +8,7 @@ const valid = {
 	disciplines: ['backend'],
 	languages: ['java'],
 	origin: 'official',
-	owners: ['somospragma/backend-architecture'],
+	owners: ['somospragma/backend-chapter'],
 	repository: 'https://github.com/somospragma/ejemplo',
 	status: 'stable',
 	license: 'Apache-2.0',

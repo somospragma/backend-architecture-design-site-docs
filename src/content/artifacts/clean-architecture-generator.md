@@ -12,7 +12,7 @@ disciplines: [backend, dx]
 languages: [java, kotlin]
 technologies: [spring-boot, spring-webflux, gradle]
 origin: official
-owners: [somospragma/backend-architecture]
+owners: [somospragma/backend-chapter]
 repository: https://github.com/somospragma/backend-architecture-design-archetype-generator-core
 status: beta
 license: Apache-2.0

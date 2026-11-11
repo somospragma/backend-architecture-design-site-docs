@@ -63,7 +63,7 @@ body:
     attributes:
       label: Owners
       description: Usuarios de GitHub o equipo que responde por el artefacto.
-      placeholder: "@dev-user, @somospragma/backend-architecture"
+      placeholder: "@dev-user, @somospragma/backend-chapter"
     validations:
       required: true
   - type: checkboxes

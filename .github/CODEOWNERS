@@ -1,28 +1,28 @@
 # Quién aprueba cada parte del hub. La última regla que coincide gana.
-# Hoy todo lo aprueba una persona, mientras se crea el equipo del hub; las secciones están separadas para poder repartirlas después.
+# Hoy todo lo aprueba el Backend Chapter; las secciones están separadas para poder repartirlas después.
 
 # Todo lo demás: configuración, componentes, CI.
-*                                   @dayepesb-pragma
+*                                   @somospragma/backend-chapter
 
 # Fichas del catálogo.
-/src/content/artifacts/             @dayepesb-pragma
-/src/content/artifact-schema.ts     @dayepesb-pragma
-/src/content/taxonomy.mjs           @dayepesb-pragma
+/src/content/artifacts/             @somospragma/backend-chapter
+/src/content/artifact-schema.ts     @somospragma/backend-chapter
+/src/content/taxonomy.mjs           @somospragma/backend-chapter
 
 # Documentación hosted de cada artefacto.
-/src/content/docs/artifacts/        @dayepesb-pragma
-/src/content/docs/en/artifacts/     @dayepesb-pragma
+/src/content/docs/artifacts/        @somospragma/backend-chapter
+/src/content/docs/en/artifacts/     @somospragma/backend-chapter
 
 # Marca y tema: colores, logos y chequeo de contraste.
-/src/styles/                        @dayepesb-pragma
-/src/assets/brand/                  @dayepesb-pragma
-/public/favicon.svg                 @dayepesb-pragma
-/scripts/build-tokens.mjs           @dayepesb-pragma
-/scripts/check-contrast.mjs         @dayepesb-pragma
-/scripts/tokens-lib.mjs             @dayepesb-pragma
+/src/styles/                        @somospragma/backend-chapter
+/src/assets/brand/                  @somospragma/backend-chapter
+/public/favicon.svg                 @somospragma/backend-chapter
+/scripts/build-tokens.mjs           @somospragma/backend-chapter
+/scripts/check-contrast.mjs         @somospragma/backend-chapter
+/scripts/tokens-lib.mjs             @somospragma/backend-chapter
 
 # Reglas de aporte y CI.
-/.github/                           @dayepesb-pragma
-/CONTRIBUTING.md                    @dayepesb-pragma
-/CODE_OF_CONDUCT.md                 @dayepesb-pragma
-/SECURITY.md                        @dayepesb-pragma
+/.github/                           @somospragma/backend-chapter
+/CONTRIBUTING.md                    @somospragma/backend-chapter
+/CODE_OF_CONDUCT.md                 @somospragma/backend-chapter
+/SECURITY.md                        @somospragma/backend-chapter
