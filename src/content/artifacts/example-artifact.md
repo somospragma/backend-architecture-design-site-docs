@@ -13,7 +13,7 @@ disciplines: [backend, cloudops]
 languages: [java, kotlin]
 technologies: [spring-boot, spring-webflux, gradle]
 origin: official
-owners: [somospragma/backend-architecture]
+owners: [somospragma/backend-chapter]
 repository: https://github.com/somospragma/example-artifact
 registry:
   type: maven-central

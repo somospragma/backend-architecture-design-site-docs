@@ -12,7 +12,7 @@ disciplines: [integration, backend]
 languages: [typescript]
 technologies: [node]
 origin: official
-owners: [somospragma/backend-architecture]
+owners: [somospragma/backend-chapter]
 repository: https://github.com/somospragma/backend-architecture-desing-ts-emvco-qr
 registry:
   type: npm
