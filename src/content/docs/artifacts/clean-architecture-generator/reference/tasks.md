@@ -66,7 +66,7 @@ Crea un adaptador de salida, su gateway si falta, su entidad de persistencia y s
 |---|---|---|---|
 | `--name` | Sí | | Nombre del adaptador, por ejemplo `Order`. |
 | `--entity` | Sí | | Entidad del dominio que guarda o consulta. |
-| `--type` | No | `redis` | Uno de los [adaptadores de salida](../driven-adapters/). |
+| `--type` | No | `redis` | Uno de los [adaptadores de salida](../../driven-adapters/overview/). |
 | `--methods` | No | | Métodos del gateway, con el formato de `generateUseCase`. |
 | `--packageName` | No | `<paquete base>.infrastructure.drivenadapters.<nombre><tipo>` | Paquete completo. |
 
@@ -81,7 +81,7 @@ Crea un adaptador de entrada que llama a un caso de uso.
 | Opción | Obligatoria | Por defecto | Valores |
 |---|---|---|---|
 | `--name` | Sí | | Nombre del adaptador, por ejemplo `Order`. |
-| `--type` | No | `rest` | Uno de los [adaptadores de entrada](../entry-points/). |
+| `--type` | No | `rest` | Uno de los [adaptadores de entrada](../../entry-points/overview/). |
 | `--useCase` | Sí, en la práctica | | Caso de uso que llama, sin el sufijo `UseCase`. Las plantillas lo usan aunque la tarea no lo valide. |
 | `--endpoints` | Solo para `rest` | | `/ruta:MÉTODO:metodo:Retorno[:param:ORIGEN:Tipo…]`, separados por `\|`. `MÉTODO`: `GET`, `POST`, `PUT`, `DELETE`, `PATCH`. `ORIGEN`: `PATH`, `BODY`, `QUERY`. Se valida, pero las plantillas `v1` publican siempre un CRUD en `/api/v1/<nombre>s`. |
 | `--packageName` | No | `<paquete base>.infrastructure.entrypoints.<nombre><tipo>` | Paquete completo. |

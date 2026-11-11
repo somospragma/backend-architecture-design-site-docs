@@ -66,7 +66,7 @@ Creates an output adapter, its gateway if missing, its persistence entity and it
 |---|---|---|---|
 | `--name` | Yes | | Adapter name, for example `Order`. |
 | `--entity` | Yes | | Domain entity it stores or queries. |
-| `--type` | No | `redis` | One of the [output adapters](../driven-adapters/). |
+| `--type` | No | `redis` | One of the [output adapters](../../driven-adapters/overview/). |
 | `--methods` | No | | Gateway methods, with the `generateUseCase` format. |
 | `--packageName` | No | `<base package>.infrastructure.drivenadapters.<name><type>` | Full package. |
 
@@ -81,7 +81,7 @@ Creates an input adapter that calls a use case.
 | Option | Required | Default | Values |
 |---|---|---|---|
 | `--name` | Yes | | Adapter name, for example `Order`. |
-| `--type` | No | `rest` | One of the [input adapters](../entry-points/). |
+| `--type` | No | `rest` | One of the [input adapters](../../entry-points/overview/). |
 | `--useCase` | Yes, in practice | | Use case it calls, without the `UseCase` suffix. The templates use it even though the task doesn't validate it. |
 | `--endpoints` | Only for `rest` | | `/path:METHOD:method:ReturnType[:param:SOURCE:Type…]`, separated by `\|`. `METHOD`: `GET`, `POST`, `PUT`, `DELETE`, `PATCH`. `SOURCE`: `PATH`, `BODY`, `QUERY`. It is validated, but the `v1` templates always publish a CRUD at `/api/v1/<name>s`. |
 | `--packageName` | No | `<base package>.infrastructure.entrypoints.<name><type>` | Full package. |
