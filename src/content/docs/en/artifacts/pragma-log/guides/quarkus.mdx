@@ -110,8 +110,8 @@ public class RegionEnricher implements LogEnricher {
 Use Quarkus's own async. The pragma-log format applies the same way:
 
 ```properties
-quarkus.log.console.async=true
-quarkus.log.file.async=true
+quarkus.log.console.async.enabled=true
+quarkus.log.file.async.enabled=true
 ```
 
 With async, enrichers run in the thread that writes the log, not in the one that called it. For request data, use the MDC.

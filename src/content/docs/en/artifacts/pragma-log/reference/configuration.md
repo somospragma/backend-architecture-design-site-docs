@@ -7,6 +7,8 @@ sidebar:
 
 The properties are the same in Spring Boot (`application.yml`) and in Quarkus (`application.properties`), with the `pragma.log` prefix. The **Where** column shows whether a property exists in only one of the two. For `logback.xml`, read the [Logback reference](../logback/).
 
+To see them all together in a file ready to copy, read the complete configuration for [Spring Boot](../example-spring-boot/) or [Quarkus](../example-quarkus/).
+
 Value formats:
 
 - **Lists:** `[a, b]` in YAML; `a,b` in properties.
@@ -117,7 +119,7 @@ Value formats:
 
 | Property | Default | Where | What it does |
 |---|---|---|---|
-| `async.enabled` | `false` | Spring Boot | Writes the logs on another thread. In Quarkus, use `quarkus.log.console.async`. |
+| `async.enabled` | `false` | Spring Boot | Writes the logs on another thread. In Quarkus, use `quarkus.log.console.async.enabled`. |
 | `async.queue-size` | `8192` | Spring Boot | Logs that can wait to be written. |
 | `async.never-block` | `false` | Spring Boot | Discards logs when the queue is full, instead of waiting. |
 | `async.max-flush-time` | `5s` | Spring Boot | Maximum time to write pending logs when the app shuts down. |

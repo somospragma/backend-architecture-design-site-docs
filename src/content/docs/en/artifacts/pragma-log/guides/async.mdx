@@ -29,14 +29,15 @@ It wraps the Spring Boot console and file appenders.
 <TabItem label="Quarkus">
 Use Quarkus's own async. The pragma-log format applies the same way:
 ```properties
-quarkus.log.console.async=true
-quarkus.log.file.async=true
+quarkus.log.console.async.enabled=true
+quarkus.log.file.async.enabled=true
 ```
 </TabItem>
 <TabItem label="Java with Logback">
 Wrap the real appender with `PragmaAsyncAppender`:
 ```xml
 <configuration>
+  <shutdownHook/>  <!-- writes pending logs when the app stops -->
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
     <encoder class="co.com.pragma.logging.logback.PragmaStructuredEncoder"/>
   </appender>
@@ -51,7 +52,7 @@ Wrap the real appender with `PragmaAsyncAppender`:
   </root>
 </configuration>
 ```
-It accepts the properties of Logback's `AsyncAppender`, like `queueSize`, `neverBlock` and `maxFlushTime`, with the same defaults as Spring Boot.
+`<shutdownHook/>` is required: without it, Logback doesn't wait for pending logs to be written when the app ends. It accepts the properties of Logback's `AsyncAppender`, like `queueSize`, `neverBlock` and `maxFlushTime`, with the same defaults as Spring Boot.
 </TabItem>
 </Tabs>
 

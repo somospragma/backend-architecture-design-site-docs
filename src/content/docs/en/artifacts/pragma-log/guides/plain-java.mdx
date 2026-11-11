@@ -104,6 +104,7 @@ Wrap the real appender with `PragmaAsyncAppender`:
 
 ```xml
 <configuration>
+  <shutdownHook/>  <!-- writes pending logs when the app stops -->
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
     <encoder class="co.com.pragma.logging.logback.PragmaStructuredEncoder"/>
   </appender>
@@ -118,7 +119,7 @@ Wrap the real appender with `PragmaAsyncAppender`:
 </configuration>
 ```
 
-Unlike Logback's `AsyncAppender`, it doesn't drop logs when the queue fills up. Read [How to write logs asynchronously](../async/).
+Unlike Logback's `AsyncAppender`, it doesn't drop logs when the queue fills up. Keep `<shutdownHook/>`: without it, pending logs are lost when the app ends. Read [How to write logs asynchronously](../async/).
 
 ## Reload the configuration without restarting
 
