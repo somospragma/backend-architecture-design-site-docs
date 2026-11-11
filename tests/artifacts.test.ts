@@ -3,15 +3,15 @@ import type { Artifact } from '../src/content/artifact-schema';
 
 // astro:content solo existe dentro de Astro; aquí se reemplaza por una colección de prueba.
 const entries = vi.hoisted(() => [
-	{ id: 'zeta', data: { name: 'Zeta', kind: 'library', draft: false } },
-	{ id: 'alfa', data: { name: 'Alfa', kind: 'plugin', draft: false } },
-	{ id: 'borrador', data: { name: 'Borrador', kind: 'library', draft: true } },
+	{ id: 'zeta', data: { name: 'Zeta', kind: 'library', origin: 'official', draft: false } },
+	{ id: 'alfa', data: { name: 'Alfa', kind: 'plugin', origin: 'community', draft: false } },
+	{ id: 'borrador', data: { name: 'Borrador', kind: 'library', origin: 'community', draft: true } },
 ]);
 vi.mock('astro:content', () => ({
 	getCollection: async (_name: string, filter: (entry: (typeof entries)[number]) => boolean) => entries.filter(filter),
 }));
 
-const { artifactPath, docsHref, getVisibleArtifacts, ownerHref, registryHref, sitePath } =
+const { artifactPath, docsHref, getCommunityArtifacts, getVisibleArtifacts, ownerHref, registryHref, sitePath } =
 	await import('../src/lib/artifacts');
 const { getTypePaths } = await import('../src/lib/type-paths');
 
@@ -93,6 +93,14 @@ describe('getVisibleArtifacts', () => {
 		vi.stubEnv('DEV', true);
 		const visible = await getVisibleArtifacts();
 		expect(visible.map((e) => e.id)).toEqual(['alfa', 'borrador', 'zeta']);
+	});
+});
+
+describe('getCommunityArtifacts', () => {
+	it('solo trae las fichas de comunidad visibles', async () => {
+		vi.stubEnv('DEV', false);
+		const community = await getCommunityArtifacts();
+		expect(community.map((e) => e.id)).toEqual(['alfa']);
 	});
 });
 

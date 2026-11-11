@@ -1,0 +1,40 @@
+---
+// Los proyectos open source de los pragmáticos: las fichas con origin: community.
+// Se usa desde community.mdx en cada idioma: <CommunityList lang="es" />.
+import { Aside } from '@astrojs/starlight/components';
+import ArtifactCard from './ArtifactCard.astro';
+import { ui, type Lang } from '../i18n/catalog';
+import { getCommunityArtifacts, sitePath } from '../lib/artifacts';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = ui[lang];
+const projects = await getCommunityArtifacts();
+---
+
+{projects.length === 0 ? (
+	<Aside type="note" title={t.communityEmptyTitle}>
+		{t.communityEmptyBody} <a href={sitePath(lang, 'contribute/')}>{t.emptyLink}</a>.
+	</Aside>
+) : (
+	<ul class="grid not-content">
+		{projects.map((entry) => (
+			<li>
+				<ArtifactCard lang={lang} entry={entry} />
+			</li>
+		))}
+	</ul>
+)}
+
+<style>
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+		gap: 1rem;
+		padding: 0;
+		list-style: none;
+	}
+</style>

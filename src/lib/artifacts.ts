@@ -10,6 +10,11 @@ export async function getVisibleArtifacts(): Promise<ArtifactEntry[]> {
 	return entries.sort((a, b) => a.data.name.localeCompare(b.data.name));
 }
 
+/** Los proyectos open source de los pragmáticos: las fichas visibles con origin: community. */
+export async function getCommunityArtifacts(): Promise<ArtifactEntry[]> {
+	return (await getVisibleArtifacts()).filter((entry) => entry.data.origin === 'community');
+}
+
 /** Ruta dentro del sitio, con el base y el prefijo de idioma. */
 export function sitePath(lang: Lang, path: string) {
 	const base = import.meta.env.BASE_URL.replace(/\/$/, '');
