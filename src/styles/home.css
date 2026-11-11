@@ -157,11 +157,13 @@
 		border-color 160ms var(--ph-ease),
 		transform 160ms var(--ph-ease);
 }
-.ph-preview li:nth-child(2) a {
-	margin-inline-start: clamp(0px, 3vw, 40px);
-}
-.ph-preview li:nth-child(3) a {
-	margin-inline-start: clamp(0px, 6vw, 80px);
+@media (min-width: 861px) {
+	.ph-preview li:nth-child(2) a {
+		margin-inline-start: clamp(0px, 3vw, 40px);
+	}
+	.ph-preview li:nth-child(3) a {
+		margin-inline-start: clamp(0px, 6vw, 80px);
+	}
 }
 .ph-preview a:hover,
 .ph-preview a:focus-visible {
@@ -303,9 +305,6 @@ a.ph-kind:focus-visible {
 @media (max-width: 860px) {
 	.ph-hero {
 		grid-template-columns: minmax(0, 1fr);
-	}
-	.ph-preview li a {
-		margin-inline-start: 0 !important;
 	}
 	.ph-steps__list {
 		grid-template-columns: minmax(0, 1fr);
