@@ -1,0 +1,77 @@
+---
+title: Cómo cambiar la configuración en caliente
+description: Aplica cambios de configuración sin reiniciar y entiende las advertencias de configuración del arranque.
+sidebar:
+  order: 34
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Puedes cambiar la configuración de pragma-log sin reiniciar la app, por ejemplo para agregar un campo sensible a la lista o activar los bodies durante un incidente.
+
+<Tabs syncKey="framework">
+<TabItem label="Spring Boot">
+Los cambios a `pragma.log.*` se aplican solos cuando Spring Cloud publica un `EnvironmentChangeEvent`: con el endpoint `refresh` de Actuator, con ConfigMaps de Kubernetes (Spring Cloud Kubernetes) o con Spring Cloud Config Server.
+
+Si cambias el `Environment` de otra forma, llama a `PragmaLogReloader`, que es un bean:
+
+```java
+import co.com.pragma.logging.spring.PragmaLogReloader;
+
+@RestController
+class LoggingAdmin {
+
+    private final PragmaLogReloader reloader;
+
+    LoggingAdmin(PragmaLogReloader reloader) {
+        this.reloader = reloader;
+    }
+
+    @PostMapping("/admin/logging/reload")
+    void reload() {
+        reloader.reload();
+    }
+}
+```
+
+Se recargan el masking, los campos y su organización, las alertas, el stack trace, el timestamp y el contexto HTTP. Pasar de `plain` a un formato estructurado, o al revés, sigue pidiendo reinicio.
+</TabItem>
+<TabItem label="Quarkus">
+Quarkus no relee su configuración mientras la app corre. Para cambiar una opción de pragma-log, reinicia la app. En dev mode (`quarkus dev`) los cambios en `application.properties` sí se aplican al recargar.
+</TabItem>
+<TabItem label="Java con Logback">
+Usa el `scan` de Logback. Relee `logback.xml` cuando cambia y crea encoders nuevos con la configuración nueva:
+
+```xml
+<configuration scan="true" scanPeriod="30 seconds">
+  ...
+</configuration>
+```
+</TabItem>
+</Tabs>
+
+Si la configuración nueva es inválida, se mantiene la anterior y se avisa por la salida de error. Una recarga nunca deja la app sin masking.
+
+## Advertencias de configuración
+
+Al arrancar, pragma-log revisa combinaciones que no hacen lo que parecen y avisa una sola vez, sin detener la app. En Spring Boot salen por la salida de error, en Quarkus como un log `WARN` y en `logback.xml` en el estado de Logback.
+
+| Advertencia | Por qué |
+|---|---|
+| `masking.enabled: false` con `masking.patterns` o `http.body` | Los bodies y los textos se escriben sin enmascarar. |
+| `masking.fields` vacío | Ningún campo se enmascara por nombre, solo por anotación. Quita la propiedad para usar la lista segura por defecto. |
+| `max-field-length` muy bajo | La mayoría de los mensajes saldrían cortados. |
+| `json.pretty` con otro formato | `json.pretty` solo aplica a JSON. |
+| `json.pretty` activo | Los recolectores esperan un log por línea. Úsalo solo en local. |
+| `csv.*` sin `format: csv` | Las opciones de CSV no aplican. |
+| `custom-formatter` sin `format: custom` | El formatter no se usa. |
+| Un campo de `required-fields` también está en `hide-fields` | Siempre sale con el valor por defecto. |
+| Un campo de `field-order` también está en `hide-fields` | El orden no aplica a un campo oculto. |
+| Dos campos renombrados al mismo nombre | Solo uno de los dos se escribe. |
+| Un campo renombrado con el nombre de un campo estándar | Uno de los dos se pierde. |
+| `extra-field` con un nombre que ya usa otro campo | Los dos chocan. |
+| `alerts.truncate` sin `alerts.max-log-size` | Sin tamaño máximo no se recorta nada. |
+| `http.body.max-size` de dos bodies mayor que `alerts.max-log-size` | Los logs de fin de request van a generar alertas y a recortarse. |
+| `http.headers: "*"` con `exclude-headers` vacío | Las credenciales y cookies se copian a cada log (enmascaradas por nombre). |
+
+Las advertencias no detienen la app. Los errores sí: un tipo de masking que no existe, una clase que no se puede cargar o una regex inválida impiden el arranque en Spring Boot y Quarkus.

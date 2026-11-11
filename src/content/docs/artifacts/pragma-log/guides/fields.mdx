@@ -1,0 +1,214 @@
+---
+title: Cómo organizar los campos
+description: Agrega campos fijos, oculta, renombra, anida y ordena campos, define obligatorios, agrupa en extra y cambia el timestamp.
+sidebar:
+  order: 21
+---
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+Cada log tiene campos estándar (`timestamp`, `level`, `logger`, `thread`, `message`, `app`, `host`…), los campos del MDC, los key-values y los de los enrichers. Esta guía muestra cómo cambiar cuáles salen, con qué nombre y en qué orden. Todo lo de esta página aplica igual a JSON, XML, CSV y formatos propios.
+
+El esquema completo de la salida está en la [referencia de campos](../../reference/output-fields/).
+
+## Identifica la app
+
+| Opción | Por defecto | Campo |
+|---|---|---|
+| `app-name` | `spring.application.name` o `quarkus.application.name` | `app` |
+| `version` | `spring.application.version` o `quarkus.application.version`; si no hay, no sale | `version` |
+| `include-host` | `true` | `host`: la variable `HOSTNAME` (en Kubernetes, el nombre del pod) o el nombre del equipo |
+| `include-pid` | `false` | `pid`: el id del proceso |
+
+En `logback.xml` son `<appName>`, `<appVersion>`, `<includeHost>` e `<includePid>`.
+
+## Agrega campos fijos
+
+Un campo fijo sale en todos los logs con el mismo valor. Sirve para el ambiente, la región o el equipo dueño:
+
+<Tabs syncKey="framework">
+<TabItem label="Spring Boot">
+```yaml
+pragma:
+  log:
+    fields:
+      env: prod
+      team: payments
+```
+</TabItem>
+<TabItem label="Quarkus">
+```properties
+pragma.log.fields.env=prod
+pragma.log.fields.team=payments
+```
+</TabItem>
+<TabItem label="Java con Logback">
+```xml
+<field>env=prod</field>
+<field>team=payments</field>
+```
+</TabItem>
+</Tabs>
+
+Usa una variable de ambiente para que el mismo artefacto sirva en todos los ambientes: `env: ${ENVIRONMENT:local}` en Spring o `pragma.log.fields.env=${ENVIRONMENT:local}` en Quarkus.
+
+## Oculta campos
+
+`hide-fields` quita campos estándar, fijos, del MDC o de los key-values:
+
+<Tabs syncKey="framework">
+<TabItem label="Spring Boot">
+```yaml
+pragma:
+  log:
+    hide-fields: [thread, logger]
+```
+</TabItem>
+<TabItem label="Quarkus">
+```properties
+pragma.log.hide-fields=thread,logger
+```
+</TabItem>
+<TabItem label="Java con Logback">
+```xml
+<hideFields>thread,logger</hideFields>
+```
+</TabItem>
+</Tabs>
+
+## Renombra campos
+
+Para que tus logs usen los nombres que espera tu plataforma (`severity` en vez de `level`, `@timestamp` en vez de `timestamp`):
+
+<Tabs syncKey="framework">
+<TabItem label="Spring Boot">
+```yaml
+pragma:
+  log:
+    rename-fields:
+      level: severity
+      timestamp: "@timestamp"
+```
+</TabItem>
+<TabItem label="Quarkus">
+```properties
+pragma.log.rename-fields.level=severity
+pragma.log.rename-fields.timestamp=@timestamp
+```
+</TabItem>
+<TabItem label="Java con Logback">
+```xml
+<renameField>level=severity</renameField>
+<renameField>timestamp=@timestamp</renameField>
+```
+</TabItem>
+</Tabs>
+
+Aplica a cualquier campo: estándar, fijo, del MDC o de los key-values. Los nombres con puntos funcionan tal cual, sin corchetes: `http.method: http.request.method`.
+
+Para Elastic, Datadog y OpenTelemetry hay configuraciones listas en [Cómo enviar los logs a Elastic, Datadog u OpenTelemetry](../observability/).
+
+## Anida campos en objetos
+
+Un nombre nuevo que empieza con `$.` mete el campo dentro de objetos:
+
+```yaml
+pragma:
+  log:
+    rename-fields:
+      requestId: $.http.request.id
+      stacktrace: $.error.stack_trace
+```
+
+```json
+{"level":"INFO","message":"Order paid","http":{"request":{"id":"req-7"}},"error":{"type":"java.lang.IllegalStateException","message":"Gateway timeout","stack_trace":"java.lang.IllegalStateException: ..."}}
+```
+
+Si el objeto ya existe, como `error`, el campo se agrega adentro. Sin `$.`, `http.request.id` es un solo campo con puntos en el nombre; para Elasticsearch y Datadog las dos formas son equivalentes.
+
+## Ordena los campos
+
+`field-order` pone esos campos primero, en ese orden. El resto conserva su orden natural. Puedes usar el nombre original o el nuevo:
+
+```yaml
+pragma:
+  log:
+    field-order: [timestamp, level, message, requestId]
+```
+
+En `logback.xml`: `<fieldOrder>timestamp,level,message,requestId</fieldOrder>`.
+
+## Exige campos obligatorios
+
+`required-fields` lista los campos que todo log debe tener. Si a un log le falta uno, sale con el valor de `required-placeholder` (`unknown` por defecto) y se avisa a los [listeners de alertas](../alerts/) con `onMissingFields`. El log nunca se pierde.
+
+```yaml
+pragma:
+  log:
+    required-fields: [requestId, userId]
+    required-placeholder: none
+```
+
+```json
+{"level":"INFO","message":"Scheduled job ran","requestId":"none","userId":"none"}
+```
+
+En `logback.xml`: `<requiredFields>requestId,userId</requiredFields>` y `<requiredPlaceholder>none</requiredPlaceholder>`.
+
+## Agrupa el contexto en un objeto `extra`
+
+Con `extra-field`, el MDC y los key-values van dentro de un objeto, y en la raíz quedan los campos estándar y fijos:
+
+```yaml
+pragma:
+  log:
+    extra-field: extra
+```
+
+```json
+{"timestamp":"…","level":"INFO","message":"Order paid","app":"orders-service","extra":{"orderId":"o-1","amount":10}}
+```
+
+- Los campos que nombras en `field-order`, `rename-fields` o `required-fields` quedan en la raíz.
+- Acepta un nombre anidado: `extra-field: $.context.extra`.
+
+En `logback.xml`: `<extraField>extra</extraField>`.
+
+## Cambia el formato del timestamp
+
+| Opción | Por defecto | Ejemplo |
+|---|---|---|
+| `timestamp.pattern` | `[ISO_OFFSET_DATE_TIME]` en JSON; `yyyy-MM-dd HH:mm:ss.SSS` en texto | `[ISO_INSTANT]`, `yyyy-MM-dd HH:mm:ss.SSS` |
+| `timestamp.zone` | La zona del sistema | `UTC`, `America/Bogota` |
+
+El patrón es un patrón de `DateTimeFormatter`, o el nombre de una de sus constantes entre corchetes. Por ejemplo, para UTC con `Z`, como recomienda Elastic:
+
+```yaml
+pragma:
+  log:
+    timestamp:
+      pattern: "[ISO_INSTANT]"
+      zone: UTC
+```
+
+```json
+{"timestamp":"2026-11-11T15:15:30.123Z", "level":"INFO"}
+```
+
+En `logback.xml`: `<timestampPattern>[ISO_INSTANT]</timestampPattern>` y `<timeZone>UTC</timeZone>`.
+
+## Recorta los textos largos
+
+`max-field-length` corta el mensaje y cada valor de texto que pase ese número de caracteres. El resto se reemplaza por `...[truncated N chars]`:
+
+```yaml
+pragma:
+  log:
+    max-field-length: 4000
+```
+
+Primero se enmascara y después se corta, así ningún pedazo de un secreto queda visible. `0` (por defecto) no recorta. El stack trace tiene su propio límite: lee [Cómo registrar excepciones](../exceptions/).
+
+<Aside type="tip" title="Combinaciones que avisan">
+Algunas combinaciones no hacen lo que parecen: un campo obligatorio que también está oculto, dos campos renombrados al mismo nombre o un `extra-field` con el nombre de otro campo. pragma-log las detecta al arrancar y avisa una vez. Lee [Advertencias de configuración](../hot-reload/#advertencias-de-configuración).
+</Aside>

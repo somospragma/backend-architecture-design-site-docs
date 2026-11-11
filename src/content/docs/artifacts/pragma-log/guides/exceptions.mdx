@@ -1,0 +1,76 @@
+---
+title: Cómo registrar excepciones
+description: El resumen error, el stack trace acotado y sus opciones de profundidad, largo y causa raíz.
+sidebar:
+  order: 22
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Cuando logueas una excepción, pragma-log escribe dos cosas: un resumen fácil de buscar en el campo `error` y el stack trace acotado en `stacktrace`. Los dos pasan por el masking.
+
+```java
+try {
+    gateway.charge(payment);
+} catch (GatewayException e) {
+    log.error("Payment failed", e);
+}
+```
+
+```json
+{"timestamp":"…","level":"ERROR","message":"Payment failed","error":{"type":"com.acme.GatewayException","message":"Gateway timeout","rootCause":"java.net.SocketTimeoutException: Read timed out"},"stacktrace":"com.acme.GatewayException: Gateway timeout\n\tat com.acme.Payments.charge(Payments.java:42)\n..."}
+```
+
+## El resumen `error`
+
+| Campo | Qué es |
+|---|---|
+| `error.type` | Clase de la excepción. |
+| `error.message` | Mensaje de la excepción, enmascarado. |
+| `error.rootCause` | La última causa de la cadena, como `Clase: mensaje`. Solo sale si la excepción tiene causa. |
+
+Siempre sale, aunque apagues el stack trace. Con él puedes contar errores por tipo sin procesar el texto del stack trace.
+
+## Acota el stack trace
+
+| Opción | Por defecto | Qué hace |
+|---|---|---|
+| `stacktrace.include` | `true` | `false` quita el stack trace y deja solo el resumen `error`. |
+| `stacktrace.max-depth` | `50` | Frames por cada excepción de la cadena. |
+| `stacktrace.max-length` | `16384` | Caracteres máximos de todo el stack trace. |
+| `stacktrace.root-cause-first` | `false` | Escribe primero la causa raíz, que suele ser la que explica el error. |
+
+<Tabs syncKey="framework">
+<TabItem label="Spring Boot">
+```yaml
+pragma:
+  log:
+    stacktrace:
+      max-depth: 30
+      max-length: 8000
+      root-cause-first: true
+```
+</TabItem>
+<TabItem label="Quarkus">
+```properties
+pragma.log.stacktrace.max-depth=30
+pragma.log.stacktrace.max-length=8000
+pragma.log.stacktrace.root-cause-first=true
+```
+</TabItem>
+<TabItem label="Java con Logback">
+```xml
+<stacktraceMaxDepth>30</stacktraceMaxDepth>
+<stacktraceMaxLength>8000</stacktraceMaxLength>
+<stacktraceRootCauseFirst>true</stacktraceRootCauseFirst>
+```
+</TabItem>
+</Tabs>
+
+## Ningún log sale sin mensaje
+
+Si escribes `log.error("", e)` o el mensaje es `null`, el mensaje del log es la excepción (`com.acme.GatewayException: Gateway timeout`). Si tampoco hay excepción, es `(empty message)`. Así ningún log queda imposible de buscar.
+
+## Datos sensibles en excepciones
+
+Los mensajes de excepción suelen llevar datos de entrada (`Invalid card 4111111111111111`). Los [patrones de masking](../masking/#busca-datos-dentro-del-texto-con-patrones) también se aplican al resumen `error` y al stack trace, así que con `CARD` ese número sale enmascarado.

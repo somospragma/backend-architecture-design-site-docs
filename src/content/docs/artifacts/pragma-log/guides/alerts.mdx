@@ -1,0 +1,137 @@
+---
+title: Cómo controlar el tamaño de los logs y recibir alertas
+description: Limita el tamaño de cada log, recórtalo si se pasa y recibe alertas de tamaño, de masking y de campos faltantes.
+sidebar:
+  order: 32
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Un log de varios megas (un body enorme, una lista completa) cuesta dinero en el recolector y puede romper la ingesta. pragma-log puede avisarte cuando eso pasa, recortar el log hasta que quepa y avisarte también cuando un log no se pudo enmascarar o le faltan campos obligatorios.
+
+## Avisa cuando un log es demasiado grande
+
+`alerts.max-log-size` es el tamaño máximo de un log ya codificado, en bytes UTF-8. Cuando un log lo supera, se avisa. Por defecto el log se escribe completo:
+
+<Tabs syncKey="framework">
+<TabItem label="Spring Boot">
+```yaml
+pragma:
+  log:
+    alerts:
+      max-log-size: 64KB
+```
+</TabItem>
+<TabItem label="Quarkus">
+```properties
+pragma.log.alerts.max-log-size=64K
+```
+</TabItem>
+<TabItem label="Java con Logback">
+```xml
+<!-- en bytes -->
+<maxLogSize>65536</maxLogSize>
+```
+</TabItem>
+</Tabs>
+
+Sin `max-log-size` no hay alertas de tamaño.
+
+## Recorta los logs que se pasan
+
+Con `alerts.truncate: true`, un log más grande que `max-log-size` se recorta hasta que quepa:
+
+```yaml
+pragma:
+  log:
+    alerts:
+      max-log-size: 64KB
+      truncate: true
+```
+
+- Se recortan primero los campos más grandes. Los textos conservan el comienzo y terminan con `...[truncated N chars]`; los objetos se reemplazan por `[truncated N bytes]`.
+- El log lleva `"truncated":true`, para que puedas buscarlos.
+- `timestamp`, `level`, `logger`, `thread` y `app` nunca se recortan: sin ellos el log no se encuentra.
+- Aplica a JSON, XML, CSV y formatos propios.
+
+En `logback.xml`: `<truncateLargeLogs>true</truncateLargeLogs>`.
+
+Para cortar solo los textos largos sin mirar el tamaño total, usa [`max-field-length`](../fields/#recorta-los-textos-largos).
+
+## Mira las alertas en la consola
+
+Por defecto cada alerta escribe una línea en la salida de error, máximo una por minuto por logger y por tipo de alerta:
+
+```text
+pragma-log WARN: a INFO log of 98304 bytes from com.acme.Orders exceeds max-log-size (65536 bytes). It was written whole; check what that logger writes.
+```
+
+Para apagarlas: `alerts.console: false` (en `logback.xml`, `<alertConsole>false</alertConsole>`). Si tienes un appender de consola y uno de archivo, cada uno avisa por su lado.
+
+## Lleva las alertas a una métrica o una notificación
+
+Implementa `LogAlertListener`. Sus tres métodos son opcionales:
+
+```java
+package com.acme.logging;
+
+import co.com.pragma.logging.core.alert.LargeLogAlert;
+import co.com.pragma.logging.core.alert.LogAlertListener;
+import co.com.pragma.logging.core.alert.MaskingErrorAlert;
+import co.com.pragma.logging.core.alert.MissingFieldsAlert;
+import io.micrometer.core.instrument.Metrics;
+
+public class AlertsToMetrics implements LogAlertListener {
+
+    @Override
+    public void onLargeLog(LargeLogAlert alert) {
+        Metrics.counter("logs.too.large", "logger", alert.logger()).increment();
+    }
+
+    @Override
+    public void onMaskingError(MaskingErrorAlert alert) {
+        Metrics.counter("logs.masking.errors", "logger", alert.logger()).increment();
+    }
+
+    @Override
+    public void onMissingFields(MissingFieldsAlert alert) {
+        Metrics.counter("logs.missing.fields", "logger", alert.logger()).increment();
+    }
+}
+```
+
+| Método | Cuándo se llama | Datos de la alerta |
+|---|---|---|
+| `onLargeLog` | Un log supera `max-log-size`. | `logger`, `level`, `sizeBytes`, `maxBytes` |
+| `onMaskingError` | Un log no se pudo enmascarar y se escribió sin argumentos, con el campo `pragmaLogError`. | `logger`, `error` |
+| `onMissingFields` | A un log le faltan [campos obligatorios](../fields/#exige-campos-obligatorios). | `logger`, `level`, `fields` |
+
+Regístralo de una de estas formas:
+
+<Tabs syncKey="framework">
+<TabItem label="Spring Boot">
+Como bean, o por nombre de clase:
+```yaml
+pragma:
+  log:
+    alerts:
+      listeners: [com.acme.logging.AlertsToMetrics]
+```
+</TabItem>
+<TabItem label="Quarkus">
+Como bean CDI, o por nombre de clase:
+```properties
+pragma.log.alerts.listeners=com.acme.logging.AlertsToMetrics
+```
+</TabItem>
+<TabItem label="Java con Logback">
+En el encoder, o en código con `LogAlerts.register(new AlertsToMetrics())`:
+```xml
+<alertListener>com.acme.logging.AlertsToMetrics</alertListener>
+```
+</TabItem>
+</Tabs>
+
+- El listener corre en el hilo que escribe el log: mantenlo rápido y no loguees desde él con el mismo logger que dispara la alerta.
+- Si el listener lanza una excepción, el log se escribe igual.
+- Por nombre de clase necesita un constructor público sin argumentos. Una clase que no existe detiene el arranque en Spring Boot y Quarkus.

@@ -1,0 +1,230 @@
+---
+title: How to choose the output format
+description: Compact or indented JSON, XML, CSV, your own format, and plain text with colors for local development.
+sidebar:
+  order: 23
+---
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+`format` chooses how each log is written. Every format goes through the same masking and the same [field organization](../fields/).
+
+| `format` | Output | What for |
+|---|---|---|
+| `json` (default) | One JSON object per line. | Production: every collector reads it. |
+| `xml` | One `<event>` per line. | Systems that only accept XML. |
+| `csv` | Fixed columns separated by a delimiter. | Files for spreadsheets or bulk loads. |
+| `custom` | Whatever your class returns. | A format that isn't on the list. |
+| `plain` | Readable text, with colors in the console. | Local development. |
+
+<Tabs syncKey="framework">
+<TabItem label="Spring Boot">
+```yaml
+pragma:
+  log:
+    format: xml
+```
+</TabItem>
+<TabItem label="Quarkus">
+```properties
+pragma.log.format=xml
+```
+</TabItem>
+<TabItem label="Java with Logback">
+```xml
+<encoder class="co.com.pragma.logging.logback.PragmaStructuredEncoder">
+  <format>xml</format>
+</encoder>
+```
+For `plain`, use another encoder, `PragmaTextEncoder`. [The plain text section](#plain-text-for-local-development) explains it.
+</TabItem>
+</Tabs>
+
+## JSON
+
+It's the default format: one object per line, which is what Elastic, Datadog, Loki, CloudWatch and the OpenTelemetry collector expect.
+
+To read it locally, `json.pretty: true` writes it indented across several lines:
+
+```yaml
+pragma:
+  log:
+    json:
+      pretty: true
+```
+
+```json
+{
+  "timestamp" : "2026-11-11T10:15:30.123-05:00",
+  "level" : "INFO",
+  "message" : "Order placed"
+}
+```
+
+Don't use it in production: collectors expect one event per line and would split each log into several. pragma-log warns at startup if it's on. In `logback.xml` it's `<pretty>true</pretty>`.
+
+## XML
+
+One `<event>` element per line. Objects are nested elements:
+
+```xml
+<event><timestamp>2026-11-11T10:15:30.123-05:00</timestamp><level>INFO</level><logger>com.acme.Orders</logger><thread>main</thread><message>Order placed</message><orderId>ORD-9</orderId><app>orders-service</app></event>
+```
+
+## CSV
+
+| Option | Default | What it does |
+|---|---|---|
+| `csv.columns` | `timestamp, level, logger, thread, message` | Columns, by output name. A nested field is a column with dots: `http.request.id`. |
+| `csv.delimiter` | `,` | Column separator. |
+| `csv.header` | `false` | Writes the column names at the start of each file. Only in `logback.xml` and Quarkus. |
+
+<Tabs syncKey="framework">
+<TabItem label="Spring Boot">
+```yaml
+pragma:
+  log:
+    format: csv
+    csv:
+      columns: [timestamp, level, requestId, message]
+      delimiter: ";"
+```
+</TabItem>
+<TabItem label="Quarkus">
+```properties
+pragma.log.format=csv
+pragma.log.csv.columns=timestamp,level,requestId,message
+pragma.log.csv.delimiter=;
+pragma.log.csv.header=true
+```
+</TabItem>
+<TabItem label="Java with Logback">
+```xml
+<format>csv</format>
+<csvColumns>timestamp,level,requestId,message</csvColumns>
+<csvDelimiter>;</csvDelimiter>
+<csvHeader>true</csvHeader>
+```
+</TabItem>
+</Tabs>
+
+```text
+2026-11-11T10:15:30.123-05:00;INFO;req-7;Order placed
+```
+
+Objects go as JSON inside the column and line breaks as `\n`, so each log takes a single line.
+
+## Your own format
+
+Implement `LogEventFormatter`. It receives the fields already masked, renamed and ordered, and returns the log text, ending in a line break:
+
+```java
+package com.acme.logging;
+
+import co.com.pragma.logging.core.format.LogEventFormatter;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/** Writes key=value pairs separated by spaces. */
+public class KeyValueFormatter implements LogEventFormatter {
+
+    @Override
+    public String format(Map<String, Object> event) {
+        return event.entrySet().stream()
+                .map(e -> e.getKey() + "=" + e.getValue())
+                .collect(Collectors.joining(" ", "", System.lineSeparator()));
+    }
+
+    @Override
+    public String header() {
+        return null; // one line at the start of each file, or null for none
+    }
+}
+```
+
+<Tabs syncKey="framework">
+<TabItem label="Spring Boot">
+```yaml
+pragma:
+  log:
+    format: custom
+    custom-formatter: com.acme.logging.KeyValueFormatter
+```
+</TabItem>
+<TabItem label="Quarkus">
+```properties
+pragma.log.format=custom
+pragma.log.custom-formatter=com.acme.logging.KeyValueFormatter
+```
+</TabItem>
+<TabItem label="Java with Logback">
+```xml
+<format>custom</format>
+<customFormatter>com.acme.logging.KeyValueFormatter</customFormatter>
+```
+</TabItem>
+</Tabs>
+
+- The class needs a public no-argument constructor and must be thread-safe.
+- Values are `String`, `Number`, `Boolean` or `null`; logged objects arrive as Jackson `JsonNode`, and nested fields (`$.a.b`), `error` and `extra` as `Map<String, Object>`.
+- If your formatter throws an exception on an event, that event goes out as JSON and gets reported. The log isn't lost.
+
+## Plain text for local development
+
+`format: plain` replaces the JSON with a readable line. The masking is the same: no secret that the JSON hides shows up in the text.
+
+```text
+2026-11-11 10:15:30.123  INFO [main] c.a.orders.CustomerResource : Customer found: {"id":"1","cardNumber":"4111********1111"} requestId=req-1
+```
+
+- MDC fields and key-values go at the end as `name=value`. The stack trace, trimmed, goes on the following lines.
+- `app`, `host` and the fixed fields don't show up in text.
+- `timestamp.pattern` and `timestamp.zone` apply the same way. In text, the default pattern is `yyyy-MM-dd HH:mm:ss.SSS`.
+
+### Colors
+
+In the console, the level comes out in color, the timestamp faint and the logger in cyan. Log files never have colors.
+
+| Option | Default | What it does |
+|---|---|---|
+| `color.mode` | `auto` | `auto`: only in a terminal and never with the `NO_COLOR` variable. `always`: also in the IDE console, which isn't detected as a terminal. `never`: no colors. |
+| `color.levels` | `ERROR` red, `WARN` yellow, `INFO` green, `DEBUG` cyan, `TRACE` faint | Color per level, by name (`red`, `bright_blue`, `faint`…) or hex (`#ff8800`). |
+
+<Tabs syncKey="framework">
+<TabItem label="Spring Boot">
+```yaml
+pragma:
+  log:
+    format: plain
+    color:
+      mode: always
+      levels:
+        INFO: blue
+        WARN: "#ff8800"
+```
+</TabItem>
+<TabItem label="Quarkus">
+```properties
+%dev.pragma.log.format=plain
+%dev.pragma.log.color.mode=always
+%dev.pragma.log.color.levels.INFO=blue
+%dev.pragma.log.color.levels.WARN=#ff8800
+```
+</TabItem>
+<TabItem label="Java with Logback">
+```xml
+<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+  <encoder class="co.com.pragma.logging.logback.PragmaTextEncoder">
+    <color>ALWAYS</color>
+    <levelColor>INFO=blue</levelColor>
+    <levelColor>WARN=#ff8800</levelColor>
+  </encoder>
+</appender>
+```
+`PragmaTextEncoder` accepts the same masking, stack trace, timestamp and `hideFields` options as the JSON encoder. In file appenders, set `<color>NEVER</color>`.
+</TabItem>
+</Tabs>
+
+<Aside type="tip" title="Text locally, JSON in other environments">
+Turn on `plain` only with a profile: `application-local.yml` in Spring Boot or the `%dev.` prefix in Quarkus. That way nobody deploys plain text by mistake.
+</Aside>

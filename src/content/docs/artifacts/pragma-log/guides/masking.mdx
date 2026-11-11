@@ -1,0 +1,240 @@
+---
+title: Cómo enmascarar datos sensibles
+description: Enmascara campos con @MaskedLogField, por nombre, con estrategias propias y con patrones dentro del texto.
+sidebar:
+  order: 20
+---
+
+import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+Todo objeto que llega al log pasa por el masking: los argumentos `{}` del mensaje, los key-values, el MDC, los enrichers, los headers y los bodies HTTP. pragma-log nunca llama a `toString()` y nunca modifica el objeto que logueas: lo convierte a JSON enmascarado para el log.
+
+Hay cuatro formas de decidir qué se enmascara. Se combinan entre sí.
+
+| Forma | Qué cubre | Cuándo usarla |
+|---|---|---|
+| [`@MaskedLogField`](#marca-los-campos-con-maskedlogfield) | Campos de tus clases. | Tus objetos de dominio y DTOs. |
+| [Por nombre](#enmascara-por-nombre-de-campo) | Cualquier campo con ese nombre, a cualquier profundidad. | Clases de terceros, mapas, MDC, key-values, headers. |
+| [Estrategia propia](#crea-tu-propia-estrategia) | Lo que tú programes. | Un formato que los tipos incluidos no cubren. |
+| [Patrones](#busca-datos-dentro-del-texto-con-patrones) | Texto libre: el mensaje, los textos de los objetos y el stack trace. | Datos concatenados en un texto. |
+
+## Marca los campos con `@MaskedLogField`
+
+Pon la anotación en el campo o en el componente del record:
+
+```java
+import co.com.pragma.logging.core.masking.MaskType;
+import co.com.pragma.logging.core.masking.MaskedLogField;
+
+public record Customer(
+        String name,
+        @MaskedLogField(type = MaskType.MIDDLE, length = 4) String cardNumber,
+        @MaskedLogField(type = MaskType.HIDDEN) String cvv,
+        @MaskedLogField String documentId) {}
+```
+
+```java
+log.info("Customer registered: {}", customer);
+```
+
+```json
+"message":"Customer registered: {\"name\":\"Ana\",\"cardNumber\":\"4111********1111\",\"documentId\":\"**********\"}"
+```
+
+- Funciona en campos de cualquier tipo: textos, números, fechas, enums y UUIDs se enmascaran carácter por carácter; un objeto o una lista se reemplaza por una máscara fija.
+- Respeta los campos heredados de una clase padre.
+- Aplica a cualquier profundidad: si `Order` tiene un `Customer`, el `Customer` sale enmascarado dentro del `Order`.
+
+### Elige el tipo de máscara
+
+| Tipo | Qué hace | Ejemplo con `length = 4` |
+|---|---|---|
+| `FULL` (por defecto) | Reemplaza todo el valor. | `password` → `********` |
+| `PREFIX` | Enmascara el comienzo y deja visibles los últimos caracteres. | `secret123` → `****et123` |
+| `SUFFIX` | Deja visible el comienzo y enmascara el final. | `secret123` → `secre****` |
+| `MIDDLE` | Deja visibles `length` caracteres a cada lado. | `4111111111111111` → `4111********1111` |
+| `HIDDEN` | Quita el campo del log. | el campo no aparece |
+| `CUSTOM` | Usa una [estrategia propia](#crea-tu-propia-estrategia) por nombre. | depende de la estrategia |
+
+Si no pones `length`, se usa `masking.default-length` (`4`).
+
+### Enmascara una clase completa
+
+En la clase, la anotación aplica a cada uno de sus campos. Un campo con su propia anotación usa la suya. Las subclases la heredan:
+
+```java
+@MaskedLogField(type = MaskType.MIDDLE, length = 2)
+public class ContactData {
+    private String phone;                                    // MIDDLE, como la clase
+    private String email;                                    // MIDDLE, como la clase
+    @MaskedLogField(type = MaskType.HIDDEN) private String note;   // el campo manda
+}
+```
+
+## Enmascara por nombre de campo
+
+Sin anotación, un campo se enmascara si su nombre está en la lista de nombres sensibles. Aplica a cualquier objeto (también de librerías de terceros), a los mapas, al MDC, a los key-values, a los headers y a los bodies.
+
+La lista por defecto es: `password`, `passwd`, `pwd`, `secret`, `token`, `accessToken`, `refreshToken`, `idToken`, `apiKey`, `authToken`, `authorization`, `proxyAuthorization`, `cookie`, `setCookie`, `cardNumber`, `cvv`, `cvc` y `pin`.
+
+- No importan mayúsculas ni separadores: `access_token`, `Access-Token` y `accessToken` son el mismo nombre.
+- En nombres con puntos cuenta el último tramo, sin el prefijo `x-`: `http.header.x-api-key` se enmascara como `apiKey`.
+- Se usa el tipo de `masking.default-type` (`FULL` por defecto).
+
+Para cambiar la lista:
+
+<Tabs syncKey="framework">
+<TabItem label="Spring Boot">
+```yaml
+pragma:
+  log:
+    masking:
+      fields: [password, token, cardNumber, documentId, phone]
+      default-type: MIDDLE
+      default-length: 2
+```
+</TabItem>
+<TabItem label="Quarkus">
+```properties
+pragma.log.masking.fields=password,token,cardNumber,documentId,phone
+pragma.log.masking.default-type=MIDDLE
+pragma.log.masking.default-length=2
+```
+</TabItem>
+<TabItem label="Java con Logback">
+```xml
+<encoder class="co.com.pragma.logging.logback.PragmaStructuredEncoder">
+  <maskFields>password,token,cardNumber,documentId,phone</maskFields>
+  <maskDefaultType>MIDDLE</maskDefaultType>
+  <maskDefaultLength>2</maskDefaultLength>
+</encoder>
+```
+</TabItem>
+</Tabs>
+
+<Aside type="caution" title="La lista reemplaza a la de por defecto">
+`masking.fields` no se suma a la lista por defecto: la reemplaza. Si la defines, incluye también los nombres por defecto que quieras conservar, como `password` y `token`.
+</Aside>
+
+## Crea tu propia estrategia
+
+Cuando ningún tipo sirve, implementa `MaskingStrategy`. Recibe el valor como texto, el carácter de máscara y la longitud de la anotación (o la de por defecto):
+
+```java
+package com.acme.logging;
+
+import co.com.pragma.logging.core.masking.MaskingStrategy;
+
+/** Deja visibles el código de país y los últimos 4 dígitos de un IBAN. */
+public class IbanMasking implements MaskingStrategy {
+
+    @Override
+    public String mask(String value, char maskChar, int length) {
+        if (value.length() <= 6) {
+            return String.valueOf(maskChar).repeat(value.length());
+        }
+        return value.substring(0, 2)
+                + String.valueOf(maskChar).repeat(value.length() - 6)
+                + value.substring(value.length() - 4);
+    }
+}
+```
+
+Regístrala con un nombre y úsala con `type = MaskType.CUSTOM`:
+
+<Tabs syncKey="framework">
+<TabItem label="Spring Boot">
+```yaml
+pragma:
+  log:
+    masking:
+      strategies:
+        iban: com.acme.logging.IbanMasking
+```
+</TabItem>
+<TabItem label="Quarkus">
+```properties
+pragma.log.masking.strategies.iban=com.acme.logging.IbanMasking
+```
+</TabItem>
+<TabItem label="Java con Logback">
+```xml
+<maskStrategy>iban=com.acme.logging.IbanMasking</maskStrategy>
+```
+</TabItem>
+</Tabs>
+
+```java
+public record Transfer(@MaskedLogField(type = MaskType.CUSTOM, strategy = "iban") String account) {}
+```
+
+La clase necesita un constructor público sin argumentos. Si la clase no existe o una anotación pide una estrategia que no está registrada, la app no arranca (en `logback.xml`, se reporta en el estado de Logback).
+
+## Busca datos dentro del texto con patrones
+
+Las anotaciones y los nombres no ven un dato metido en un texto, como `"cobrado a la tarjeta " + numero`. Los patrones lo buscan en el mensaje, en los textos del MDC y de los key-values (también dentro de objetos), en el stack trace y en el resumen `error`.
+
+| Patrón | Qué enmascara | Resultado |
+|---|---|---|
+| `CARD` | Números de tarjeta de 13 a 19 dígitos, con espacios o guiones, que pasan la validación de Luhn. | `4111 **** **** 1111` |
+| `EMAIL` | La parte local del correo, menos la primera letra. | `a********@example.com` |
+| `JWT` | El token completo. | `********` |
+| una regex | Lo que coincide. Si la regex tiene un grupo, solo el grupo. | `password=(\S+)` → `password=*******` |
+
+<Tabs syncKey="framework">
+<TabItem label="Spring Boot">
+```yaml
+pragma:
+  log:
+    masking:
+      patterns:
+        - CARD
+        - JWT
+        - 'password=(\S+)'
+```
+</TabItem>
+<TabItem label="Quarkus">
+```properties
+pragma.log.masking.patterns=CARD,JWT,password=(\\S+)
+```
+</TabItem>
+<TabItem label="Java con Logback">
+```xml
+<maskPattern>CARD</maskPattern>
+<maskPattern>JWT</maskPattern>
+<maskPattern>password=(\S+)</maskPattern>
+```
+</TabItem>
+</Tabs>
+
+```java
+log.info("Charged to card 4111 1111 1111 1111");
+```
+
+```json
+"message":"Charged to card 4111 **** **** 1111"
+```
+
+Los patrones están apagados por defecto. Cada uno recorre todos los logs, así que usa solo los que necesitas. La validación de Luhn evita enmascarar números que no son tarjetas, como IDs largos.
+
+## Ajusta el masking
+
+| Opción | Por defecto | Qué hace |
+|---|---|---|
+| `masking.enabled` | `true` | Apaga todo el masking. Úsalo solo en pruebas. |
+| `masking.character` | `*` | Carácter de la máscara. |
+| `masking.max-depth` | `10` | Profundidad máxima de objetos anidados. Más allá sale `"[max-depth]"`. |
+
+Las referencias circulares no rompen el log: el objeto que se repite sale como `"[circular]"`.
+
+## Qué pasa si el masking falla
+
+Si un objeto no se puede convertir (por ejemplo, un getter que lanza una excepción), el log se escribe igual: sin los argumentos, con el campo `pragmaLogError` y avisando a los listeners con `onMaskingError`. Nunca se escribe el objeto sin enmascarar.
+
+## Verifica que funciona
+
+Pon una prueba que loguee un objeto con datos sensibles y revise la salida. Con un `ListAppender` de Logback o leyendo el archivo de log de la app, comprueba que el valor real no aparece:
+
+```java
+assertThat(logOutput).doesNotContain("4111111111111111");
+```

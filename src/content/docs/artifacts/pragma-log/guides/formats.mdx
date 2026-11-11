@@ -1,0 +1,230 @@
+---
+title: Cómo elegir el formato de salida
+description: JSON compacto o indentado, XML, CSV, un formato propio y texto plano con colores para desarrollo local.
+sidebar:
+  order: 23
+---
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+`format` elige cómo se escribe cada log. Todos los formatos pasan por el mismo masking y la misma [organización de campos](../fields/).
+
+| `format` | Salida | Para qué |
+|---|---|---|
+| `json` (por defecto) | Un objeto JSON por línea. | Producción: lo leen todos los recolectores. |
+| `xml` | Un `<event>` por línea. | Sistemas que solo aceptan XML. |
+| `csv` | Columnas fijas separadas por un delimitador. | Archivos para hojas de cálculo o cargas masivas. |
+| `custom` | Lo que devuelva tu clase. | Un formato que no está en la lista. |
+| `plain` | Texto legible, con colores en la consola. | Desarrollo local. |
+
+<Tabs syncKey="framework">
+<TabItem label="Spring Boot">
+```yaml
+pragma:
+  log:
+    format: xml
+```
+</TabItem>
+<TabItem label="Quarkus">
+```properties
+pragma.log.format=xml
+```
+</TabItem>
+<TabItem label="Java con Logback">
+```xml
+<encoder class="co.com.pragma.logging.logback.PragmaStructuredEncoder">
+  <format>xml</format>
+</encoder>
+```
+Para `plain` usa otro encoder, `PragmaTextEncoder`. Lo explica [la sección de texto plano](#texto-plano-para-desarrollo-local).
+</TabItem>
+</Tabs>
+
+## JSON
+
+Es el formato por defecto: un objeto por línea, que es lo que esperan Elastic, Datadog, Loki, CloudWatch y el collector de OpenTelemetry.
+
+Para leerlo en local, `json.pretty: true` lo escribe indentado en varias líneas:
+
+```yaml
+pragma:
+  log:
+    json:
+      pretty: true
+```
+
+```json
+{
+  "timestamp" : "2026-11-11T10:15:30.123-05:00",
+  "level" : "INFO",
+  "message" : "Order placed"
+}
+```
+
+No lo uses en producción: los recolectores esperan un evento por línea y partirían cada log en varios. pragma-log avisa al arrancar si está activo. En `logback.xml` es `<pretty>true</pretty>`.
+
+## XML
+
+Un elemento `<event>` por línea. Los objetos son elementos anidados:
+
+```xml
+<event><timestamp>2026-11-11T10:15:30.123-05:00</timestamp><level>INFO</level><logger>com.acme.Orders</logger><thread>main</thread><message>Order placed</message><orderId>ORD-9</orderId><app>orders-service</app></event>
+```
+
+## CSV
+
+| Opción | Por defecto | Qué hace |
+|---|---|---|
+| `csv.columns` | `timestamp, level, logger, thread, message` | Columnas, por nombre de salida. Un campo anidado es una columna con puntos: `http.request.id`. |
+| `csv.delimiter` | `,` | Separador de columnas. |
+| `csv.header` | `false` | Escribe los nombres de las columnas al comienzo de cada archivo. Solo en `logback.xml` y Quarkus. |
+
+<Tabs syncKey="framework">
+<TabItem label="Spring Boot">
+```yaml
+pragma:
+  log:
+    format: csv
+    csv:
+      columns: [timestamp, level, requestId, message]
+      delimiter: ";"
+```
+</TabItem>
+<TabItem label="Quarkus">
+```properties
+pragma.log.format=csv
+pragma.log.csv.columns=timestamp,level,requestId,message
+pragma.log.csv.delimiter=;
+pragma.log.csv.header=true
+```
+</TabItem>
+<TabItem label="Java con Logback">
+```xml
+<format>csv</format>
+<csvColumns>timestamp,level,requestId,message</csvColumns>
+<csvDelimiter>;</csvDelimiter>
+<csvHeader>true</csvHeader>
+```
+</TabItem>
+</Tabs>
+
+```text
+2026-11-11T10:15:30.123-05:00;INFO;req-7;Order placed
+```
+
+Los objetos van como JSON dentro de la columna y los saltos de línea como `\n`, así cada log ocupa una sola línea.
+
+## Formato propio
+
+Implementa `LogEventFormatter`. Recibe los campos ya enmascarados, renombrados y ordenados, y devuelve el texto del log, terminado en salto de línea:
+
+```java
+package com.acme.logging;
+
+import co.com.pragma.logging.core.format.LogEventFormatter;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/** Escribe clave=valor separados por espacios. */
+public class KeyValueFormatter implements LogEventFormatter {
+
+    @Override
+    public String format(Map<String, Object> event) {
+        return event.entrySet().stream()
+                .map(e -> e.getKey() + "=" + e.getValue())
+                .collect(Collectors.joining(" ", "", System.lineSeparator()));
+    }
+
+    @Override
+    public String header() {
+        return null; // una línea al comienzo de cada archivo, o null para ninguna
+    }
+}
+```
+
+<Tabs syncKey="framework">
+<TabItem label="Spring Boot">
+```yaml
+pragma:
+  log:
+    format: custom
+    custom-formatter: com.acme.logging.KeyValueFormatter
+```
+</TabItem>
+<TabItem label="Quarkus">
+```properties
+pragma.log.format=custom
+pragma.log.custom-formatter=com.acme.logging.KeyValueFormatter
+```
+</TabItem>
+<TabItem label="Java con Logback">
+```xml
+<format>custom</format>
+<customFormatter>com.acme.logging.KeyValueFormatter</customFormatter>
+```
+</TabItem>
+</Tabs>
+
+- La clase necesita un constructor público sin argumentos y debe ser segura para varios hilos.
+- Los valores son `String`, `Number`, `Boolean` o `null`; los objetos logueados llegan como `JsonNode` de Jackson, y los campos anidados (`$.a.b`), `error` y `extra` como `Map<String, Object>`.
+- Si tu formatter lanza una excepción con un evento, ese evento sale en JSON y se reporta. El log no se pierde.
+
+## Texto plano para desarrollo local
+
+`format: plain` cambia el JSON por una línea legible. El masking es el mismo: ningún secreto que el JSON oculta aparece en el texto.
+
+```text
+2026-11-11 10:15:30.123  INFO [main] c.a.orders.CustomerResource : Customer found: {"id":"1","cardNumber":"4111********1111"} requestId=req-1
+```
+
+- Los campos del MDC y los key-values van al final como `nombre=valor`. El stack trace, acotado, va en las líneas siguientes.
+- `app`, `host` y los campos fijos no salen en texto.
+- `timestamp.pattern` y `timestamp.zone` aplican igual. En texto el patrón por defecto es `yyyy-MM-dd HH:mm:ss.SSS`.
+
+### Colores
+
+En la consola, el nivel sale con color, el timestamp tenue y el logger en cian. Los archivos de log nunca llevan colores.
+
+| Opción | Por defecto | Qué hace |
+|---|---|---|
+| `color.mode` | `auto` | `auto`: solo en una terminal y nunca con la variable `NO_COLOR`. `always`: también en la consola del IDE, que no se detecta como terminal. `never`: sin colores. |
+| `color.levels` | `ERROR` rojo, `WARN` amarillo, `INFO` verde, `DEBUG` cian, `TRACE` tenue | Color por nivel, con nombre (`red`, `bright_blue`, `faint`…) o hex (`#ff8800`). |
+
+<Tabs syncKey="framework">
+<TabItem label="Spring Boot">
+```yaml
+pragma:
+  log:
+    format: plain
+    color:
+      mode: always
+      levels:
+        INFO: blue
+        WARN: "#ff8800"
+```
+</TabItem>
+<TabItem label="Quarkus">
+```properties
+%dev.pragma.log.format=plain
+%dev.pragma.log.color.mode=always
+%dev.pragma.log.color.levels.INFO=blue
+%dev.pragma.log.color.levels.WARN=#ff8800
+```
+</TabItem>
+<TabItem label="Java con Logback">
+```xml
+<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+  <encoder class="co.com.pragma.logging.logback.PragmaTextEncoder">
+    <color>ALWAYS</color>
+    <levelColor>INFO=blue</levelColor>
+    <levelColor>WARN=#ff8800</levelColor>
+  </encoder>
+</appender>
+```
+`PragmaTextEncoder` acepta las mismas opciones de masking, stack trace, timestamp y `hideFields` que el encoder JSON. En los appenders de archivo pon `<color>NEVER</color>`.
+</TabItem>
+</Tabs>
+
+<Aside type="tip" title="Texto en local, JSON en los demás ambientes">
+Activa `plain` solo con un perfil: `application-local.yml` en Spring Boot o el prefijo `%dev.` en Quarkus. Así nadie despliega texto plano por error.
+</Aside>

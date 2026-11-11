@@ -1,0 +1,73 @@
+---
+title: How to write logs asynchronously
+description: Asynchronous logging that doesn't lose logs, in Spring Boot, Quarkus and Java with Logback.
+sidebar:
+  order: 33
+---
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+With asynchronous logging, `log.info(...)` returns right away and another thread masks, formats and writes the log. It helps when logging shows up in your performance profiles, for example with many logs per request or with a slow output.
+
+<Tabs syncKey="framework">
+<TabItem label="Spring Boot">
+```yaml
+pragma:
+  log:
+    async:
+      enabled: true
+```
+It wraps the Spring Boot console and file appenders.
+
+| Option | Default | What it does |
+|---|---|---|
+| `async.enabled` | `false` | Turns on asynchronous logging. |
+| `async.queue-size` | `8192` | Logs that can wait to be written. |
+| `async.never-block` | `false` | `true` discards logs when the queue is full, instead of making the caller wait. |
+| `async.max-flush-time` | `5s` | Maximum time to write the pending logs when the app shuts down. |
+</TabItem>
+<TabItem label="Quarkus">
+Use Quarkus's own async. The pragma-log format applies the same way:
+```properties
+quarkus.log.console.async=true
+quarkus.log.file.async=true
+```
+</TabItem>
+<TabItem label="Java with Logback">
+Wrap the real appender with `PragmaAsyncAppender`:
+```xml
+<configuration>
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="co.com.pragma.logging.logback.PragmaStructuredEncoder"/>
+  </appender>
+
+  <appender name="ASYNC" class="co.com.pragma.logging.logback.PragmaAsyncAppender">
+    <queueSize>8192</queueSize>
+    <appender-ref ref="CONSOLE"/>
+  </appender>
+
+  <root level="INFO">
+    <appender-ref ref="ASYNC"/>
+  </root>
+</configuration>
+```
+It accepts the properties of Logback's `AsyncAppender`, like `queueSize`, `neverBlock` and `maxFlushTime`, with the same defaults as Spring Boot.
+</TabItem>
+</Tabs>
+
+## No log gets lost
+
+Logback's default `AsyncAppender` discards `INFO`, `DEBUG` and `TRACE` logs when the queue is 80 % full. pragma-log discards nothing:
+
+- When the queue is full, the caller waits until there's room. With `never-block: true` you choose discarding over waiting.
+- When the app shuts down, the pending logs are written, up to `max-flush-time`.
+
+## The context is the one from the logging thread
+
+The MDC and the enricher fields are taken on the thread that called `log.info(...)`, not on the one that writes. Your logs carry the right `requestId` even if they're written later, on another thread.
+
+In Quarkus, Quarkus's async calls the enrichers on the thread that writes. For request data, use the MDC.
+
+<Aside type="caution" title="Don't change an object after you log it">
+Objects are masked and turned into JSON on the thread that writes. If you change an object right after logging it, the log can show the new value. Log immutable objects, like records, or copies.
+</Aside>
