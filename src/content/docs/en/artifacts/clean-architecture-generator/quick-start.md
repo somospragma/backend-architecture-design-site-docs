@@ -95,4 +95,4 @@ To see everything you generated:
 
 - [Choose the architecture](../guides/architectures/) that best fits your service.
 - See every option of each command in the [tasks reference](../reference/tasks/).
-- Review the available [input](../reference/entry-points/) and [output adapters](../reference/driven-adapters/).
+- Review the available [input](../entry-points/overview/) and [output adapters](../driven-adapters/overview/).
