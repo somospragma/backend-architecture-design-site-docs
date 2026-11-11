@@ -54,7 +54,7 @@ When each request finishes, a log with the status and the duration comes out, fr
 {"level":"INFO","logger":"co.com.pragma.logging.http","message":"HTTP GET /orders/7 200 in 12 ms","requestId":"req-7","http.method":"GET","http.path":"/orders/7","http.status":200,"http.durationMs":12}
 ```
 
-- Unhandled exceptions come out with `500` and Spring's with their status (`404`, `400`…).
+- Unhandled exceptions come out with `500` and Spring's with their status (`404`, `400`…). In Spring Boot, when the status is `500` or higher because of an unhandled exception, the log is an `ERROR` with the exception, so the stack trace carries the `requestId` and the rest of the context. The container (Tomcat or WebFlux) also writes its own log of that exception, without the request context.
 - If the client cancels the request (for example, in WebFlux), the message is `HTTP GET /orders/7 cancelled after 12 ms`.
 - It doesn't come out for the routes in `request-log.exclude-paths`: `/actuator/**` in Spring Boot and `/q/**` in Quarkus. The patterns are Ant-style (`*` one segment, `**` several).
 
@@ -167,7 +167,7 @@ pragma.log.http.body.max-size=4K
 | `http.body.content-types` | JSON, `application/*+json`, forms, XML and `text/*` | Types that are captured. Binary ones never are. |
 
 - JSON and form bodies are turned into objects and masked like any object: by field name at any depth and by patterns. The rest of the text (XML, plain text) only goes through the patterns.
-- In Quarkus, the response body is the object the endpoint returns, so its `@MaskedLogField` annotations apply too. This applies to Quarkus REST endpoints.
+- The response body is the object the endpoint returns, so its `@MaskedLogField` annotations apply too. This applies to Spring MVC and WebFlux `@RestController`s and to Quarkus REST endpoints. If the endpoint returns a `Flux`, its first 100 elements come out. Text, binary and functional (`RouterFunction`) responses are logged as bytes and only masked by name and by patterns.
 - Bodies are copied as they pass through, without reading them ahead of time or keeping them whole in memory.
 
 <Aside type="caution" title="Turn on bodies with care">

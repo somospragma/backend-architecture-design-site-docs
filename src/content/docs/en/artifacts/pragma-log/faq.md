@@ -58,7 +58,7 @@ Use the BOM:
 
 ```kotlin
 dependencies {
-    implementation(platform("co.com.pragma.logging:pragma-log-bom:1.0.0"))
+    implementation(platform("co.com.pragma.logging:pragma-log-bom:1.0.1"))
     implementation("co.com.pragma.logging:pragma-log-spring-boot-starter")
 }
 ```

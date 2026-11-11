@@ -195,8 +195,9 @@ pragma:
 </TabItem>
 <TabItem label="Quarkus">
 ```properties
-pragma.log.masking.patterns=CARD,JWT,password=(\\S+)
+pragma.log.masking.patterns=CARD,JWT,password=(\\\\S+)
 ```
+En `application.properties` cada `\` de una regex de esta lista se escribe `\\\\`: el convertidor de listas de Quarkus consume un nivel de escape más que un valor simple. Con `\\S` el patrón queda como `S+` y no enmascara nada.
 </TabItem>
 <TabItem label="Java con Logback">
 ```xml

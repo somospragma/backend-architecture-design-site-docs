@@ -47,6 +47,8 @@ Use Logback's `scan`. It rereads `logback.xml` when it changes and creates new e
   ...
 </configuration>
 ```
+
+`scan` only works with a `logback.xml` on disk, for example with `-Dlogback.configurationFile=/path/logback.xml`. If the file is inside the jar (`src/main/resources`), Logback can't watch it: it warns at startup and prints its whole internal status.
 </TabItem>
 </Tabs>
 

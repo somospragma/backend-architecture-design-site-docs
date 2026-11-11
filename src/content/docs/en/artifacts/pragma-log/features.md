@@ -5,7 +5,7 @@ sidebar:
   order: 3
 ---
 
-This page lists every feature of pragma-log `1.0.0`, grouped by topic. Each row says which integration it works in and links to the page that explains how to use it.
+This page lists every feature of pragma-log `1.0.1`, grouped by topic. Each row says which integration it works in and links to the page that explains how to use it.
 
 **Spring** is the Spring Boot 3.5 and 4.x starter (MVC and WebFlux). **Quarkus** is the extension for Quarkus 3.33 or later. **Java** is `logback.xml` without a framework. ✓ works; — doesn't apply to that integration.
 

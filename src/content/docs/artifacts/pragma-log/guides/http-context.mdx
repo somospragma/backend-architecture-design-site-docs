@@ -54,7 +54,7 @@ Al terminar cada request sale un log con el status y la duración, desde el logg
 {"level":"INFO","logger":"co.com.pragma.logging.http","message":"HTTP GET /orders/7 200 in 12 ms","requestId":"req-7","http.method":"GET","http.path":"/orders/7","http.status":200,"http.durationMs":12}
 ```
 
-- Las excepciones no manejadas salen con `500` y las de Spring con su status (`404`, `400`…).
+- Las excepciones no manejadas salen con `500` y las de Spring con su status (`404`, `400`…). En Spring Boot, cuando el status es `500` o mayor por una excepción no manejada, el log sale en `ERROR` con la excepción: así el stack trace lleva el `requestId` y el resto del contexto. El contenedor (Tomcat o WebFlux) escribe además su propio log de esa excepción, ya sin el contexto del request.
 - Si el cliente cancela el request (por ejemplo, en WebFlux), el mensaje es `HTTP GET /orders/7 cancelled after 12 ms`.
 - No sale para las rutas de `request-log.exclude-paths`: `/actuator/**` en Spring Boot y `/q/**` en Quarkus. Los patrones son del estilo Ant (`*` un tramo, `**` varios).
 
@@ -167,7 +167,7 @@ pragma.log.http.body.max-size=4K
 | `http.body.content-types` | JSON, `application/*+json`, formularios, XML y `text/*` | Tipos que se capturan. Los binarios nunca. |
 
 - Los bodies JSON y de formulario se convierten en objetos y se enmascaran como cualquier objeto: por nombre de campo a cualquier profundidad y por patrones. El resto del texto (XML, texto plano) solo pasa por los patrones.
-- En Quarkus, el body de la respuesta es el objeto que retorna el endpoint, así que también aplican sus `@MaskedLogField`. Aplica a los endpoints de Quarkus REST.
+- El body de la respuesta es el objeto que retorna el endpoint, así que también aplican sus `@MaskedLogField`. Aplica a los `@RestController` de Spring MVC y WebFlux y a los endpoints de Quarkus REST. Si el endpoint retorna un `Flux`, salen sus primeros 100 elementos. Las respuestas de texto, binarias o de funciones (`RouterFunction`) se loguean como bytes y solo se enmascaran por nombre y por patrones.
 - Los bodies se copian a medida que pasan, sin leerlos por adelantado ni guardarlos completos en memoria.
 
 <Aside type="caution" title="Activa los bodies con cuidado">

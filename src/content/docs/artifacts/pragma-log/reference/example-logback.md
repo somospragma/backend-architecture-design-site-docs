@@ -7,9 +7,11 @@ sidebar:
 
 Este `logback.xml` tiene todas las propiedades del encoder de pragma-log, agrupadas y comentadas, con logging asíncrono. Es la misma configuración que la de [Spring Boot](../example-spring-boot/). Se probó con una app Java sin framework: escribe todos los logs, incluidos los pendientes al terminar la app.
 
+`scan` solo funciona si el archivo está en disco (`-Dlogback.configurationFile=/ruta/logback.xml`). Si lo dejas en `src/main/resources`, quita `scan` y `scanPeriod`: dentro del jar Logback no puede vigilarlo y lo avisa al arrancar.
+
 ```xml
 <!-- src/main/resources/logback.xml -->
-<configuration scan="true" scanPeriod="30 seconds">  <!-- scan: aplica cambios sin reiniciar -->
+<configuration scan="true" scanPeriod="30 seconds">  <!-- scan: aplica cambios sin reiniciar; solo con el archivo en disco -->
 
   <!-- Al apagar la app escribe los logs pendientes del appender asíncrono -->
   <shutdownHook/>
