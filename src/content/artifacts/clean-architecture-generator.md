@@ -6,7 +6,7 @@ summary:
 description:
   es: Crea el proyecto con sus capas, pruebas de arquitectura con ArchUnit y la configuración de calidad. Después genera entidades, casos de uso y adaptadores (REST, GraphQL, gRPC, SQS, MongoDB, PostgreSQL, Redis, DynamoDB) en Spring Boot reactivo o imperativo.
   en: It creates the project with its layers, ArchUnit architecture tests and quality setup. Then it generates entities, use cases and adapters (REST, GraphQL, gRPC, SQS, MongoDB, PostgreSQL, Redis, DynamoDB) on reactive or imperative Spring Boot.
-install: id("co.com.pragma.archetype-generator") version "1.1.0"
+install: id("co.com.pragma.archetype-generator") version "1.1.1"
 kind: plugin
 disciplines: [backend, dx]
 languages: [java, kotlin]
@@ -14,11 +14,14 @@ technologies: [spring-boot, spring-webflux, gradle]
 origin: official
 owners: [somospragma/backend-chapter]
 repository: https://github.com/somospragma/backend-architecture-design-archetype-generator-core
+registry:
+  type: gradle-plugin-portal
+  id: co.com.pragma.archetype-generator
+  url: https://plugins.gradle.org/plugin/co.com.pragma.archetype-generator
 status: stable
 license: Apache-2.0
 docs:
-  mode: indexed
-  url: https://github.com/somospragma/backend-architecture-design-archetype-generator-core#readme
+  mode: hosted
 tags: [arquitectura limpia, clean architecture, hexagonal, onion, microservicio, microservice, generador, scaffold, adaptadores, adapters, archunit]
 lastReviewed: 2026-11-11
 ---
