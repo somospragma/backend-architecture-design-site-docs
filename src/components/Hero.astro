@@ -1,34 +1,43 @@
 ---
 // Reemplaza el Hero de Starlight. Solo lo usa la página inicial (la única con `hero` en el frontmatter).
-// El título lleva dentro una ventana con la salida real del Clean Architecture Generator:
-// lo que "no empezar desde cero" quiere decir. El texto va en CSS (::before) para que no cuente como parte del título. Debajo, el círculo del isotipo sale como un horizonte.
-import { home, generatorRun } from './home/copy';
-import { sitePath } from '../lib/artifacts';
+// A la izquierda, qué es el hub; a la derecha, fichas reales del catálogo para que se vea qué hay dentro.
+import { home } from './home/copy';
+import { kindLabels, statusLabels } from '../i18n/catalog';
+import { artifactPath, getVisibleArtifacts, sitePath } from '../lib/artifacts';
 
 const lang = Astro.locals.starlightRoute.lang === 'en' ? 'en' : 'es';
 const t = home[lang];
 // Starlight enlaza "volver arriba" y el salto de contenido a este id (PAGE_TITLE_ID, no exportado).
 const PAGE_TITLE_ID = '_top';
+const preview = (await getVisibleArtifacts()).slice(0, 3);
 ---
 
 <section class="ph-hero not-content" data-lang={lang}>
-	<h1 id={PAGE_TITLE_ID}>
-		<span class="ph-hero__line">{t.title[0]}</span>
-		<span class="ph-hero__line">
-			{t.title[1]}
-			<span class="ph-slot" data-ui aria-hidden="true">
-				<span class="ph-slot__run" data-run={[...generatorRun, ...generatorRun].join('\n')}></span>
-			</span>
-			{t.title[2]}
-		</span>
-	</h1>
-	<p class="ph-horizon">
-		<span>{t.lead[0]}</span> <span>{t.lead[1]}</span>
-	</p>
-	<div class="ph-hero__action">
-		<a class="ph-btn ph-btn--paper" href={sitePath(lang, 'catalog/')}>
-			{t.action}
-		</a>
+	<div class="ph-hero__text">
+		<h1 id={PAGE_TITLE_ID}>{t.title}</h1>
+		<p class="ph-hero__lead">{t.lead}</p>
+		<div class="ph-hero__actions">
+			<a class="ph-btn ph-btn--primary" href={sitePath(lang, 'catalog/')}>
+				{t.explore}
+			</a>
+			<a class="ph-btn ph-btn--line" href={sitePath(lang, 'contribute/')}>
+				{t.contribute}
+			</a>
+		</div>
 	</div>
-	<div class="ph-sun ph-shutter" aria-hidden="true"></div>
+	{preview.length > 0 && (
+		<ul class="ph-preview" role="list" aria-label={t.previewLabel}>
+			{preview.map(({ id, data }) => (
+				<li>
+					<a href={artifactPath(lang, id)}>
+						<span class="ph-preview__meta">
+							{kindLabels[lang][data.kind]} · {statusLabels[lang][data.status]}
+						</span>
+						<span class="ph-preview__name">{data.name}</span>
+						<span class="ph-preview__summary">{data.summary[lang]}</span>
+					</a>
+				</li>
+			))}
+		</ul>
+	)}
 </section>
