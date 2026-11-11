@@ -25,3 +25,6 @@ src/styles/tokens.css
 
 # artefactos de trabajo de la skill de diseño
 .taste-skill/
+
+# cobertura de vitest (pnpm test:coverage)
+coverage/

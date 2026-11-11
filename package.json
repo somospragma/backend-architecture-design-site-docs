@@ -16,6 +16,7 @@
     "format:check": "prettier --check .",
     "typecheck": "pnpm tokens && astro check",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "knip": "knip",
     "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm knip && pnpm check:contrast && pnpm check:reviews"
   },
@@ -34,6 +35,7 @@
   "devDependencies": {
     "@astrojs/check": "0.9.12",
     "@eslint/js": "10.0.1",
+    "@vitest/coverage-v8": "5.1.0",
     "eslint": "10.14.0",
     "eslint-plugin-astro": "3.2.1",
     "globals": "17.14.0",

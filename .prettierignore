@@ -1,5 +1,6 @@
 # Prettier solo revisa código. La prosa (Markdown, MDX), los YAML y lo generado quedan fuera.
 dist/
+coverage/
 .astro/
 .taste-skill/
 .claude/

@@ -56,7 +56,7 @@ En [.claude/skills/](.claude/skills/) hay skills para que cualquier asistente ha
 
 | Workflow | Cuándo | Qué hace |
 |---|---|---|
-| `ci.yml` | Cada PR y `main` | **Calidad**, en jobs paralelos: ESLint y Prettier, tipos (`astro check`), pruebas (vitest), código muerto (knip), contraste de la marca y fichas sin revisar. Si todo pasa, **Build**: construye el sitio (valida el schema de las fichas) y revisa los enlaces internos. |
+| `ci.yml` | Cada PR y `main` | **Calidad**, en jobs paralelos: ESLint y Prettier, tipos (`astro check`), pruebas (vitest), código muerto (knip), contraste de la marca, fichas sin revisar y SonarCloud con la cobertura de vitest. Si todo pasa, **Build**: construye el sitio (valida el schema de las fichas) y revisa los enlaces internos. |
 | `security.yml` | Cada PR, `main` y los lunes | Secretos con gitleaks en toda la historia, CodeQL para TypeScript y para los workflows, zizmor, `pnpm audit` y revisión de dependencias nuevas en el PR. |
 | `deploy.yml` | `main` | Corre CI y seguridad en paralelo, **espera aprobación** en el environment `production` y publica en GitHub Pages el mismo build que validó el CI. Está apagado hasta que exista la variable `DEPLOY_ENABLED=true`. |
 

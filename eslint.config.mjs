@@ -7,7 +7,7 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig(
-	{ ignores: ['dist/', '.astro/', '.taste-skill/', 'src/styles/tokens.css'] },
+	{ ignores: ['dist/', 'coverage/', '.astro/', '.taste-skill/', 'src/styles/tokens.css'] },
 	js.configs.recommended,
 	tseslint.configs.recommended,
 	astro.configs.recommended,
