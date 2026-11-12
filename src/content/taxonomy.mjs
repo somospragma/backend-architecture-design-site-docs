@@ -117,8 +117,11 @@ export const TECHNOLOGIES = {
 	kafka: 'Kafka',
 	rabbitmq: 'RabbitMQ',
 	postgresql: 'PostgreSQL',
+	mysql: 'MySQL',
+	oracle: 'Oracle',
 	mongodb: 'MongoDB',
 	opentelemetry: 'OpenTelemetry',
+	kiro: 'Kiro',
 };
 
 /** @param {object} o */
