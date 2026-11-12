@@ -17,8 +17,7 @@ repository: https://github.com/somospragma/pragma-ia-kiro-custom-powers
 status: experimental
 license: Apache-2.0
 docs:
-  mode: indexed
-  url: https://github.com/somospragma/pragma-ia-kiro-custom-powers#readme
+  mode: hosted
 tags: [kiro, power, mcp, base de datos, database, sql, consultas, queries, csv, ia, ai, agente, agent]
 lastReviewed: 2026-11-12
 ---
