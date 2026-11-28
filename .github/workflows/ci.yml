@@ -79,11 +79,12 @@ jobs:
       - name: vitest
         run: pnpm test
 
-  # Análisis de SonarCloud con la cobertura de vitest. No lo corre deploy.yml (publish) ni un PR desde un fork,
-  # porque ahí no hay SONAR_TOKEN. El build no depende de este job: si SonarCloud falla, no frena el despliegue.
+  # Análisis de SonarCloud con la cobertura de vitest. No lo corre deploy.yml (publish), ni un PR desde un fork,
+  # ni un PR de Dependabot, porque ahí no hay SONAR_TOKEN. El build no depende de este job: si SonarCloud falla,
+  # no frena el despliegue.
   sonar:
     name: Calidad · SonarCloud
-    if: ${{ !inputs.publish && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+    if: ${{ !inputs.publish && github.actor != 'dependabot[bot]' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
