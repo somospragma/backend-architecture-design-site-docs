@@ -13,7 +13,7 @@ function readArtifacts(includeDrafts) {
 	return readdirSync(ARTIFACTS_DIR)
 		.filter((file) => file.endsWith('.md'))
 		.map((file) => {
-			const frontmatter = readFileSync(new URL(file, ARTIFACTS_DIR), 'utf8').match(/^---\n([\s\S]*?)\n---/)?.[1];
+			const frontmatter = /^---\n([\s\S]*?)\n---/.exec(readFileSync(new URL(file, ARTIFACTS_DIR), 'utf8'))?.[1];
 			return { slug: file.replace(/\.md$/, ''), ...parse(frontmatter ?? '') };
 		})
 		.filter((a) => a.kind in KINDS && (includeDrafts || !a.draft));
@@ -25,7 +25,7 @@ export function draftArtifactSlugs() {
 	return readdirSync(ARTIFACTS_DIR)
 		.filter((file) => file.endsWith('.md'))
 		.filter((file) => {
-			const frontmatter = readFileSync(new URL(file, ARTIFACTS_DIR), 'utf8').match(/^---\n([\s\S]*?)\n---/)?.[1];
+			const frontmatter = /^---\n([\s\S]*?)\n---/.exec(readFileSync(new URL(file, ARTIFACTS_DIR), 'utf8'))?.[1];
 			return parse(frontmatter ?? '')?.draft === true;
 		})
 		.map((file) => file.replace(/\.md$/, ''));
@@ -52,7 +52,7 @@ function hostedItems(slug) {
 	const pages = entries
 		.filter((e) => e.isFile() && /\.mdx?$/.test(e.name))
 		.map((e) => {
-			const frontmatter = readFileSync(new URL(e.name, dir), 'utf8').match(/^---\n([\s\S]*?)\n---/)?.[1];
+			const frontmatter = /^---\n([\s\S]*?)\n---/.exec(readFileSync(new URL(e.name, dir), 'utf8'))?.[1];
 			const name = e.name.replace(/\.mdx?$/, '');
 			return {
 				order: parse(frontmatter ?? '')?.sidebar?.order ?? 50,

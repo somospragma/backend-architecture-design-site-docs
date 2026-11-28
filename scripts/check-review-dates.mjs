@@ -13,7 +13,7 @@ limit.setUTCMonth(limit.getUTCMonth() - MAX_AGE_MONTHS);
 let stale = 0;
 for (const file of readdirSync(DIR).filter((f) => f.endsWith('.md'))) {
 	const source = readFileSync(new URL(file, DIR), 'utf8');
-	const frontmatter = source.match(/^---\n([\s\S]*?)\n---/)?.[1];
+	const frontmatter = /^---\n([\s\S]*?)\n---/.exec(source)?.[1];
 	if (!frontmatter) continue;
 	const { lastReviewed, owners = [] } = parse(frontmatter);
 	const reviewed = new Date(lastReviewed);
