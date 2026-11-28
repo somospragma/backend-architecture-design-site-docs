@@ -79,11 +79,12 @@ jobs:
       - name: vitest
         run: pnpm test
 
-  # Análisis de SonarCloud con la cobertura de vitest. No lo corre deploy.yml (publish) ni un PR desde un fork,
-  # porque ahí no hay SONAR_TOKEN. El build no depende de este job: si SonarCloud falla, no frena el despliegue.
+  # Análisis de SonarCloud con la cobertura de vitest. No lo corren deploy.yml (publish), los PRs desde un fork
+  # ni los PRs de Dependabot, porque ahí no llega SONAR_TOKEN; SonarCloud analiza esos cambios al llegar a main.
+  # El build no depende de este job: si SonarCloud falla, no frena el despliegue.
   sonar:
     name: Calidad · SonarCloud
-    if: ${{ !inputs.publish && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+    if: ${{ !inputs.publish && (github.event_name != 'pull_request' || (github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.user.login != 'dependabot[bot]')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -185,3 +186,5 @@ jobs:
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: dist
+          # El despliegue espera la aprobación de production hasta 30 días; el sitio construido tiene que seguir ahí.
+          retention-days: 30

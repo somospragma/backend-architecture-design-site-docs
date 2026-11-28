@@ -37,7 +37,7 @@ function hubDocsLoader(): Loader {
 			await base.load(context);
 			if (isDev) return;
 			const prefixes = draftArtifactSlugs().flatMap((slug) => [`artifacts/${slug}`, `en/artifacts/${slug}`]);
-			for (const id of [...context.store.keys()]) {
+			for (const id of context.store.keys()) {
 				if (prefixes.some((prefix) => id === prefix || id.startsWith(`${prefix}/`))) context.store.delete(id);
 			}
 		},
